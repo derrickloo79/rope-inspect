@@ -34,7 +34,6 @@
           <div>
             <%= f.label :site_name, "Site / location", class: "field-label" %>
             <%= f.text_field :site_name, class: "field-input", required: true, placeholder: "e.g. Seletar South Link, N109, etc.." %>
-            <p class="field-hint">Construction site name, address, or plot reference.</p>
           </div>
 
           <div>
@@ -52,20 +51,21 @@
 
     <section class="card">
       <div class="card-section">
-        <div class="flex items-start justify-between gap-4 mb-4">
-          <div>
-            <h2 class="section-label">Cranes to inspect</h2>
-            <p class="text-sm text-[--color-ink-muted] mt-1">Add every lifting machine that needs a rope inspection.</p>
-          </div>
-          <button type="button" class="btn-secondary !py-1.5 !px-3 text-sm shrink-0" data-action="nested-form#add">
-            + Add crane
-          </button>
+        <div class="mb-4">
+          <h2 class="section-label">Cranes to inspect</h2>
+          <p class="text-sm text-[--color-ink-muted] mt-1">Add rope diameter is this order: Aux / Main / Boom.</p>
         </div>
 
         <div class="space-y-4" data-nested-form-target="container">
           <%= f.fields_for :cranes do |crane_form| %>
             <%= render "crane_fields", f: crane_form %>
           <% end %>
+        </div>
+
+        <div class="mt-4">
+          <button type="button" class="btn-secondary !py-1.5 !px-3 text-sm" data-action="nested-form#add">
+            + Add crane
+          </button>
         </div>
 
         <template data-nested-form-target="template">
@@ -76,8 +76,14 @@
       </div>
     </section>
 
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
-      <%= f.submit "Submit request", class: "btn-primary cursor-pointer" %>
+    <div class="flex flex-col pt-1 sm:flex-row sm:justify-end">
+      <button type="submit" class="btn-primary cursor-pointer">
+        Submit request
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14" />
+          <path d="M13 6l6 6-6 6" />
+        </svg>
+      </button>
     </div>
   <% end %>
 </div>
