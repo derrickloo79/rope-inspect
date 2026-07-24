@@ -1,4 +1,4 @@
-# RopeInspect
+# Hey Tec Rope Inspection Booking App
 
 Construction crane **wire rope inspection** requests — public intake form, internal staff dashboard, and shareable job status pages.
 
