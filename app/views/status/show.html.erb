@@ -18,15 +18,27 @@
           <li class="flex gap-4 pb-8 last:pb-0">
             <div class="flex flex-col items-center">
               <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold
-                <%= event[:done] ? 'border-green-600 bg-green-600 text-white' : 'border-[--color-line-strong] bg-white text-[--color-ink-faint]' %>">
-                <% if event[:done] %>✓<% else %><%= index + 1 %><% end %>
+                <%= if event[:failed]
+                      'border-red-300 bg-red-100 text-red-700'
+                    elsif event[:done]
+                      'border-green-600 bg-green-600 text-white'
+                    else
+                      'border-[--color-line-strong] bg-white text-[--color-ink-faint]'
+                    end %>">
+                <%= timeline_marker_content(event, index) %>
               </span>
               <% unless index == @inspection_request.status_timeline.length - 1 %>
-                <span class="w-px flex-1 mt-1 <%= event[:done] ? 'bg-green-300' : 'bg-[--color-line]' %>"></span>
+                <span class="w-px flex-1 mt-1 <%= event[:failed] ? 'bg-red-200' : (event[:done] ? 'bg-green-300' : 'bg-[--color-line]') %>"></span>
               <% end %>
             </div>
             <div class="pt-1 min-w-0">
-              <p class="font-medium text-[--color-ink] <%= 'text-[--color-ink-faint]' unless event[:done] %>">
+              <p class="font-medium <%= if event[:failed]
+                                          'text-red-700'
+                                        elsif event[:done]
+                                          'text-[--color-ink]'
+                                        else
+                                          'text-[--color-ink-faint]'
+                                        end %>">
                 <%= event[:label] %>
               </p>
               <% if event[:at].present? %>

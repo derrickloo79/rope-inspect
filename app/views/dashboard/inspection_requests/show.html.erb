@@ -66,12 +66,11 @@
           <ol>
             <% @inspection_request.status_timeline.each_with_index do |event, index| %>
               <li class="flex gap-3 pb-5 last:pb-0">
-                <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold
-                  <%= event[:done] ? 'bg-green-600 text-white' : 'bg-stone-200 text-stone-500' %>">
-                  <% if event[:done] %>✓<% else %><%= index + 1 %><% end %>
+                <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold <%= timeline_marker_classes(event) %>">
+                  <%= timeline_marker_content(event, index) %>
                 </span>
                 <div>
-                  <p class="text-sm font-medium"><%= event[:label] %></p>
+                  <p class="text-sm font-medium <%= 'text-red-700' if event[:failed] %>"><%= event[:label] %></p>
                   <p class="text-xs text-[--color-ink-muted]">
                     <%= event[:at].present? ? format_datetime(event[:at]) : "—" %>
                     <% if event[:detail].present? %> · <%= event[:detail] %><% end %>
@@ -94,9 +93,18 @@
                           accept_dashboard_inspection_request_path(@inspection_request),
                           method: :patch,
                           class: "btn-primary w-full cursor-pointer" %>
+            <%= button_to "Reject request",
+                          reject_dashboard_inspection_request_path(@inspection_request),
+                          method: :patch,
+                          class: "btn-danger w-full cursor-pointer",
+                          form: { data: { turbo_confirm: "Reject this inspection request?" } } %>
             <p class="text-xs text-[--color-ink-muted]">
               Accepting creates a public status link you can share with the client.
             </p>
+          <% end %>
+
+          <% if @inspection_request.rejected? %>
+            <p class="text-sm text-[--color-ink-muted]">This request was rejected.</p>
           <% end %>
 
           <% if @inspection_request.accepted? || @inspection_request.scheduled? %>

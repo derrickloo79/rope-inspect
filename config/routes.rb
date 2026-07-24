@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     resources :inspection_requests, only: [ :index, :show ], path: "jobs" do
       member do
         patch :accept
+        patch :reject
         patch :schedule
         patch :complete
       end

@@ -1,6 +1,6 @@
 module Dashboard
   class InspectionRequestsController < BaseController
-    before_action :set_inspection_request, only: [ :show, :accept, :schedule, :complete ]
+    before_action :set_inspection_request, only: [ :show, :accept, :reject, :schedule, :complete ]
 
     def index
       @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
@@ -20,6 +20,16 @@ module Dashboard
       else
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     alert: "Could not accept this request from its current state."
+      end
+    end
+
+    def reject
+      if @inspection_request.reject!
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    notice: "Request rejected."
+      else
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "Could not reject this request from its current state."
       end
     end
 

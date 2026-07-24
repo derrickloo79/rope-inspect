@@ -24,10 +24,31 @@ module ApplicationHelper
           when "accepted" then "badge-accepted"
           when "scheduled" then "badge-scheduled"
           when "completed" then "badge-completed"
+          when "rejected" then "badge-rejected"
           else "badge bg-stone-100 text-stone-700"
           end
 
     content_tag(:span, status.to_s.humanize, class: css)
+  end
+
+  def timeline_marker_classes(event)
+    if event[:failed]
+      "bg-red-100 text-red-700"
+    elsif event[:done]
+      "bg-green-600 text-white"
+    else
+      "bg-stone-200 text-stone-500"
+    end
+  end
+
+  def timeline_marker_content(event, index)
+    if event[:failed]
+      "✕"
+    elsif event[:done]
+      "✓"
+    else
+      (index + 1).to_s
+    end
   end
 
   def format_datetime(value)

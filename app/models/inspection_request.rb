@@ -1,5 +1,5 @@
 class InspectionRequest < ApplicationRecord
-  STATUSES = %w[pending accepted scheduled completed].freeze
+  STATUSES = %w[pending accepted scheduled completed rejected].freeze
 
   has_many :cranes, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :inspection_request
   accepts_nested_attributes_for :cranes, allow_destroy: true, reject_if: :all_blank
@@ -16,6 +16,7 @@ class InspectionRequest < ApplicationRecord
   scope :accepted, -> { where(status: "accepted") }
   scope :scheduled, -> { where(status: "scheduled") }
   scope :completed, -> { where(status: "completed") }
+  scope :rejected, -> { where(status: "rejected") }
   scope :recent_first, -> { order(created_at: :desc) }
 
   def pending?
@@ -34,8 +35,12 @@ class InspectionRequest < ApplicationRecord
     status == "completed"
   end
 
+  def rejected?
+    status == "rejected"
+  end
+
   def public_status?
-    share_token.present? && !pending?
+    share_token.present? && !pending? && !rejected?
   end
 
   # Simple state machine transitions
@@ -49,6 +54,12 @@ class InspectionRequest < ApplicationRecord
         share_token: share_token.presence || generate_share_token
       )
     end
+  end
+
+  def reject!
+    return false unless pending?
+
+    update!(status: "rejected", rejected_at: Time.current)
   end
 
   def schedule!(on:, at: nil, inspector: nil)
@@ -76,7 +87,21 @@ class InspectionRequest < ApplicationRecord
         label: "Request submitted",
         at: created_at,
         done: true
-      },
+      }
+    ]
+
+    if rejected?
+      events << {
+        key: "rejected",
+        label: "Rejected",
+        at: rejected_at,
+        done: true,
+        failed: true
+      }
+      return events
+    end
+
+    events + [
       {
         key: "accepted",
         label: "Accepted",
@@ -97,8 +122,6 @@ class InspectionRequest < ApplicationRecord
         done: completed_at.present?
       }
     ]
-
-    events
   end
 
   def reference_code
