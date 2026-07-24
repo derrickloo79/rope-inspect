@@ -20,13 +20,13 @@ module ApplicationHelper
 
   def status_badge(status)
     css = case status.to_s
-          when "pending" then "badge-pending"
-          when "accepted" then "badge-accepted"
-          when "scheduled" then "badge-scheduled"
-          when "completed" then "badge-completed"
-          when "rejected" then "badge-rejected"
-          else "badge bg-stone-100 text-stone-700"
-          end
+    when "pending" then "badge-pending"
+    when "accepted" then "badge-accepted"
+    when "scheduled" then "badge-scheduled"
+    when "completed" then "badge-completed"
+    when "rejected" then "badge-rejected"
+    else "badge bg-stone-100 text-stone-700"
+    end
 
     content_tag(:span, status.to_s.humanize, class: css)
   end
