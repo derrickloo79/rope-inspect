@@ -105,6 +105,11 @@
 
           <% if @inspection_request.rejected? %>
             <p class="text-sm text-[--color-ink-muted]">This request was rejected.</p>
+            <%= button_to "Re-open request",
+                          reopen_dashboard_inspection_request_path(@inspection_request),
+                          method: :patch,
+                          class: "btn-secondary w-full cursor-pointer",
+                          form: { data: { turbo_confirm: "Are you sure you want to re-open this request? It will return to pending status." } } %>
           <% end %>
 
           <% if @inspection_request.accepted? || @inspection_request.scheduled? %>

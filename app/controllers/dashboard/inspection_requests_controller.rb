@@ -1,6 +1,6 @@
 module Dashboard
   class InspectionRequestsController < BaseController
-    before_action :set_inspection_request, only: [ :show, :accept, :reject, :schedule, :complete ]
+    before_action :set_inspection_request, only: [ :show, :accept, :reject, :reopen, :schedule, :complete ]
 
     def index
       @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
@@ -30,6 +30,16 @@ module Dashboard
       else
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     alert: "Could not reject this request from its current state."
+      end
+    end
+
+    def reopen
+      if @inspection_request.reopen!
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    notice: "Request re-opened and moved back to pending."
+      else
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "Could not re-open this request from its current state."
       end
     end
 

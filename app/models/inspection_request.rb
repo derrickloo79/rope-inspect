@@ -62,6 +62,12 @@ class InspectionRequest < ApplicationRecord
     update!(status: "rejected", rejected_at: Time.current)
   end
 
+  def reopen!
+    return false unless rejected?
+
+    update!(status: "pending", rejected_at: nil)
+  end
+
   def schedule!(on:, at: nil, inspector: nil)
     return false unless accepted? || scheduled?
 
