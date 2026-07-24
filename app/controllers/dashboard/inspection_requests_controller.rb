@@ -25,7 +25,8 @@ module Dashboard
 
     def schedule
       on = params.dig(:inspection_request, :scheduled_on).presence
-      at = params.dig(:inspection_request, :scheduled_time).presence
+      period = params.dig(:inspection_request, :scheduled_time).presence_in(%w[AM PM])
+      at = period_to_time(period)
       inspector = params.dig(:inspection_request, :assigned_inspector).presence
 
       if on.blank?
@@ -57,6 +58,14 @@ module Dashboard
 
     def set_inspection_request
       @inspection_request = InspectionRequest.includes(:cranes).find(params[:id])
+    end
+
+    # Map AM/PM radio values to a time-of-day stored on scheduled_time.
+    def period_to_time(period)
+      case period
+      when "AM" then Time.zone.parse("09:00")
+      when "PM" then Time.zone.parse("14:00")
+      end
     end
   end
 end

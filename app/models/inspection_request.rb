@@ -105,6 +105,13 @@ class InspectionRequest < ApplicationRecord
     "RI-#{id.to_s.rjust(5, '0')}"
   end
 
+  # AM / PM derived from the stored time-of-day (AM before noon, PM otherwise).
+  def scheduled_period
+    return nil if scheduled_time.blank?
+
+    scheduled_time.hour < 12 ? "AM" : "PM"
+  end
+
   private
 
   def set_default_status
@@ -133,7 +140,7 @@ class InspectionRequest < ApplicationRecord
     return nil unless scheduled_on.present?
 
     parts = [ scheduled_on.strftime("%-d %b %Y") ]
-    parts << scheduled_time.strftime("%-l:%M %p") if scheduled_time.present?
+    parts << scheduled_period if scheduled_period.present?
     parts << "· #{assigned_inspector}" if assigned_inspector.present?
     parts.join(" ")
   end

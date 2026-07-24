@@ -108,13 +108,25 @@
                        class="field-input" required>
               </div>
               <div>
-                <label class="field-label" for="scheduled_time">Time <span class="font-normal text-[--color-ink-faint]">(optional)</span></label>
-                <input type="time" name="inspection_request[scheduled_time]" id="scheduled_time"
-                       value="<%= @inspection_request.scheduled_time&.strftime('%H:%M') %>"
-                       class="field-input">
+                <span class="field-label" id="scheduled_time_label">Time</span>
+                <% selected_period = @inspection_request.scheduled_period %>
+                <div class="flex gap-4 mt-1" role="radiogroup" aria-labelledby="scheduled_time_label">
+                  <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                    <input type="radio" name="inspection_request[scheduled_time]" value="AM"
+                           class="h-4 w-4 accent-[var(--color-accent)]"
+                           <%= "checked" if selected_period == "AM" %>>
+                    <span>AM</span>
+                  </label>
+                  <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                    <input type="radio" name="inspection_request[scheduled_time]" value="PM"
+                           class="h-4 w-4 accent-[var(--color-accent)]"
+                           <%= "checked" if selected_period == "PM" %>>
+                    <span>PM</span>
+                  </label>
+                </div>
               </div>
               <div>
-                <label class="field-label" for="assigned_inspector">Inspector</label>
+                <label class="field-label" for="assigned_inspector">Inspector/FSP</label>
                 <input type="text" name="inspection_request[assigned_inspector]" id="assigned_inspector"
                        value="<%= @inspection_request.assigned_inspector %>"
                        class="field-input" placeholder="e.g. Tan Wei Ming">
