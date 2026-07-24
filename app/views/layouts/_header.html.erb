@@ -1,0 +1,27 @@
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="site-header-brand">
+      <%= link_to root_path, class: "site-logo" do %>
+        <span class="site-logo-mark">HT</span>
+        <span class="site-logo-text">Hey Tec</span>
+      <% end %>
+
+      <% if user_signed_in? %>
+        <nav class="site-header-primary" aria-label="Main">
+          <%= link_to "Dashboard", dashboard_root_path, class: site_header_link_class(:dashboard) %>
+          <%= link_to "Jobs", dashboard_inspection_requests_path, class: site_header_link_class(:jobs) %>
+          <%= link_to "Public form", root_path, class: site_header_link_class(:public_form) %>
+        </nav>
+      <% end %>
+    </div>
+
+    <nav class="site-header-nav" aria-label="Account">
+      <% if user_signed_in? %>
+        <span class="site-header-email"><%= current_user.email %></span>
+        <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn-ghost !py-1.5 !px-2 text-sm" %>
+      <% else %>
+        <%= link_to "Staff sign in", new_user_session_path, class: "btn-primary !py-1.5 !px-3 text-sm no-underline" %>
+      <% end %>
+    </nav>
+  </div>
+</header>

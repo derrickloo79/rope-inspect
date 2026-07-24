@@ -13,14 +13,14 @@ Rails.application.routes.draw do
 
   # Internal dashboard
   namespace :dashboard do
-    resources :inspection_requests, only: [ :index, :show ] do
+    root to: "home#index"
+    resources :inspection_requests, only: [ :index, :show ], path: "jobs" do
       member do
         patch :accept
         patch :schedule
         patch :complete
       end
     end
-    root to: "inspection_requests#index"
   end
 
   root "inspection_requests#new"

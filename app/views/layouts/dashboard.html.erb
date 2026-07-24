@@ -18,25 +18,7 @@
   </head>
 
   <body class="min-h-screen flex flex-col">
-    <header class="border-b border-[--color-line] bg-[--color-paper]">
-      <div class="mx-auto max-w-5xl px-5 py-4 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-6">
-          <%= link_to dashboard_root_path, class: "no-underline flex items-center gap-2.5 group" do %>
-            <span class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[--color-ink] text-white text-sm font-bold">RI</span>
-            <span class="text-[15px] font-semibold text-[--color-ink]">RopeInspect</span>
-            <span class="text-xs font-medium text-[--color-ink-faint] uppercase tracking-wide ml-1">Staff</span>
-          <% end %>
-          <nav class="hidden sm:flex items-center gap-4 text-sm">
-            <%= link_to "Jobs", dashboard_inspection_requests_path, class: "no-underline text-[--color-ink-muted] hover:text-[--color-ink]" %>
-            <%= link_to "Public form", root_path, class: "no-underline text-[--color-ink-muted] hover:text-[--color-ink]" %>
-          </nav>
-        </div>
-        <div class="flex items-center gap-3 text-sm text-[--color-ink-muted]">
-          <span class="hidden sm:inline"><%= current_user.email %></span>
-          <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn-ghost !py-1.5 !px-2 text-sm" %>
-        </div>
-      </div>
-    </header>
+    <%= render "layouts/header" %>
 
     <% if notice.present? || alert.present? %>
       <div class="mx-auto max-w-5xl w-full px-5 pt-6 space-y-2">

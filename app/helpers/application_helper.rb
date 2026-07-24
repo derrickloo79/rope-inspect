@@ -1,4 +1,23 @@
 module ApplicationHelper
+  def nav_link_active?(section)
+    case section
+    when :dashboard
+      controller_path == "dashboard/home"
+    when :jobs
+      controller_path == "dashboard/inspection_requests"
+    when :public_form
+      controller_path == "inspection_requests" || controller_path == "status"
+    else
+      false
+    end
+  end
+
+  def site_header_link_class(section)
+    classes = [ "site-header-link" ]
+    classes << "is-active" if nav_link_active?(section)
+    classes.join(" ")
+  end
+
   def status_badge(status)
     css = case status.to_s
           when "pending" then "badge-pending"
