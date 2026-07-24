@@ -323,7 +323,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
-  brakeman
+  brakeman (~> 7.1)
   debug
   devise (~> 5.0)
   importmap-rails

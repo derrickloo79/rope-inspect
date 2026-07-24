@@ -39,7 +39,8 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
+  # Pin to 7.x: Brakeman 8+ requires Ruby >= 3.2 (this app is on 3.1.4).
+  gem "brakeman", "~> 7.1", require: false
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
