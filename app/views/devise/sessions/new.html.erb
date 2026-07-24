@@ -1,0 +1,40 @@
+<% content_for :title, "Staff sign in — RopeInspect" %>
+
+<div class="max-w-md mx-auto">
+  <div class="mb-8 text-center">
+    <h1 class="page-title">Staff sign in</h1>
+    <p class="page-lede mx-auto">Sign in to review and schedule inspection jobs.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-section">
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+        <div>
+          <%= f.label :email, class: "field-label" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "field-input", required: true %>
+        </div>
+
+        <div>
+          <%= f.label :password, class: "field-label" %>
+          <%= f.password_field :password, autocomplete: "current-password", class: "field-input", required: true %>
+        </div>
+
+        <% if devise_mapping.rememberable? %>
+          <div class="flex items-center gap-2">
+            <%= f.check_box :remember_me, class: "rounded border-[--color-line-strong]" %>
+            <%= f.label :remember_me, class: "text-sm text-[--color-ink-muted]" %>
+          </div>
+        <% end %>
+
+        <div>
+          <%= f.submit "Sign in", class: "btn-primary w-full cursor-pointer" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <p class="mt-6 text-center text-sm text-[--color-ink-faint]">
+    Looking to request an inspection?
+    <%= link_to "Use the public form", root_path %>.
+  </p>
+</div>

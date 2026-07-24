@@ -1,0 +1,67 @@
+<% content_for :title, "Jobs — RopeInspect" %>
+
+<div class="space-y-8">
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div>
+      <h1 class="page-title">Inspection jobs</h1>
+      <p class="page-lede">Review requests, accept work, schedule inspectors, mark complete.</p>
+    </div>
+  </div>
+
+  <%# Status filter tabs %>
+  <div class="flex flex-wrap gap-2 border-b border-[--color-line] pb-px">
+    <%= link_to dashboard_inspection_requests_path,
+                class: "no-underline px-3 py-2 text-sm font-medium border-b-2 -mb-px #{@status_filter.nil? ? 'border-[--color-ink] text-[--color-ink]' : 'border-transparent text-[--color-ink-muted] hover:text-[--color-ink]'}" do %>
+      All
+      <span class="ml-1 text-[--color-ink-faint]"><%= @counts.values.sum %></span>
+    <% end %>
+    <% InspectionRequest::STATUSES.each do |status| %>
+      <%= link_to dashboard_inspection_requests_path(status: status),
+                  class: "no-underline px-3 py-2 text-sm font-medium border-b-2 -mb-px #{@status_filter == status ? 'border-[--color-ink] text-[--color-ink]' : 'border-transparent text-[--color-ink-muted] hover:text-[--color-ink]'}" do %>
+        <%= status.humanize %>
+        <span class="ml-1 text-[--color-ink-faint]"><%= @counts[status] || 0 %></span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @inspection_requests.any? %>
+    <div class="card overflow-hidden">
+      <ul class="divide-y divide-[--color-line]">
+        <% @inspection_requests.each do |request| %>
+          <li>
+            <%= link_to dashboard_inspection_request_path(request), class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-medium text-[--color-ink]"><%= request.company_name %></span>
+                    <%= status_badge(request.status) %>
+                  </div>
+                  <p class="text-sm text-[--color-ink-muted] mt-0.5 truncate">
+                    <%= request.site_name %> · <%= pluralize(request.cranes.size, "crane") %> · <%= request.reference_code %>
+                  </p>
+                </div>
+                <div class="text-sm text-[--color-ink-faint] shrink-0">
+                  <%= time_ago_in_words(request.created_at) %> ago
+                </div>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <div class="card">
+      <div class="card-section text-center py-12 text-[--color-ink-muted]">
+        <p class="font-medium text-[--color-ink]">No jobs here yet</p>
+        <p class="text-sm mt-1">
+          <% if @status_filter %>
+            Nothing in <strong><%= @status_filter %></strong>.
+            <%= link_to "View all", dashboard_inspection_requests_path %>
+          <% else %>
+            Public requests will show up here when submitted.
+          <% end %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+</div>

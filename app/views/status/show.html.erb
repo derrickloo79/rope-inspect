@@ -1,0 +1,61 @@
+<% content_for :title, "#{@inspection_request.reference_code} status — RopeInspect" %>
+
+<div class="space-y-8">
+  <div>
+    <p class="section-label mb-2">Inspection status</p>
+    <h1 class="page-title"><%= @inspection_request.company_name %></h1>
+    <p class="page-lede">
+      <%= @inspection_request.site_name %> · <%= @inspection_request.reference_code %>
+    </p>
+    <div class="mt-3"><%= status_badge(@inspection_request.status) %></div>
+  </div>
+
+  <section class="card">
+    <div class="card-section">
+      <h2 class="section-label mb-5">Timeline</h2>
+      <ol class="relative space-y-0">
+        <% @inspection_request.status_timeline.each_with_index do |event, index| %>
+          <li class="flex gap-4 pb-8 last:pb-0">
+            <div class="flex flex-col items-center">
+              <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold
+                <%= event[:done] ? 'border-green-600 bg-green-600 text-white' : 'border-[--color-line-strong] bg-white text-[--color-ink-faint]' %>">
+                <% if event[:done] %>✓<% else %><%= index + 1 %><% end %>
+              </span>
+              <% unless index == @inspection_request.status_timeline.length - 1 %>
+                <span class="w-px flex-1 mt-1 <%= event[:done] ? 'bg-green-300' : 'bg-[--color-line]' %>"></span>
+              <% end %>
+            </div>
+            <div class="pt-1 min-w-0">
+              <p class="font-medium text-[--color-ink] <%= 'text-[--color-ink-faint]' unless event[:done] %>">
+                <%= event[:label] %>
+              </p>
+              <% if event[:at].present? %>
+                <p class="text-sm text-[--color-ink-muted] mt-0.5"><%= format_datetime(event[:at]) %></p>
+              <% elsif !event[:done] %>
+                <p class="text-sm text-[--color-ink-faint] mt-0.5">Waiting…</p>
+              <% end %>
+              <% if event[:detail].present? %>
+                <p class="text-sm text-[--color-ink-muted] mt-1"><%= event[:detail] %></p>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-section">
+      <h2 class="section-label mb-4">Cranes on this job</h2>
+      <ul class="divide-y divide-[--color-line]">
+        <% @inspection_request.cranes.each do |crane| %>
+          <li class="py-3 first:pt-0 last:pb-0 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+            <span class="font-medium text-[--color-ink]"><%= crane.crane_type_label %></span>
+            <span class="text-[--color-ink-muted]">LM <%= crane.lm_number %></span>
+            <span class="text-[--color-ink-muted]">A/M/B <%= crane.rope_diameter_mm %> cm</span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </section>
+</div>

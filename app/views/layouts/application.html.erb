@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "RopeInspect — Crane rope inspections" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen flex flex-col">
+    <header class="site-header">
+      <div class="site-header-inner">
+        <%= link_to root_path, class: "site-logo" do %>
+          <span class="site-logo-mark">HT</span>
+          <span class="site-logo-text">Hey Tec</span>
+        <% end %>
+
+        <nav class="site-header-nav">
+          <% if user_signed_in? %>
+            <%= link_to "Dashboard", dashboard_root_path, class: "no-underline text-sm", style: "color: var(--color-ink-muted);" %>
+            <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn-ghost !py-1.5 !px-2 text-sm" %>
+          <% else %>
+            <%= link_to "Staff sign in", new_user_session_path, class: "btn-primary !py-1.5 !px-3 text-sm no-underline" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <% if notice.present? || alert.present? %>
+      <div class="mx-auto max-w-3xl w-full px-5 pt-6 space-y-2">
+        <% if notice.present? %><div class="flash-notice" role="status"><%= notice %></div><% end %>
+        <% if alert.present? %><div class="flash-alert" role="alert"><%= alert %></div><% end %>
+      </div>
+    <% end %>
+
+    <main class="flex-1 mx-auto w-full max-w-3xl px-5 py-10">
+      <%= yield %>
+    </main>
+
+    <footer class="border-t border-line py-8">
+      <div class="mx-auto max-w-3xl px-5 text-sm" style="color: var(--color-ink-faint);">
+        RopeInspect — construction wire rope inspections, kept simple.
+      </div>
+    </footer>
+  </body>
+</html>

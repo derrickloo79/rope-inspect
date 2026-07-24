@@ -1,0 +1,33 @@
+<% content_for :title, "Request received — RopeInspect" %>
+
+<div class="card max-w-xl mx-auto">
+  <div class="card-section text-center space-y-4 py-10">
+    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-green-700 text-xl font-semibold">
+      ✓
+    </div>
+    <h1 class="page-title">Request received</h1>
+    <p class="page-lede mx-auto">
+      Thanks — we’ve logged your inspection request. Our team will review the details and follow up to schedule.
+    </p>
+
+    <% if @reference_code.present? %>
+      <div class="inline-flex flex-col items-center gap-1 rounded-md border border-[--color-line] bg-stone-50 px-5 py-3">
+        <span class="text-xs uppercase tracking-wider text-[--color-ink-muted] font-medium">Reference</span>
+        <span class="font-mono text-lg font-semibold text-[--color-ink]"><%= @reference_code %></span>
+      </div>
+    <% end %>
+
+    <div class="text-left max-w-sm mx-auto mt-4 space-y-2 text-sm text-[--color-ink-muted]">
+      <p class="font-medium text-[--color-ink]">What happens next</p>
+      <ol class="list-decimal list-inside space-y-1.5">
+        <li>We verify crane types, LM numbers, and rope diameters.</li>
+        <li>A certified inspector is allocated for your site.</li>
+        <li>You’ll get a schedule once the job is accepted.</li>
+      </ol>
+    </div>
+
+    <div class="pt-4">
+      <%= link_to "Submit another request", new_inspection_request_path, class: "btn-secondary no-underline" %>
+    </div>
+  </div>
+</div>
