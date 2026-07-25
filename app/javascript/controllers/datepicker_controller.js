@@ -15,7 +15,12 @@ export default class extends Controller {
       position: "above",
       appendTo: document.body,
       static: false,
-      monthSelectorType: "static"
+      monthSelectorType: "static",
+      onChange: () => {
+        // Keep native change listeners (e.g. schedule-form validation) in sync.
+        this.element.dispatchEvent(new Event("change", { bubbles: true }))
+        this.element.dispatchEvent(new Event("input", { bubbles: true }))
+      }
     })
   }
 

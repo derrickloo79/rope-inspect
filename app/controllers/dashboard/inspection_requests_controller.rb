@@ -55,6 +55,12 @@ module Dashboard
         return
       end
 
+      if period.blank?
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "Select a time (AM or PM)."
+        return
+      end
+
       if @inspection_request.schedule!(on: on, at: at, inspector: inspector)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Inspection scheduled."

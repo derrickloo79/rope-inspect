@@ -88,54 +88,75 @@
   <aside class="job-detail-side space-y-6">
     <%# Variation C: schedule fields live in-page (not sticky) so the datepicker has room %>
     <% if schedule_actions %>
-      <section class="card" id="schedule-section">
-        <div class="card-section space-y-3">
-          <h2 class="section-label">Schedule</h2>
-          <%= form_with url: schedule_dashboard_inspection_request_path(@inspection_request),
-                        method: :patch,
-                        html: { id: "job-schedule-form", class: "job-schedule-form space-y-3" } do %>
-            <div class="job-schedule-form__when">
-              <div class="job-schedule-form__field">
-                <label class="field-label" for="scheduled_on">Schedule date</label>
-                <input type="text"
-                       name="inspection_request[scheduled_on]"
-                       id="scheduled_on"
-                       value="<%= @inspection_request.scheduled_on %>"
-                       class="field-input"
-                       placeholder="dd/mm/yyyy"
-                       autocomplete="off"
-                       required
-                       data-controller="datepicker"
-                       inputmode="none">
-              </div>
-              <div class="job-schedule-form__field">
-                <span class="field-label" id="scheduled_time_label">Time</span>
-                <% selected_period = @inspection_request.scheduled_period %>
-                <div class="job-schedule-form__time" role="radiogroup" aria-labelledby="scheduled_time_label">
-                  <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="radio" name="inspection_request[scheduled_time]" value="AM"
-                           class="h-4 w-4 accent-[var(--color-accent)]"
-                           <%= "checked" if selected_period == "AM" %>>
-                    <span>AM</span>
-                  </label>
-                  <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="radio" name="inspection_request[scheduled_time]" value="PM"
-                           class="h-4 w-4 accent-[var(--color-accent)]"
-                           <%= "checked" if selected_period == "PM" %>>
-                    <span>PM</span>
-                  </label>
+      <div id="schedule-section"
+           class="job-schedule-section space-y-3"
+           data-controller="schedule-form"
+           data-schedule-form-target="section">
+        <div class="error-list hidden"
+             role="alert"
+             hidden
+             data-schedule-form-target="error">
+          <p class="font-medium" data-schedule-form-target="errorText"></p>
+        </div>
+
+        <section class="card">
+          <div class="card-section space-y-3">
+            <h2 class="section-label">Schedule</h2>
+            <%= form_with url: schedule_dashboard_inspection_request_path(@inspection_request),
+                          method: :patch,
+                          html: {
+                            id: "job-schedule-form",
+                            class: "job-schedule-form space-y-3",
+                            data: { action: "submit->schedule-form#submit" },
+                            novalidate: true
+                          } do %>
+              <div class="job-schedule-form__when">
+                <div class="job-schedule-form__field">
+                  <label class="field-label" for="scheduled_on">Schedule date</label>
+                  <input type="text"
+                         name="inspection_request[scheduled_on]"
+                         id="scheduled_on"
+                         value="<%= @inspection_request.scheduled_on %>"
+                         class="field-input"
+                         placeholder="dd/mm/yyyy"
+                         autocomplete="off"
+                         data-controller="datepicker"
+                         data-schedule-form-target="dateField"
+                         data-action="change->schedule-form#clearError"
+                         inputmode="none">
+                </div>
+                <div class="job-schedule-form__field">
+                  <span class="field-label" id="scheduled_time_label">Time</span>
+                  <% selected_period = @inspection_request.scheduled_period %>
+                  <div class="job-schedule-form__time" role="radiogroup" aria-labelledby="scheduled_time_label" aria-required="true">
+                    <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                      <input type="radio" name="inspection_request[scheduled_time]" value="AM"
+                             class="h-4 w-4 accent-[var(--color-accent)]"
+                             data-action="change->schedule-form#clearError"
+                             <%= "checked" if selected_period == "AM" %>>
+                      <span>AM</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                      <input type="radio" name="inspection_request[scheduled_time]" value="PM"
+                             class="h-4 w-4 accent-[var(--color-accent)]"
+                             data-action="change->schedule-form#clearError"
+                             <%= "checked" if selected_period == "PM" %>>
+                      <span>PM</span>
+                    </label>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div>
-              <label class="field-label" for="assigned_inspector">Inspector/FSP</label>
-              <input type="text" name="inspection_request[assigned_inspector]" id="assigned_inspector"
-                     value="<%= @inspection_request.assigned_inspector %>"
-                     class="field-input" placeholder="e.g. Tan Wei Ming">
-            </div>
-          <% end %>
-        </div>
-      </section>
+              <div>
+                <label class="field-label" for="assigned_inspector">Inspector/FSP</label>
+                <input type="text" name="inspection_request[assigned_inspector]" id="assigned_inspector"
+                       value="<%= @inspection_request.assigned_inspector %>"
+                       class="field-input" placeholder="e.g. Tan Wei Ming"
+                       data-action="input->schedule-form#clearError">
+              </div>
+            <% end %>
+          </div>
+        </section>
+      </div>
     <% end %>
 
     <section class="card job-actions-bar<%= " job-actions-bar--sticky" if sticky_actions %><%= " job-actions-bar--cta-only" if schedule_actions %>">

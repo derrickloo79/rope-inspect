@@ -332,7 +332,11 @@
     width: 100%;
   }
 
-  /* Schedule form: date + time side-by-side on narrow screens */
+  /* Schedule form: stacked by default; side-by-side from desktop */
+  .job-schedule-section {
+    scroll-margin-top: 5rem; /* clear sticky header when scrolling to errors */
+  }
+
   .job-schedule-form__when {
     display: flex;
     flex-direction: column;
@@ -412,22 +416,9 @@
       flex-direction: row-reverse;
     }
 
-    /* Scheduled: primary + complete side by side in thin sticky bar */
-    .job-actions-bar--cta-only .job-actions-cta-row {
-      flex-direction: column;
-    }
-
-    .job-actions-bar--cta-only .job-actions-cta-row:has(.job-actions-cta-row__item) {
-      flex-direction: column;
-    }
-
+    /* Mobile: date and time stay on separate rows */
     .job-schedule-form__when {
-      flex-direction: row;
-      align-items: flex-start;
-    }
-
-    .job-schedule-form__when > .job-schedule-form__field {
-      flex: 1 1 0;
+      flex-direction: column;
     }
   }
 
@@ -472,6 +463,16 @@
 
     .job-actions-bar--sticky .job-actions-bar__label {
       display: block;
+    }
+
+    /* Desktop: date + time can share a row in the side rail */
+    .job-schedule-form__when {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .job-schedule-form__when > .job-schedule-form__field {
+      flex: 1 1 0;
     }
   }
 
