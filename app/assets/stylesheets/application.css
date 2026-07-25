@@ -13,3 +13,30 @@
  *= require_tree .
  *= require_self
  */
+
+/* Flatpickr: keep calendar above sticky bars and match app fields */
+.flatpickr-calendar {
+  z-index: 60 !important;
+  font-family: inherit;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  border: 1px solid #e7e5e4;
+  border-radius: 0.5rem;
+}
+
+.flatpickr-alt-input {
+  width: 100%;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.flatpickr-months .flatpickr-month {
+  height: 2.25rem;
+}

@@ -45,8 +45,8 @@
     background-color: var(--color-paper);
   }
 
-  /* Stick header to top while scrolling on mobile */
-  @media (max-width: 39.999rem) {
+  /* Stick header to top while scrolling on mobile (< 700px) */
+  @media (max-width: 699.98px) {
     .site-header {
       position: sticky;
       top: 0;
@@ -274,7 +274,8 @@
     word-break: break-all;
   }
 
-  @media (min-width: 40rem) {
+  /* Desktop header nav at 700px+ */
+  @media (min-width: 700px) {
     .site-header-desktop {
       display: flex;
       flex-direction: row;
@@ -319,9 +320,33 @@
     width: 100%;
   }
 
+  /* Schedule form: date + time side-by-side on mobile */
+  .job-schedule-form__when {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .job-schedule-form__field {
+    min-width: 0;
+  }
+
+  .job-schedule-form__time {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    min-height: 2.625rem; /* align with field-input height */
+    margin-top: 0.125rem;
+  }
+
   @media (max-width: 63.999rem) {
     .job-detail--with-sticky-actions {
       padding-bottom: 8rem;
+    }
+
+    .job-detail--with-schedule-actions {
+      padding-bottom: 14rem;
     }
 
     .job-actions-sticky {
@@ -337,6 +362,7 @@
       border-bottom: none;
       box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.1);
       background-color: var(--color-paper);
+      overflow: visible;
     }
 
     .job-actions-sticky .card-section {
@@ -356,6 +382,15 @@
 
     .job-actions-pending-row {
       flex-direction: row-reverse;
+    }
+
+    .job-schedule-form__when {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .job-schedule-form__when > .job-schedule-form__field {
+      flex: 1 1 0;
     }
   }
 
