@@ -1,27 +1,97 @@
-<header class="site-header">
+<header class="site-header"
+        data-controller="menu"
+        data-menu-open-class="is-menu-open"
+        data-action="keydown@window->menu#keydown">
   <div class="site-header-inner">
-    <div class="site-header-brand">
-      <%= link_to root_path, class: "site-logo" do %>
-        <span class="site-logo-mark">HT</span>
-        <span class="site-logo-text">Hey Tec</span>
-      <% end %>
+    <%= link_to root_path, class: "site-logo" do %>
+      <span class="site-logo-mark">HT</span>
+      <span class="site-logo-text">Hey Tec</span>
+    <% end %>
 
-      <% if user_signed_in? %>
-        <nav class="site-header-primary" aria-label="Main">
-          <%= link_to "Dashboard", dashboard_root_path, class: site_header_link_class(:dashboard) %>
-          <%= link_to "Jobs", dashboard_inspection_requests_path, class: site_header_link_class(:jobs) %>
-          <%= link_to "Public form", root_path, class: site_header_link_class(:public_form) %>
-        </nav>
-      <% end %>
-    </div>
+    <% if user_signed_in? %>
+      <%# Desktop primary + account nav %>
+      <nav class="site-header-desktop" aria-label="Main">
+        <%= link_to "Dashboard", dashboard_root_path, class: site_header_link_class(:dashboard) %>
+        <%= link_to "Jobs", dashboard_inspection_requests_path, class: site_header_link_class(:jobs) %>
+        <%= link_to "Public form", root_path, class: site_header_link_class(:public_form) %>
+      </nav>
 
-    <nav class="site-header-nav" aria-label="Account">
-      <% if user_signed_in? %>
+      <div class="site-header-desktop-account">
         <span class="site-header-email"><%= current_user.email %></span>
         <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn-ghost !py-1.5 !px-2 text-sm" %>
-      <% else %>
+      </div>
+
+      <%# Mobile menu toggle %>
+      <button type="button"
+              class="site-header-menu-btn"
+              data-menu-target="button"
+              data-action="menu#toggle"
+              aria-expanded="false"
+              aria-haspopup="dialog"
+              aria-controls="site-header-menu"
+              aria-label="Open menu">
+        <svg data-menu-target="openIcon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 6h16" />
+          <path d="M4 12h16" />
+          <path d="M4 18h16" />
+        </svg>
+        <svg data-menu-target="closeIcon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6L6 18" />
+          <path d="M6 6l12 12" />
+        </svg>
+      </button>
+    <% else %>
+      <nav class="site-header-nav" aria-label="Account">
         <%= link_to "Staff sign in", new_user_session_path, class: "btn-primary !py-1.5 !px-3 text-sm no-underline" %>
-      <% end %>
-    </nav>
+      </nav>
+    <% end %>
   </div>
+
+  <% if user_signed_in? %>
+    <div id="site-header-menu"
+         class="site-header-modal"
+         data-menu-target="panel"
+         hidden>
+      <div class="site-header-modal-backdrop" data-action="click->menu#close" aria-hidden="true"></div>
+
+      <div class="site-header-modal-dialog"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="site-header-menu-title">
+        <div class="site-header-modal-header">
+          <h2 id="site-header-menu-title" class="site-header-modal-title">Menu</h2>
+          <button type="button"
+                  class="site-header-modal-close"
+                  data-action="menu#close"
+                  aria-label="Close menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 6L6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <nav class="site-header-mobile-nav" aria-label="Mobile main">
+          <%= link_to "Dashboard", dashboard_root_path,
+                      class: site_header_link_class(:dashboard),
+                      data: { action: "menu#navigate" } %>
+          <%= link_to "Jobs", dashboard_inspection_requests_path,
+                      class: site_header_link_class(:jobs),
+                      data: { action: "menu#navigate" } %>
+          <%= link_to "Public form", root_path,
+                      class: site_header_link_class(:public_form),
+                      data: { action: "menu#navigate" } %>
+        </nav>
+
+        <div class="site-header-mobile-account">
+          <span class="site-header-mobile-email"><%= current_user.email %></span>
+          <%= button_to "Sign out",
+                        destroy_user_session_path,
+                        method: :delete,
+                        class: "btn-ghost !py-1.5 !px-2 text-sm w-full justify-start",
+                        form: { data: { action: "menu#navigate" } } %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </header>
