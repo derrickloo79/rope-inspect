@@ -332,7 +332,7 @@
     width: 100%;
   }
 
-  /* Schedule form: date + time side-by-side on mobile */
+  /* Schedule form: date + time side-by-side on narrow screens */
   .job-schedule-form__when {
     display: flex;
     flex-direction: column;
@@ -352,14 +352,21 @@
     margin-top: 0.125rem;
   }
 
-  /* Mobile / tablet: pin actions bar to the real viewport bottom */
+  .job-actions-cta-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .job-actions-cta-row__item {
+    margin: 0;
+    width: 100%;
+  }
+
+  /* Mobile / tablet: thin sticky CTA bar only (Variation C) */
   @media (max-width: 1023px) {
     .job-detail-page--sticky-actions {
-      padding-bottom: 8.5rem;
-    }
-
-    .job-detail-page--schedule-actions {
-      padding-bottom: 15rem;
+      padding-bottom: 6.5rem;
     }
 
     .job-actions-bar--sticky {
@@ -397,8 +404,21 @@
       text-align: center;
     }
 
+    .job-actions-schedule-hint {
+      display: none;
+    }
+
     .job-actions-pending-row {
       flex-direction: row-reverse;
+    }
+
+    /* Scheduled: primary + complete side by side in thin sticky bar */
+    .job-actions-bar--cta-only .job-actions-cta-row {
+      flex-direction: column;
+    }
+
+    .job-actions-bar--cta-only .job-actions-cta-row:has(.job-actions-cta-row__item) {
+      flex-direction: column;
     }
 
     .job-schedule-form__when {

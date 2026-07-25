@@ -3,7 +3,7 @@
 <% sticky_actions = @inspection_request.pending? || @inspection_request.accepted? || @inspection_request.scheduled? %>
 <% schedule_actions = @inspection_request.accepted? || @inspection_request.scheduled? %>
 
-<div class="job-detail-page<%= " job-detail-page--sticky-actions" if sticky_actions %><%= " job-detail-page--schedule-actions" if schedule_actions %>">
+<div class="job-detail-page<%= " job-detail-page--sticky-actions" if sticky_actions %>">
   <div class="job-detail-intro">
     <%= link_to "← All jobs", dashboard_inspection_requests_path, class: "text-sm no-underline text-[--color-ink-muted] hover:text-[--color-ink]" %>
     <div class="mt-3 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -86,39 +86,14 @@
   </div>
 
   <aside class="job-detail-side space-y-6">
-    <section class="card job-actions-bar<%= " job-actions-bar--sticky" if sticky_actions %>">
-      <div class="job-actions-bar__inner card-section space-y-4">
-        <h2 class="section-label job-actions-bar__label">Actions</h2>
-
-        <% if @inspection_request.pending? %>
-          <p class="text-xs text-[--color-ink-muted] job-actions-pending-hint">
-            Accepting creates a public status link you can share with the client.
-          </p>
-          <div class="job-actions-pending-row">
-            <%= button_to "Accept request",
-                          accept_dashboard_inspection_request_path(@inspection_request),
-                          method: :patch,
-                          class: "btn-primary w-full cursor-pointer",
-                          form: { class: "job-actions-pending-row__item" } %>
-            <%= button_to "Reject request",
-                          reject_dashboard_inspection_request_path(@inspection_request),
-                          method: :patch,
-                          class: "btn-danger w-full cursor-pointer",
-                          form: { class: "job-actions-pending-row__item", data: { turbo_confirm: "Reject this inspection request?" } } %>
-          </div>
-        <% end %>
-
-        <% if @inspection_request.rejected? %>
-          <p class="text-sm text-[--color-ink-muted]">This request was rejected.</p>
-          <%= button_to "Re-open request",
-                        reopen_dashboard_inspection_request_path(@inspection_request),
+    <%# Variation C: schedule fields live in-page (not sticky) so the datepicker has room %>
+    <% if schedule_actions %>
+      <section class="card" id="schedule-section">
+        <div class="card-section space-y-3">
+          <h2 class="section-label">Schedule</h2>
+          <%= form_with url: schedule_dashboard_inspection_request_path(@inspection_request),
                         method: :patch,
-                        class: "btn-secondary w-full cursor-pointer",
-                        form: { data: { turbo_confirm: "Are you sure you want to re-open this request? It will return to pending status." } } %>
-        <% end %>
-
-        <% if schedule_actions %>
-          <%= form_with url: schedule_dashboard_inspection_request_path(@inspection_request), method: :patch, class: "job-schedule-form space-y-3" do %>
+                        html: { id: "job-schedule-form", class: "job-schedule-form space-y-3" } do %>
             <div class="job-schedule-form__when">
               <div class="job-schedule-form__field">
                 <label class="field-label" for="scheduled_on">Schedule date</label>
@@ -158,18 +133,60 @@
                      value="<%= @inspection_request.assigned_inspector %>"
                      class="field-input" placeholder="e.g. Tan Wei Ming">
             </div>
-            <button type="submit" class="btn-primary w-full cursor-pointer">
-              <%= @inspection_request.scheduled? ? "Update schedule" : "Mark scheduled" %>
-            </button>
           <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <section class="card job-actions-bar<%= " job-actions-bar--sticky" if sticky_actions %><%= " job-actions-bar--cta-only" if schedule_actions %>">
+      <div class="job-actions-bar__inner card-section space-y-3">
+        <h2 class="section-label job-actions-bar__label">Actions</h2>
+
+        <% if @inspection_request.pending? %>
+          <p class="text-xs text-[--color-ink-muted] job-actions-pending-hint">
+            Accepting creates a public status link you can share with the client.
+          </p>
+          <div class="job-actions-pending-row">
+            <%= button_to "Accept request",
+                          accept_dashboard_inspection_request_path(@inspection_request),
+                          method: :patch,
+                          class: "btn-primary w-full cursor-pointer",
+                          form: { class: "job-actions-pending-row__item" } %>
+            <%= button_to "Reject request",
+                          reject_dashboard_inspection_request_path(@inspection_request),
+                          method: :patch,
+                          class: "btn-danger w-full cursor-pointer",
+                          form: { class: "job-actions-pending-row__item", data: { turbo_confirm: "Reject this inspection request?" } } %>
+          </div>
         <% end %>
 
-        <% if @inspection_request.scheduled? %>
-          <%= button_to "Mark completed",
-                        complete_dashboard_inspection_request_path(@inspection_request),
+        <% if @inspection_request.rejected? %>
+          <p class="text-sm text-[--color-ink-muted]">This request was rejected.</p>
+          <%= button_to "Re-open request",
+                        reopen_dashboard_inspection_request_path(@inspection_request),
                         method: :patch,
                         class: "btn-secondary w-full cursor-pointer",
-                        form: { data: { turbo_confirm: "Mark this inspection as completed?" } } %>
+                        form: { data: { turbo_confirm: "Are you sure you want to re-open this request? It will return to pending status." } } %>
+        <% end %>
+
+        <% if schedule_actions %>
+          <p class="text-xs text-[--color-ink-muted] job-actions-schedule-hint">
+            Fill the schedule details above, then confirm here.
+          </p>
+          <div class="job-actions-cta-row">
+            <button type="submit"
+                    form="job-schedule-form"
+                    class="btn-primary w-full cursor-pointer">
+              <%= @inspection_request.scheduled? ? "Update schedule" : "Mark scheduled" %>
+            </button>
+            <% if @inspection_request.scheduled? %>
+              <%= button_to "Mark completed",
+                            complete_dashboard_inspection_request_path(@inspection_request),
+                            method: :patch,
+                            class: "btn-secondary w-full cursor-pointer",
+                            form: { class: "job-actions-cta-row__item", data: { turbo_confirm: "Mark this inspection as completed?" } } %>
+            <% end %>
+          </div>
         <% end %>
 
         <% if @inspection_request.completed? %>
