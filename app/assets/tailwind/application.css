@@ -45,6 +45,15 @@
     background-color: var(--color-paper);
   }
 
+  /* Stick header to top while scrolling on mobile */
+  @media (max-width: 39.999rem) {
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 45;
+    }
+  }
+
   .site-header-inner {
     display: flex;
     flex-direction: row;
