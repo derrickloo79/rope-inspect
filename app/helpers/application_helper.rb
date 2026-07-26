@@ -74,4 +74,15 @@ module ApplicationHelper
       time.strftime("%-d %b, %y")
     end
   end
+
+  # Sticky schedule dock summary for accepted jobs.
+  def schedule_summary_label(inspection_request)
+    parts = []
+    if inspection_request.scheduled_on.present?
+      parts << inspection_request.scheduled_on.strftime("%-d %b, %y")
+    end
+    parts << inspection_request.scheduled_period if inspection_request.scheduled_period.present?
+    parts << inspection_request.assigned_inspector if inspection_request.assigned_inspector.present?
+    parts.presence&.join(" · ") || "Set schedule"
+  end
 end

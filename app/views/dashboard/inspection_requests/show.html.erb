@@ -2,9 +2,10 @@
 
 <% sticky_actions = @inspection_request.pending? || @inspection_request.accepted? || @inspection_request.scheduled? %>
 <% schedule_actions = @inspection_request.accepted? || @inspection_request.scheduled? %>
-<% show_actions_card = @inspection_request.pending? || @inspection_request.accepted? || @inspection_request.rejected? || @inspection_request.scheduled? || @inspection_request.completed? %>
+<% accepted_collapsible = @inspection_request.accepted? %>
+<% show_actions_card = @inspection_request.pending? || @inspection_request.rejected? || @inspection_request.scheduled? || @inspection_request.completed? %>
 
-<div class="job-detail-page<%= " job-detail-page--sticky-actions" if sticky_actions %>">
+<div class="job-detail-page<%= " job-detail-page--sticky-actions" if sticky_actions %><%= " job-detail-page--accepted-dock" if accepted_collapsible %>">
   <div class="job-detail-intro">
     <%= link_to "← All jobs", dashboard_inspection_requests_path, class: "text-sm no-underline text-[--color-ink-muted] hover:text-[--color-ink]" %>
     <div class="mt-3 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -87,8 +88,108 @@
   </div>
 
   <aside class="job-detail-side space-y-6">
-    <%# Variation C: schedule fields live in-page (not sticky) so the datepicker has room %>
-    <% if schedule_actions %>
+    <% if accepted_collapsible %>
+      <%# Variation B (accepted, mobile): sticky summary peeks; tap expands form %>
+      <div id="schedule-section"
+           class="schedule-dock"
+           data-controller="schedule-dock schedule-form"
+           data-schedule-dock-expanded-class="is-expanded"
+           data-schedule-dock-empty-label-value="Set schedule"
+           data-schedule-form-target="section"
+           data-action="change->schedule-dock#refreshSummary input->schedule-dock#refreshSummary">
+        <div class="schedule-dock__shell">
+          <button type="button"
+                  class="schedule-dock__summary"
+                  data-schedule-dock-target="toggle"
+                  data-action="schedule-dock#toggle"
+                  aria-expanded="true"
+                  aria-controls="schedule-dock-panel">
+            <span class="schedule-dock__handle" aria-hidden="true"></span>
+            <span class="schedule-dock__summary-row">
+              <span class="schedule-dock__summary-text" data-schedule-dock-target="summaryText">
+                <%= schedule_summary_label(@inspection_request) %>
+              </span>
+              <svg class="schedule-dock__chevron" data-schedule-dock-target="chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
+          </button>
+
+          <div id="schedule-dock-panel"
+               class="schedule-dock__panel"
+               data-schedule-dock-target="panel">
+            <div class="error-list hidden"
+                 role="alert"
+                 hidden
+                 data-schedule-form-target="error">
+              <p class="font-medium" data-schedule-form-target="errorText"></p>
+            </div>
+
+            <%= form_with url: schedule_dashboard_inspection_request_path(@inspection_request),
+                          method: :patch,
+                          html: {
+                            id: "job-schedule-form",
+                            class: "job-schedule-form space-y-3",
+                            data: { action: "submit->schedule-form#submit" },
+                            novalidate: true
+                          } do %>
+              <div class="job-schedule-form__when">
+                <div class="job-schedule-form__field">
+                  <label class="field-label" for="scheduled_on">Schedule date</label>
+                  <input type="text"
+                         name="inspection_request[scheduled_on]"
+                         id="scheduled_on"
+                         value="<%= @inspection_request.scheduled_on %>"
+                         class="field-input"
+                         placeholder="dd/mm/yyyy"
+                         autocomplete="off"
+                         data-controller="datepicker"
+                         data-schedule-form-target="dateField"
+                         data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary"
+                         inputmode="none">
+                </div>
+                <div class="job-schedule-form__field">
+                  <span class="field-label" id="scheduled_time_label">Time</span>
+                  <% selected_period = @inspection_request.scheduled_period %>
+                  <div class="job-schedule-form__time" role="radiogroup" aria-labelledby="scheduled_time_label" aria-required="true">
+                    <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                      <input type="radio" name="inspection_request[scheduled_time]" value="AM"
+                             class="h-4 w-4 accent-[var(--color-accent)]"
+                             data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary"
+                             <%= "checked" if selected_period == "AM" %>>
+                      <span>AM</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                      <input type="radio" name="inspection_request[scheduled_time]" value="PM"
+                             class="h-4 w-4 accent-[var(--color-accent)]"
+                             data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary"
+                             <%= "checked" if selected_period == "PM" %>>
+                      <span>PM</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="field-label" for="assigned_inspector">Inspector/FSP</label>
+                <input type="text" name="inspection_request[assigned_inspector]" id="assigned_inspector"
+                       value="<%= @inspection_request.assigned_inspector %>"
+                       class="field-input" placeholder="e.g. Tan Wei Ming"
+                       data-action="input->schedule-form#clearError input->schedule-dock#refreshSummary">
+              </div>
+            <% end %>
+          </div>
+
+          <div class="schedule-dock__footer">
+            <button type="submit"
+                    form="job-schedule-form"
+                    class="btn-primary w-full cursor-pointer">
+              Mark scheduled
+            </button>
+          </div>
+        </div>
+      </div>
+    <% elsif schedule_actions %>
+      <%# Scheduled (and non-collapsible schedule UI) %>
       <div id="schedule-section"
            class="job-schedule-section space-y-3"
            data-controller="schedule-form"
@@ -111,38 +212,40 @@
                             data: { action: "submit->schedule-form#submit" },
                             novalidate: true
                           } do %>
-              <div class="job-schedule-form__field">
-                <label class="field-label" for="scheduled_on">Schedule date</label>
-                <input type="text"
-                       name="inspection_request[scheduled_on]"
-                       id="scheduled_on"
-                       value="<%= @inspection_request.scheduled_on %>"
-                       class="field-input"
-                       placeholder="dd/mm/yyyy"
-                       autocomplete="off"
-                       data-controller="datepicker"
-                       data-schedule-form-target="dateField"
-                       data-action="change->schedule-form#clearError"
-                       inputmode="none">
-              </div>
-              <div class="job-schedule-form__field">
-                <span class="field-label" id="scheduled_time_label">Time</span>
-                <% selected_period = @inspection_request.scheduled_period %>
-                <div class="job-schedule-form__time" role="radiogroup" aria-labelledby="scheduled_time_label" aria-required="true">
-                  <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="radio" name="inspection_request[scheduled_time]" value="AM"
-                           class="h-4 w-4 accent-[var(--color-accent)]"
-                           data-action="change->schedule-form#clearError"
-                           <%= "checked" if selected_period == "AM" %>>
-                    <span>AM</span>
-                  </label>
-                  <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="radio" name="inspection_request[scheduled_time]" value="PM"
-                           class="h-4 w-4 accent-[var(--color-accent)]"
-                           data-action="change->schedule-form#clearError"
-                           <%= "checked" if selected_period == "PM" %>>
-                    <span>PM</span>
-                  </label>
+              <div class="job-schedule-form__when">
+                <div class="job-schedule-form__field">
+                  <label class="field-label" for="scheduled_on">Schedule date</label>
+                  <input type="text"
+                         name="inspection_request[scheduled_on]"
+                         id="scheduled_on"
+                         value="<%= @inspection_request.scheduled_on %>"
+                         class="field-input"
+                         placeholder="dd/mm/yyyy"
+                         autocomplete="off"
+                         data-controller="datepicker"
+                         data-schedule-form-target="dateField"
+                         data-action="change->schedule-form#clearError"
+                         inputmode="none">
+                </div>
+                <div class="job-schedule-form__field">
+                  <span class="field-label" id="scheduled_time_label">Time</span>
+                  <% selected_period = @inspection_request.scheduled_period %>
+                  <div class="job-schedule-form__time" role="radiogroup" aria-labelledby="scheduled_time_label" aria-required="true">
+                    <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                      <input type="radio" name="inspection_request[scheduled_time]" value="AM"
+                             class="h-4 w-4 accent-[var(--color-accent)]"
+                             data-action="change->schedule-form#clearError"
+                             <%= "checked" if selected_period == "AM" %>>
+                      <span>AM</span>
+                    </label>
+                    <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+                      <input type="radio" name="inspection_request[scheduled_time]" value="PM"
+                             class="h-4 w-4 accent-[var(--color-accent)]"
+                             data-action="change->schedule-form#clearError"
+                             <%= "checked" if selected_period == "PM" %>>
+                      <span>PM</span>
+                    </label>
+                  </div>
                 </div>
               </div>
               <div>
@@ -152,11 +255,9 @@
                        class="field-input" placeholder="e.g. Tan Wei Ming"
                        data-action="input->schedule-form#clearError">
               </div>
-              <% if @inspection_request.scheduled? %>
-                <button type="submit" class="btn-secondary w-full cursor-pointer">
-                  Update schedule
-                </button>
-              <% end %>
+              <button type="submit" class="btn-secondary w-full cursor-pointer">
+                Update schedule
+              </button>
             <% end %>
           </div>
         </section>
@@ -164,7 +265,7 @@
     <% end %>
 
     <% if show_actions_card %>
-      <section class="card job-actions-bar<%= " job-actions-bar--sticky" if sticky_actions %><%= " job-actions-bar--cta-only" if @inspection_request.accepted? || @inspection_request.scheduled? %>">
+      <section class="card job-actions-bar<%= " job-actions-bar--sticky" if sticky_actions && !accepted_collapsible %><%= " job-actions-bar--cta-only" if @inspection_request.scheduled? %>">
         <div class="job-actions-bar__inner card-section space-y-3">
           <h2 class="section-label job-actions-bar__label">Actions</h2>
 
@@ -184,14 +285,6 @@
                             class: "btn-danger w-full cursor-pointer",
                             form: { class: "job-actions-pending-row__item", data: { turbo_confirm: "Reject this inspection request?" } } %>
             </div>
-          <% end %>
-
-          <% if @inspection_request.accepted? %>
-            <button type="submit"
-                    form="job-schedule-form"
-                    class="btn-primary w-full cursor-pointer">
-              Mark scheduled
-            </button>
           <% end %>
 
           <% if @inspection_request.rejected? %>

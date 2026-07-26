@@ -19,8 +19,19 @@ export default class extends Controller {
     event.preventDefault()
     event.stopPropagation()
     this.showError(messages.join(" "))
+    this.openDockIfPresent()
     this.scrollToSection()
     this.focusFirstInvalid()
+  }
+
+  openDockIfPresent() {
+    const dock = this.application.getControllerForElementAndIdentifier(
+      this.element,
+      "schedule-dock"
+    )
+    if (dock && typeof dock.openForEdit === "function") {
+      dock.openForEdit()
+    }
   }
 
   clearError() {
