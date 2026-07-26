@@ -76,7 +76,7 @@
                           <div class="flex items-center gap-2 flex-wrap">
                             <span class="font-medium text-[--color-ink]"><%= job.company_name %></span>
                             <% if job.scheduled_period.present? %>
-                              <span class="dash-period-pill"><%= job.scheduled_period %></span>
+                              <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
                             <% end %>
                           </div>
                           <p class="text-sm text-[--color-ink-muted] mt-0.5 truncate">
