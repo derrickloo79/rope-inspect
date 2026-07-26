@@ -317,6 +317,8 @@
 
   .dash-stat-card {
     min-width: 0;
+    border-width: 1px;
+    border-style: solid;
   }
 
   .dash-stat-card__inner {
@@ -335,20 +337,26 @@
     color: var(--color-ink);
   }
 
-  .dash-stat-card--pending {
-    border-left: 3px solid #f59e0b;
+  /* Soft fill + border match status badges.
+     Use .card.dash-stat-card--* so we win over later .card { background/border }. */
+  .card.dash-stat-card--pending {
+    background-color: #fffbeb;
+    border-color: #fde68a;
   }
 
-  .dash-stat-card--accepted {
-    border-left: 3px solid #3b82f6;
+  .card.dash-stat-card--accepted {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
   }
 
-  .dash-stat-card--scheduled {
-    border-left: 3px solid #8b5cf6;
+  .card.dash-stat-card--scheduled {
+    background-color: #f5f3ff;
+    border-color: #ddd6fe;
   }
 
-  .dash-stat-card--completed {
-    border-left: 3px solid #22c55e;
+  .card.dash-stat-card--completed {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
   }
 
   .dash-link-arrow {
