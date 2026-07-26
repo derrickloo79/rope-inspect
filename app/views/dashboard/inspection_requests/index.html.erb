@@ -8,18 +8,22 @@
     </div>
   </div>
 
-  <%# Status filter tabs %>
-  <div class="flex flex-wrap gap-2 border-b border-[--color-line] pb-px">
+  <%# Status filter pills %>
+  <div class="job-filter-pills" role="tablist" aria-label="Filter jobs by status">
     <%= link_to dashboard_inspection_requests_path,
-                class: "no-underline px-3 py-2 text-sm font-medium border-b-2 -mb-px #{@status_filter.nil? ? 'border-[--color-ink] text-[--color-ink]' : 'border-transparent text-[--color-ink-muted] hover:text-[--color-ink]'}" do %>
+                class: "job-filter-pill no-underline #{@status_filter.nil? ? "is-active" : ""}",
+                role: "tab",
+                "aria-selected": @status_filter.nil? do %>
       All
-      <span class="ml-1 text-[--color-ink-faint]"><%= @counts.values.sum %></span>
+      <span class="job-filter-pill__count"><%= @counts.values.sum %></span>
     <% end %>
     <% InspectionRequest::STATUSES.each do |status| %>
       <%= link_to dashboard_inspection_requests_path(status: status),
-                  class: "no-underline px-3 py-2 text-sm font-medium border-b-2 -mb-px #{@status_filter == status ? 'border-[--color-ink] text-[--color-ink]' : 'border-transparent text-[--color-ink-muted] hover:text-[--color-ink]'}" do %>
+                  class: "job-filter-pill no-underline #{@status_filter == status ? "is-active" : ""}",
+                  role: "tab",
+                  "aria-selected": @status_filter == status do %>
         <%= status.humanize %>
-        <span class="ml-1 text-[--color-ink-faint]"><%= @counts[status] || 0 %></span>
+        <span class="job-filter-pill__count"><%= @counts[status] || 0 %></span>
       <% end %>
     <% end %>
   </div>

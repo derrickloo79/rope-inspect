@@ -1,6 +1,111 @@
 <% content_for :title, "Dashboard — RopeInspect" %>
 
-<div class="space-y-4">
-  <h1 class="page-title">Dashboard</h1>
-  <p class="page-lede">This is the dashboard</p>
+<div class="space-y-8">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-lede">Open work and the week ahead.</p>
+  </div>
+
+  <%# Status bento cards %>
+  <div class="dash-stat-grid">
+    <div class="card dash-stat-card dash-stat-card--pending">
+      <div class="card-section dash-stat-card__inner">
+        <p class="section-label">Pending</p>
+        <p class="dash-stat-card__count"><%= @counts[:pending] %></p>
+        <%= link_to dashboard_inspection_requests_path(status: "pending"),
+                    class: "dash-link-arrow",
+                    aria: { label: "See pending jobs" } do %>
+          See jobs <span aria-hidden="true">→</span>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card dash-stat-card dash-stat-card--accepted">
+      <div class="card-section dash-stat-card__inner">
+        <p class="section-label">Accepted</p>
+        <p class="dash-stat-card__count"><%= @counts[:accepted] %></p>
+        <%= link_to dashboard_inspection_requests_path(status: "accepted"),
+                    class: "dash-link-arrow",
+                    aria: { label: "See accepted jobs" } do %>
+          See jobs <span aria-hidden="true">→</span>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card dash-stat-card dash-stat-card--scheduled">
+      <div class="card-section dash-stat-card__inner">
+        <p class="section-label">Scheduled</p>
+        <p class="dash-stat-card__count"><%= @counts[:scheduled] %></p>
+      </div>
+    </div>
+
+    <div class="card dash-stat-card dash-stat-card--completed">
+      <div class="card-section dash-stat-card__inner">
+        <p class="section-label">Completed</p>
+        <p class="dash-stat-card__count"><%= @counts[:completed] %></p>
+      </div>
+    </div>
+  </div>
+
+  <%# Upcoming scheduled jobs — next 7 days %>
+  <section class="space-y-4" aria-labelledby="upcoming-heading">
+    <h2 id="upcoming-heading" class="section-label">Upcoming · next 7 days</h2>
+
+    <% if @upcoming_by_day.any? %>
+      <div class="space-y-6">
+        <% @upcoming_by_day.each do |date, jobs| %>
+          <div>
+            <h3 class="dash-day-heading">
+              <% if date == Date.current %>
+                Today · <%= date.strftime("%-d %b") %>
+              <% elsif date == Date.current + 1 %>
+                Tomorrow · <%= date.strftime("%-d %b") %>
+              <% else %>
+                <%= date.strftime("%A, %-d %b") %>
+              <% end %>
+            </h3>
+
+            <div class="card overflow-hidden mt-2">
+              <ul class="divide-y divide-[--color-line]">
+                <% jobs.each do |job| %>
+                  <li>
+                    <%= link_to dashboard_inspection_request_path(job),
+                                class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>
+                      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-medium text-[--color-ink]"><%= job.company_name %></span>
+                            <% if job.scheduled_period.present? %>
+                              <span class="dash-period-pill"><%= job.scheduled_period %></span>
+                            <% end %>
+                          </div>
+                          <p class="text-sm text-[--color-ink-muted] mt-0.5 truncate">
+                            <%= job.site_name %>
+                            · <%= pluralize(job.cranes.size, "crane") %>
+                            · <%= job.assigned_inspector.presence || "Unassigned" %>
+                            · <%= job.reference_code %>
+                          </p>
+                        </div>
+                        <span class="text-sm text-[--color-ink-faint] shrink-0" aria-hidden="true">→</span>
+                      </div>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="card">
+        <div class="card-section text-center py-12 text-[--color-ink-muted]">
+          <p class="font-medium text-[--color-ink]">No inspections scheduled in the next 7 days.</p>
+          <p class="text-sm mt-1">
+            Jobs in <strong>Accepted</strong> are ready to schedule.
+            <%= link_to "See accepted →", dashboard_inspection_requests_path(status: "accepted"), class: "dash-link-arrow" %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+  </section>
 </div>

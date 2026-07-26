@@ -18,6 +18,12 @@ class InspectionRequest < ApplicationRecord
   scope :completed, -> { where(status: "completed") }
   scope :rejected, -> { where(status: "rejected") }
   scope :recent_first, -> { order(created_at: :desc) }
+  scope :upcoming_within, ->(days = 7) {
+    scheduled
+      .where.not(scheduled_on: nil)
+      .where(scheduled_on: Date.current..(Date.current + (days - 1).days))
+      .order(:scheduled_on, :scheduled_time, :company_name)
+  }
 
   def pending?
     status == "pending"

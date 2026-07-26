@@ -197,14 +197,14 @@
           <div class="job-actions-cta-row">
             <button type="submit"
                     form="job-schedule-form"
-                    class="btn-primary w-full cursor-pointer">
+                    class="<%= @inspection_request.scheduled? ? "btn-secondary" : "btn-primary" %> w-full cursor-pointer">
               <%= @inspection_request.scheduled? ? "Update schedule" : "Mark scheduled" %>
             </button>
             <% if @inspection_request.scheduled? %>
               <%= button_to "Mark completed",
                             complete_dashboard_inspection_request_path(@inspection_request),
                             method: :patch,
-                            class: "btn-secondary w-full cursor-pointer",
+                            class: "btn-primary w-full cursor-pointer",
                             form: { class: "job-actions-cta-row__item", data: { turbo_confirm: "Mark this inspection as completed?" } } %>
             <% end %>
           </div>
