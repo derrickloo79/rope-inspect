@@ -45,7 +45,7 @@
                   </p>
                 </div>
                 <div class="text-sm text-[--color-ink-faint] shrink-0">
-                  <%= time_ago_in_words(request.created_at) %> ago
+                  <%= format_list_timestamp(request.created_at) %>
                 </div>
               </div>
             <% end %>

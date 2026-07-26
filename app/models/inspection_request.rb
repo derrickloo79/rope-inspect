@@ -174,7 +174,7 @@ class InspectionRequest < ApplicationRecord
   def schedule_detail
     return nil unless scheduled_on.present?
 
-    parts = [ scheduled_on.strftime("%-d %b %Y") ]
+    parts = [ scheduled_on.strftime("%-d %b, %y") ]
     parts << scheduled_period if scheduled_period.present?
     parts << "· #{assigned_inspector}" if assigned_inspector.present?
     parts.join(" ")

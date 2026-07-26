@@ -54,12 +54,24 @@ module ApplicationHelper
   def format_datetime(value)
     return "—" if value.blank?
 
-    value.strftime("%-d %b %Y · %-l:%M %p")
+    value.in_time_zone.strftime("%-d %b, %y · %-l:%M %p")
   end
 
   def format_date(value)
     return "—" if value.blank?
 
-    value.strftime("%-d %b %Y")
+    value.in_time_zone.to_date.strftime("%-d %b, %y")
+  end
+
+  # Jobs list: same calendar day → time; otherwise → date (e.g. 25 Jul, 26).
+  def format_list_timestamp(value)
+    return "—" if value.blank?
+
+    time = value.in_time_zone
+    if time.to_date == Time.zone.today
+      time.strftime("%-l:%M %p")
+    else
+      time.strftime("%-d %b, %y")
+    end
   end
 end
