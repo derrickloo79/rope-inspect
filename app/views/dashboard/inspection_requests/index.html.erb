@@ -34,8 +34,8 @@
         <% @inspection_requests.each do |request| %>
           <li>
             <%= link_to dashboard_inspection_request_path(request), class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>
-              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div class="min-w-0">
+              <div class="flex flex-row items-start sm:items-center justify-between gap-3">
+                <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="font-medium text-[--color-ink]"><%= request.company_name %></span>
                     <%= status_badge(request.status) %>
@@ -44,7 +44,7 @@
                     <%= request.site_name %> · <%= pluralize(request.cranes.size, "crane") %> · <%= request.reference_code %>
                   </p>
                 </div>
-                <div class="text-sm text-[--color-ink-faint] shrink-0">
+                <div class="text-sm text-[--color-ink-faint] shrink-0 whitespace-nowrap pt-0.5 sm:pt-0">
                   <%= format_list_timestamp(request.created_at) %>
                 </div>
               </div>
