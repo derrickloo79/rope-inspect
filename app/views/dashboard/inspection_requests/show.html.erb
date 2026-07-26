@@ -1,8 +1,8 @@
 <% content_for :title, "#{@inspection_request.reference_code} — RopeInspect" %>
 
-<% sticky_actions = @inspection_request.pending? || @inspection_request.scheduled? %>
+<% sticky_actions = @inspection_request.pending? || @inspection_request.accepted? || @inspection_request.scheduled? %>
 <% schedule_actions = @inspection_request.accepted? || @inspection_request.scheduled? %>
-<% show_actions_card = @inspection_request.pending? || @inspection_request.rejected? || @inspection_request.scheduled? || @inspection_request.completed? %>
+<% show_actions_card = @inspection_request.pending? || @inspection_request.accepted? || @inspection_request.rejected? || @inspection_request.scheduled? || @inspection_request.completed? %>
 
 <div class="job-detail-page<%= " job-detail-page--sticky-actions" if sticky_actions %>">
   <div class="job-detail-intro">
@@ -152,11 +152,7 @@
                        class="field-input" placeholder="e.g. Tan Wei Ming"
                        data-action="input->schedule-form#clearError">
               </div>
-              <% if @inspection_request.accepted? %>
-                <button type="submit" class="btn-primary w-full cursor-pointer">
-                  Mark scheduled
-                </button>
-              <% elsif @inspection_request.scheduled? %>
+              <% if @inspection_request.scheduled? %>
                 <button type="submit" class="btn-secondary w-full cursor-pointer">
                   Update schedule
                 </button>
@@ -168,7 +164,7 @@
     <% end %>
 
     <% if show_actions_card %>
-      <section class="card job-actions-bar<%= " job-actions-bar--sticky" if sticky_actions %><%= " job-actions-bar--cta-only" if @inspection_request.scheduled? %>">
+      <section class="card job-actions-bar<%= " job-actions-bar--sticky" if sticky_actions %><%= " job-actions-bar--cta-only" if @inspection_request.accepted? || @inspection_request.scheduled? %>">
         <div class="job-actions-bar__inner card-section space-y-3">
           <h2 class="section-label job-actions-bar__label">Actions</h2>
 
@@ -188,6 +184,14 @@
                             class: "btn-danger w-full cursor-pointer",
                             form: { class: "job-actions-pending-row__item", data: { turbo_confirm: "Reject this inspection request?" } } %>
             </div>
+          <% end %>
+
+          <% if @inspection_request.accepted? %>
+            <button type="submit"
+                    form="job-schedule-form"
+                    class="btn-primary w-full cursor-pointer">
+              Mark scheduled
+            </button>
           <% end %>
 
           <% if @inspection_request.rejected? %>
