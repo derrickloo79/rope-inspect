@@ -479,15 +479,9 @@
     width: 100%;
   }
 
-  /* Schedule form: stacked by default; side-by-side from desktop */
+  /* Schedule form: each field on its own row */
   .job-schedule-section {
     scroll-margin-top: 5rem; /* clear sticky header when scrolling to errors */
-  }
-
-  .job-schedule-form__when {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
   }
 
   .job-schedule-form__field {
@@ -562,11 +556,6 @@
     .job-actions-pending-row {
       flex-direction: row-reverse;
     }
-
-    /* Mobile: date and time stay on separate rows */
-    .job-schedule-form__when {
-      flex-direction: column;
-    }
   }
 
   /* Desktop: two-column layout, actions stay in the side rail */
@@ -610,16 +599,6 @@
 
     .job-actions-bar--sticky .job-actions-bar__label {
       display: block;
-    }
-
-    /* Desktop: date + time can share a row in the side rail */
-    .job-schedule-form__when {
-      flex-direction: row;
-      align-items: flex-start;
-    }
-
-    .job-schedule-form__when > .job-schedule-form__field {
-      flex: 1 1 0;
     }
   }
 
