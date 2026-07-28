@@ -69,46 +69,38 @@
               <% end %>
             </h3>
 
-            <div class="card overflow-hidden mt-2">
-              <ul class="divide-y divide-[--color-line]">
-                <% jobs.each do |job| %>
-                  <li>
-                    <%= link_to dashboard_inspection_request_path(job),
-                                class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>
-                      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <div class="min-w-0">
-                          <div class="flex items-center gap-2 flex-wrap">
-                            <span class="font-medium text-[--color-ink]"><%= job.company_name %></span>
-                            <% if job.scheduled_period.present? %>
-                              <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
-                            <% end %>
-                          </div>
-                          <p class="text-sm text-[--color-ink-muted] mt-0.5 truncate">
-                            <%= job.site_name %>
-                            · <%= pluralize(job.cranes.size, "crane") %>
-                            · <%= job.assigned_inspector.presence || "Unassigned" %>
-                            · <%= job.reference_code %>
-                          </p>
+            <ul class="dash-upcoming-list mt-2">
+              <% jobs.each do |job| %>
+                <li>
+                  <%= link_to dashboard_inspection_request_path(job),
+                              class: "dash-upcoming-item no-underline block" do %>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <span class="font-medium text-[--color-ink]"><%= job.company_name %></span>
+                          <% if job.scheduled_period.present? %>
+                            <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
+                          <% end %>
                         </div>
-                        <span class="text-sm text-[--color-ink-faint] shrink-0" aria-hidden="true">→</span>
+                        <p class="text-sm text-[--color-ink-muted] mt-0.5 truncate">
+                          <%= job.site_name %>
+                          · <%= pluralize(job.cranes.size, "crane") %>
+                          · <%= job.assigned_inspector.presence || "Unassigned" %>
+                          · <%= job.reference_code %>
+                        </p>
                       </div>
-                    <% end %>
-                  </li>
-                <% end %>
-              </ul>
-            </div>
+                      <span class="text-sm text-[--color-ink-faint] shrink-0" aria-hidden="true">→</span>
+                    </div>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
           </div>
         <% end %>
       </div>
     <% else %>
-      <div class="card">
-        <div class="card-section text-center py-12 text-[--color-ink-muted]">
-          <p class="font-medium text-[--color-ink]">No inspections scheduled in the next 7 days.</p>
-          <p class="text-sm mt-1">
-            Jobs in <strong>Accepted</strong> are ready to schedule.
-            <%= link_to "See accepted →", dashboard_inspection_requests_path(status: "accepted"), class: "dash-link-arrow" %>
-          </p>
-        </div>
+      <div class="text-center py-12 text-[--color-ink-muted]">
+        <p class="font-medium text-[--color-ink]">No inspections scheduled in the next 7 days.</p>
       </div>
     <% end %>
   </section>
