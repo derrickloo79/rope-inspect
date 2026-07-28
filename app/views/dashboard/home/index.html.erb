@@ -11,24 +11,28 @@
     <div class="card dash-stat-card dash-stat-card--pending">
       <div class="card-section dash-stat-card__inner">
         <p class="section-label">Pending</p>
-        <p class="dash-stat-card__count"><%= @counts[:pending] %></p>
-        <%= link_to dashboard_inspection_requests_path(status: "pending"),
-                    class: "dash-link-arrow",
-                    aria: { label: "See pending jobs" } do %>
-          See jobs <span aria-hidden="true">→</span>
-        <% end %>
+        <div class="dash-stat-card__row">
+          <p class="dash-stat-card__count"><%= @counts[:pending] %></p>
+          <%= link_to dashboard_inspection_requests_path(status: "pending"),
+                      class: "dash-link-arrow",
+                      aria: { label: "See pending jobs" } do %>
+            See jobs <span aria-hidden="true">→</span>
+          <% end %>
+        </div>
       </div>
     </div>
 
     <div class="card dash-stat-card dash-stat-card--accepted">
       <div class="card-section dash-stat-card__inner">
         <p class="section-label">Accepted</p>
-        <p class="dash-stat-card__count"><%= @counts[:accepted] %></p>
-        <%= link_to dashboard_inspection_requests_path(status: "accepted"),
-                    class: "dash-link-arrow",
-                    aria: { label: "See accepted jobs" } do %>
-          See jobs <span aria-hidden="true">→</span>
-        <% end %>
+        <div class="dash-stat-card__row">
+          <p class="dash-stat-card__count"><%= @counts[:accepted] %></p>
+          <%= link_to dashboard_inspection_requests_path(status: "accepted"),
+                      class: "dash-link-arrow",
+                      aria: { label: "See accepted jobs" } do %>
+            See jobs <span aria-hidden="true">→</span>
+          <% end %>
+        </div>
       </div>
     </div>
 
