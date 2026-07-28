@@ -67,7 +67,8 @@
               <% if jobs.any? %>
                 <% jobs.each do |job| %>
                   <%= link_to dashboard_inspection_request_path(job), class: "planner-chip no-underline" do %>
-                    <span class="planner-chip__title"><%= job.company_name %></span>
+                    <span class="planner-chip__site"><%= job.site_name %></span>
+                    <span class="planner-chip__company"><%= job.company_name %></span>
                     <span class="planner-chip__meta">
                       <% if job.scheduled_period.present? %>
                         <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>

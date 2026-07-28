@@ -638,9 +638,17 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
 
-  .planner-chip__title {
+  .planner-chip__site {
     font-size: 0.75rem;
     font-weight: 600;
+    color: var(--color-ink);
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .planner-chip__company {
+    font-size: 0.75rem;
+    font-weight: 400;
     color: var(--color-ink);
     line-height: 1.3;
     word-break: break-word;
