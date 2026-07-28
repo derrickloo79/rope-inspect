@@ -1,0 +1,90 @@
+<% content_for :title, "Planner — RopeInspect" %>
+
+<div class="planner space-y-10">
+  <div>
+    <h1 class="page-title">Planner</h1>
+    <p class="page-lede">Schedule accepted jobs and scan the week ahead.</p>
+  </div>
+
+  <%# Section A: Accepted jobs ready to schedule %>
+  <section class="space-y-4" aria-labelledby="planner-accepted-heading">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+      <div>
+        <h2 id="planner-accepted-heading" class="section-label">Accepted</h2>
+        <p class="text-sm text-[--color-ink-muted] mt-1">Jobs ready to schedule.</p>
+      </div>
+      <p class="text-sm text-[--color-ink-faint]"><%= pluralize(@accepted_jobs.size, "job") %></p>
+    </div>
+
+    <% if @accepted_jobs.any? %>
+      <div class="planner-accepted-grid">
+        <% @accepted_jobs.each do |job| %>
+          <%= link_to dashboard_inspection_request_path(job), class: "planner-accepted-card no-underline" do %>
+            <p class="planner-accepted-card__title"><%= job.company_name %></p>
+            <p class="planner-accepted-card__meta"><%= job.site_name %></p>
+            <p class="planner-accepted-card__meta">
+              <%= pluralize(job.cranes.size, "crane") %> · <%= job.reference_code %>
+            </p>
+            <span class="planner-accepted-card__cta">Schedule →</span>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-[--color-ink-muted] py-4">No accepted jobs waiting to schedule.</p>
+    <% end %>
+  </section>
+
+  <%# Section B: Weekly calendar %>
+  <section class="space-y-4" aria-labelledby="planner-week-heading">
+    <div class="planner-week-header">
+      <h2 id="planner-week-heading" class="planner-week-range">
+        <%= format_week_range(@week_start, @week_end) %>
+      </h2>
+      <div class="planner-week-toggles" role="group" aria-label="Change week">
+        <%= link_to dashboard_planner_path(week: (@week_start - 7.days).iso8601),
+                    class: "planner-week-toggle no-underline",
+                    aria: { label: "Previous week" } do %>
+          ←
+        <% end %>
+        <%= link_to dashboard_planner_path(week: (@week_start + 7.days).iso8601),
+                    class: "planner-week-toggle no-underline",
+                    aria: { label: "Next week" } do %>
+          →
+        <% end %>
+      </div>
+    </div>
+
+    <div class="planner-calendar-scroll">
+      <div class="planner-calendar" role="grid" aria-label="Scheduled jobs this week">
+        <% @week_days.each do |day| %>
+          <% jobs = @scheduled_by_day[day] || [] %>
+          <div class="planner-day<%= " is-today" if day == Date.current %>" role="gridcell">
+            <div class="planner-day__header">
+              <span class="planner-day__weekday"><%= day.strftime("%a") %></span>
+              <span class="planner-day__date"><%= day.strftime("%-d") %></span>
+            </div>
+            <div class="planner-day__body">
+              <% if jobs.any? %>
+                <% jobs.each do |job| %>
+                  <%= link_to dashboard_inspection_request_path(job), class: "planner-chip no-underline" do %>
+                    <span class="planner-chip__title"><%= job.company_name %></span>
+                    <span class="planner-chip__meta">
+                      <% if job.scheduled_period.present? %>
+                        <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
+                      <% end %>
+                      <% if job.assigned_inspector.present? %>
+                        <span class="planner-chip__inspector"><%= job.assigned_inspector %></span>
+                      <% end %>
+                    </span>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <p class="planner-day__empty">—</p>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>

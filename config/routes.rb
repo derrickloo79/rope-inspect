@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   # Internal dashboard
   namespace :dashboard do
     root to: "home#index"
+    get "planner", to: "planner#index", as: :planner
     resources :inspection_requests, only: [ :index, :show ], path: "jobs" do
       member do
         patch :accept

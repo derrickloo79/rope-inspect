@@ -3,12 +3,25 @@ module ApplicationHelper
     case section
     when :dashboard
       controller_path == "dashboard/home"
+    when :planner
+      controller_path == "dashboard/planner"
     when :jobs
       controller_path == "dashboard/inspection_requests"
     when :public_form
       controller_path == "inspection_requests" || controller_path == "status"
     else
       false
+    end
+  end
+
+  def format_week_range(week_start, week_end = week_start + 6.days)
+    start_date = week_start.to_date
+    end_date = week_end.to_date
+
+    if start_date.year == end_date.year
+      "#{start_date.strftime('%-d %b')} – #{end_date.strftime('%-d %b')}"
+    else
+      "#{start_date.strftime('%-d %b, %y')} – #{end_date.strftime('%-d %b, %y')}"
     end
   end
 

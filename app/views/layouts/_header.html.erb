@@ -12,6 +12,7 @@
       <%# Desktop primary + account nav %>
       <nav class="site-header-desktop" aria-label="Main">
         <%= link_to "Dashboard", dashboard_root_path, class: site_header_link_class(:dashboard) %>
+        <%= link_to "Planner", dashboard_planner_path, class: site_header_link_class(:planner) %>
         <%= link_to "Jobs", dashboard_inspection_requests_path, class: site_header_link_class(:jobs) %>
         <%= link_to "Public form", root_path, class: site_header_link_class(:public_form) %>
       </nav>
@@ -74,6 +75,9 @@
         <nav class="site-header-mobile-nav" aria-label="Mobile main">
           <%= link_to "Dashboard", dashboard_root_path,
                       class: site_header_link_class(:dashboard),
+                      data: { action: "menu#navigate" } %>
+          <%= link_to "Planner", dashboard_planner_path,
+                      class: site_header_link_class(:planner),
                       data: { action: "menu#navigate" } %>
           <%= link_to "Jobs", dashboard_inspection_requests_path,
                       class: site_header_link_class(:jobs),

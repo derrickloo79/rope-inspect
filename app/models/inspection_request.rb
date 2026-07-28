@@ -25,6 +25,13 @@ class InspectionRequest < ApplicationRecord
       .order(:scheduled_on, :scheduled_time, :company_name)
   }
 
+  scope :in_week, ->(week_start) {
+    start = week_start.to_date
+    scheduled
+      .where(scheduled_on: start..(start + 6.days))
+      .order(:scheduled_on, :scheduled_time, :company_name)
+  }
+
   def pending?
     status == "pending"
   end
