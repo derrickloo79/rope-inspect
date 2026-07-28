@@ -54,18 +54,16 @@
       </ul>
     </div>
   <% else %>
-    <div class="card">
-      <div class="card-section text-center py-12 text-[--color-ink-muted]">
-        <p class="font-medium text-[--color-ink]">No jobs here yet</p>
-        <p class="text-sm mt-1">
-          <% if @status_filter %>
-            Nothing in <strong><%= @status_filter %></strong>.
-            <%= link_to "View all", dashboard_inspection_requests_path %>
-          <% else %>
-            Public requests will show up here when submitted.
-          <% end %>
-        </p>
-      </div>
+    <div class="text-center py-12 text-[--color-ink-muted]">
+      <p class="font-medium text-[--color-ink]">No jobs here yet</p>
+      <p class="text-sm mt-1">
+        <% if @status_filter %>
+          Nothing in <strong><%= @status_filter %></strong>.
+          <%= link_to "View all", dashboard_inspection_requests_path %>
+        <% else %>
+          Public requests will show up here when submitted.
+        <% end %>
+      </p>
     </div>
   <% end %>
 </div>
