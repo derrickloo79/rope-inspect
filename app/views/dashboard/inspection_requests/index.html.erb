@@ -36,11 +36,19 @@
             <%= link_to dashboard_inspection_request_path(request), class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>
               <div class="job-list-row">
                 <div class="job-list-details min-w-0">
-                  <div class="job-list-title truncate">
-                    <%= request.site_name %>
+                  <div class="job-list-title-row">
+                    <span class="job-list-title truncate"><%= request.site_name %></span>
+                    <% if request.scheduled? && request.scheduled_period.present? %>
+                      <span class="dash-period-pill dash-period-pill--<%= request.scheduled_period.downcase %>"><%= request.scheduled_period %></span>
+                    <% end %>
                   </div>
                   <p class="job-list-meta mt-0.5 truncate">
-                    <%= request.company_name %> · <%= pluralize(request.cranes.size, "crane") %> · <%= request.reference_code %>
+                    <%= request.company_name %>
+                    · <%= pluralize(request.cranes.size, "crane") %>
+                    <% if request.scheduled? %>
+                      · <%= request.assigned_inspector.presence || "Unassigned" %>
+                    <% end %>
+                    · <%= request.reference_code %>
                   </p>
                 </div>
                 <div class="job-list-status">

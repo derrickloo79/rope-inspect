@@ -706,6 +706,13 @@
     min-width: 0;
   }
 
+  .job-list-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
   .job-list-title {
     font-size: 1rem;
     font-weight: 600;
