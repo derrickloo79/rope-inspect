@@ -12,9 +12,8 @@
   --color-line-strong: #d6d3d1;
   --color-accent: #1d4ed8;
   --color-accent-hover: #1e40af;
-  /* Planner page content width only */
-  --planner-max-width: 72rem;
-  --max-width-planner: 72rem; /* generates max-w-planner utility */
+  /* Planner page: full-bleed content width (side padding only) */
+  --planner-max-width: 100%;
 }
 
 @layer base {
@@ -458,7 +457,7 @@
     box-shadow: inset 0 0 0 1px #e7e5e4;
   }
 
-  /* Planner only: break out of max-w-5xl main up to --planner-max-width (72rem) */
+  /* Planner only: full viewport width, break out of max-w-5xl main */
   .planner--wide {
     box-sizing: border-box;
     width: 100vw;
@@ -468,8 +467,8 @@
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
-    padding-left: max(1.25rem, calc((100vw - var(--planner-max-width)) / 2));
-    padding-right: max(1.25rem, calc((100vw - var(--planner-max-width)) / 2));
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
 
   .planner-accepted-grid {
