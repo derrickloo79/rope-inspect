@@ -77,13 +77,13 @@
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div class="min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
-                          <span class="font-medium text-[--color-ink]"><%= job.company_name %></span>
+                          <span class="dash-upcoming-item__title"><%= job.site_name %></span>
                           <% if job.scheduled_period.present? %>
                             <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
                           <% end %>
                         </div>
-                        <p class="text-sm text-[--color-ink-muted] mt-0.5 truncate">
-                          <%= job.site_name %>
+                        <p class="dash-upcoming-item__meta mt-0.5 truncate">
+                          <%= job.company_name %>
                           · <%= pluralize(job.cranes.size, "crane") %>
                           · <%= job.assigned_inspector.presence || "Unassigned" %>
                           · <%= job.reference_code %>
