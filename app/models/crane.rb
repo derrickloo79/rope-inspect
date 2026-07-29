@@ -1,12 +1,14 @@
 class Crane < ApplicationRecord
   CRANE_TYPES = {
-    "tower_crane" => "Tower crane",
-    "mobile_crane" => "Mobile crane",
     "crawler_crane" => "Crawler crane",
-    "overhead_gantry" => "Overhead / gantry",
-    "rough_terrain" => "Rough terrain",
-    "deck_crane" => "Deck crane",
-    "portal_slewing" => "Portal slewing"
+    "mobile_crane" => "Mobile crane",
+    "tower_crane" => "Tower crane",
+    "fly_jib_crane" => "Fly jib crane",
+    "gantry_crane" => "Gantry crane",
+    "ropeway" => "Ropeway",
+    "zip_line" => "Zip line",
+    "boring_rig" => "Boring rig",
+    "others" => "Others"
   }.freeze
 
   belongs_to :inspection_request, inverse_of: :cranes
