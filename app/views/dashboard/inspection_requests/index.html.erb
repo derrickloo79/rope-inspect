@@ -1,4 +1,4 @@
-<% content_for :title, "Jobs — RopeInspect" %>
+<% content_for :title, "Jobs — Hey Tec Inspect" %>
 
 <div class="space-y-8">
   <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -34,17 +34,19 @@
         <% @inspection_requests.each do |request| %>
           <li>
             <%= link_to dashboard_inspection_request_path(request), class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>
-              <div class="flex flex-row items-center justify-between gap-3">
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="font-medium text-[--color-ink]"><%= request.company_name %></span>
-                    <%= status_badge(request.status) %>
+              <div class="job-list-row">
+                <div class="job-list-details min-w-0">
+                  <div class="job-list-title truncate">
+                    <%= request.site_name %>
                   </div>
-                  <p class="text-sm text-[--color-ink-muted] mt-0.5 truncate">
-                    <%= request.site_name %> · <%= pluralize(request.cranes.size, "crane") %> · <%= request.reference_code %>
+                  <p class="job-list-meta mt-0.5 truncate">
+                    <%= request.company_name %> · <%= pluralize(request.cranes.size, "crane") %> · <%= request.reference_code %>
                   </p>
                 </div>
-                <div class="job-list-timestamp shrink-0 whitespace-nowrap">
+                <div class="job-list-status">
+                  <%= status_badge(request.status) %>
+                </div>
+                <div class="job-list-timestamp whitespace-nowrap">
                   <%= format_list_timestamp(request.created_at) %>
                 </div>
               </div>
