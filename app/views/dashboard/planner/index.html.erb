@@ -20,10 +20,11 @@
       <div class="planner-accepted-grid">
         <% @accepted_jobs.each do |job| %>
           <%= link_to dashboard_inspection_request_path(job), class: "planner-accepted-card no-underline" do %>
-            <p class="planner-accepted-card__title"><%= job.company_name %></p>
-            <p class="planner-accepted-card__meta"><%= job.site_name %></p>
+            <p class="planner-accepted-card__title"><%= job.site_name %></p>
             <p class="planner-accepted-card__meta">
-              <%= pluralize(job.cranes.size, "crane") %> · <%= job.reference_code %>
+              <%= job.company_name %>
+              · <%= pluralize(job.cranes.size, "crane") %>
+              · <%= job.reference_code %>
             </p>
             <span class="planner-accepted-card__cta">Schedule →</span>
           <% end %>
