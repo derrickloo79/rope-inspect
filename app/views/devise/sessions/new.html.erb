@@ -22,10 +22,10 @@
 
   <div class="card">
     <div class="card-section">
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5", data: { turbo: false } }) do |f| %>
         <div>
           <%= f.label :email, class: "field-label" %>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "field-input", required: true %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "username", class: "field-input", required: true %>
         </div>
 
         <div>

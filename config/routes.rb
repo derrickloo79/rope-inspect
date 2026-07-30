@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   devise_for :fsps, skip: [ :registrations ], path: "fsp", path_names: {
     sign_in: "sign_in",
     sign_out: "sign_out"
+  }, controllers: {
+    sessions: "fsps/sessions"
   }
 
   # Public intake

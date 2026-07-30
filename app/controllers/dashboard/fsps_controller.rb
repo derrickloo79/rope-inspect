@@ -23,8 +23,12 @@ module Dashboard
     end
 
     def update
-      if @fsp.update(fsp_params)
-        redirect_to dashboard_fsps_path, notice: "#{@fsp.fsp_number} was updated."
+      attrs = fsp_params
+      password_changed = attrs[:password].present?
+      if @fsp.update(attrs)
+        notice = "#{@fsp.fsp_number} was updated."
+        notice += " Login password was changed — they can sign in at /fsp/sign_in." if password_changed
+        redirect_to dashboard_fsps_path, notice: notice
       else
         render :edit, status: :unprocessable_entity
       end

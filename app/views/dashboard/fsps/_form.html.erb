@@ -58,10 +58,13 @@
       <%= f.password_field :password,
                           class: "field-input",
                           required: !fsp.persisted?,
-                          autocomplete: fsp.persisted? ? "new-password" : "new-password",
-                          minlength: Devise.password_length.min %>
+                          autocomplete: "new-password",
+                          minlength: Devise.password_length.min,
+                          value: nil %>
       <% if fsp.persisted? %>
-        <p class="field-hint">Leave blank to keep the current password.</p>
+        <p class="field-hint">Leave blank to keep the current password. Min <%= Devise.password_length.min %> characters.</p>
+      <% else %>
+        <p class="field-hint">Min <%= Devise.password_length.min %> characters. Used with email to sign in at /fsp/sign_in.</p>
       <% end %>
     </div>
     <div>
@@ -70,7 +73,8 @@
                           class: "field-input",
                           required: !fsp.persisted?,
                           autocomplete: "new-password",
-                          minlength: Devise.password_length.min %>
+                          minlength: Devise.password_length.min,
+                          value: nil %>
     </div>
   </div>
 
