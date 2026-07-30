@@ -666,7 +666,7 @@
   }
 
   .planner-chip__site {
-    font-size: 0.75rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--color-ink);
     line-height: 1.3;
@@ -674,9 +674,9 @@
   }
 
   .planner-chip__company {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     font-weight: 400;
-    color: var(--color-ink);
+    color: var(--color-ink-muted);
     line-height: 1.3;
     word-break: break-word;
   }
