@@ -102,6 +102,19 @@ class InspectionRequest < ApplicationRecord
     fsp&.display_name.presence || assigned_inspector.presence
   end
 
+  # Sort key for day lists / planner chips: AM before PM, then FSP number, then company.
+  def schedule_sort_key
+    period_rank =
+      case scheduled_period
+      when "AM" then 0
+      when "PM" then 1
+      else 2
+      end
+
+    fsp_rank = fsp&.sequence_number || Float::INFINITY
+    [ period_rank, fsp_rank, company_name.to_s.downcase ]
+  end
+
   def complete!
     return false unless scheduled?
 

@@ -58,7 +58,9 @@
     <% if @upcoming_by_day.any? %>
       <div class="space-y-6">
         <% @upcoming_by_day.each do |date, jobs| %>
-          <div>
+          <% am_jobs, rest = jobs.partition { |j| j.scheduled_period == "AM" } %>
+          <% pm_jobs = rest # PM + any jobs without period %>
+          <div class="dash-day-block">
             <h3 class="dash-day-heading">
               <% if date == Date.current %>
                 Today · <%= date.strftime("%-d %b") %>
@@ -69,32 +71,47 @@
               <% end %>
             </h3>
 
-            <ul class="dash-upcoming-list mt-2">
-              <% jobs.each do |job| %>
-                <li>
-                  <%= link_to dashboard_inspection_request_path(job),
-                              class: "dash-upcoming-item no-underline block" do %>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <div class="min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                          <span class="dash-upcoming-item__title"><%= job.site_name %></span>
-                          <% if job.scheduled_period.present? %>
-                            <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
+            <div class="dash-period-cols mt-3">
+              <% [
+                [ "AM", am_jobs, "am" ],
+                [ "PM", pm_jobs, "pm" ]
+              ].each do |label, period_jobs, period_key| %>
+                <div class="dash-period-col">
+                  <div class="dash-period-col__header">
+                    <span class="dash-period-pill dash-period-pill--<%= period_key %>"><%= label %></span>
+                  </div>
+                  <% if period_jobs.any? %>
+                    <ul class="dash-upcoming-list">
+                      <% period_jobs.each do |job| %>
+                        <li>
+                          <%= link_to dashboard_inspection_request_path(job),
+                                      class: "dash-upcoming-item no-underline block" do %>
+                            <span class="dash-upcoming-item__title truncate"><%= job.site_name %></span>
+                            <p class="dash-upcoming-item__meta mt-0.5 truncate">
+                              <%= job.company_name %>
+                              · <%= pluralize(job.cranes.size, "crane") %>
+                              · <%= job.reference_code %>
+                            </p>
+                            <div class="dash-upcoming-item__fsp mt-1.5">
+                              <% if job.fsp.present? %>
+                                <span class="fsp-color-swatch dash-upcoming-item__swatch"
+                                      style="background-color: <%= job.fsp.color %>;"
+                                      title="<%= job.fsp.display_name %>"></span>
+                                <span class="dash-upcoming-item__fsp-number"><%= job.fsp.fsp_number %></span>
+                              <% else %>
+                                <span class="dash-upcoming-item__unassigned">Unassigned</span>
+                              <% end %>
+                            </div>
                           <% end %>
-                        </div>
-                        <p class="dash-upcoming-item__meta mt-0.5 truncate">
-                          <%= job.company_name %>
-                          · <%= pluralize(job.cranes.size, "crane") %>
-                          · <%= job.inspector_label.presence || "Unassigned" %>
-                          · <%= job.reference_code %>
-                        </p>
-                      </div>
-                      <span class="text-sm text-[--color-ink-faint] shrink-0" aria-hidden="true">→</span>
-                    </div>
+                        </li>
+                      <% end %>
+                    </ul>
+                  <% else %>
+                    <p class="dash-period-col__empty">No jobs</p>
                   <% end %>
-                </li>
+                </div>
               <% end %>
-            </ul>
+            </div>
           </div>
         <% end %>
       </div>
