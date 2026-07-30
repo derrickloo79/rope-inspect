@@ -20,27 +20,25 @@
               <th class="px-5 py-3 font-medium">Contact</th>
               <th class="px-5 py-3 font-medium">Email</th>
               <th class="px-5 py-3 font-medium">Joined</th>
-              <th class="px-5 py-3 font-medium">Color</th>
               <th class="px-5 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[--color-line]">
             <% @fsps.each do |fsp| %>
               <tr class="hover:bg-stone-50">
-                <td class="px-5 py-3">
-                  <span class="inline-flex items-center gap-2 font-mono font-medium text-[--color-ink]">
+                <td class="fsp-list-id-cell px-5 py-3">
+                  <span class="fsp-list-id">
                     <span class="fsp-color-swatch" style="background-color: <%= fsp.color %>;" title="<%= fsp.color %>"></span>
-                    <%= fsp.fsp_number %>
+                    <span class="fsp-list-id__number"><%= fsp.fsp_number %></span>
                   </span>
                 </td>
-                <td class="px-5 py-3 font-medium text-[--color-ink]"><%= fsp.full_name %></td>
-                <td class="px-5 py-3 text-[--color-ink-muted] whitespace-nowrap font-mono text-xs sm:text-sm" title="WhatsApp: <%= fsp.whatsapp_number %>">
+                <td class="px-5 py-3 align-middle font-medium text-[--color-ink]"><%= fsp.full_name %></td>
+                <td class="px-5 py-3 align-middle text-[--color-ink-muted] whitespace-nowrap font-mono text-xs sm:text-sm" title="WhatsApp: <%= fsp.whatsapp_number %>">
                   <%= fsp.full_contact_number %>
                 </td>
-                <td class="px-5 py-3 text-[--color-ink-muted]"><%= fsp.email %></td>
-                <td class="px-5 py-3 text-[--color-ink-muted] whitespace-nowrap"><%= format_date(fsp.date_joined) %></td>
-                <td class="px-5 py-3 text-[--color-ink-muted] font-mono text-xs"><%= fsp.color %></td>
-                <td class="px-5 py-3 text-right whitespace-nowrap">
+                <td class="px-5 py-3 align-middle text-[--color-ink-muted]"><%= fsp.email %></td>
+                <td class="px-5 py-3 align-middle text-[--color-ink-muted] whitespace-nowrap"><%= format_date(fsp.date_joined) %></td>
+                <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
                   <%= link_to "Edit", edit_dashboard_fsp_path(fsp), class: "text-sm no-underline font-medium" %>
                   <span class="text-[--color-ink-faint] mx-1">·</span>
                   <%= button_to "Delete",
