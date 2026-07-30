@@ -692,14 +692,22 @@
 
   .planner-chip__meta {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    justify-content: space-between;
+    align-items: end;
     gap: 0.25rem;
   }
 
   .planner-chip__inspector {
-    font-size: 0.6875rem;
-    color: var(--color-ink-muted);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 999px;
+    width: 36px;
+    height: 36px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #fafaf9;
+    background-color: var(--color-ink);
   }
 
   /* Jobs list row: equal-width details + status cols; date fixed on the right */
