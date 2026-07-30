@@ -15,10 +15,12 @@ module Dashboard
       scheduled = InspectionRequest.scheduled
         .includes(:cranes, :fsp)
         .where(scheduled_on: @week_start..@week_end)
-        .order(:scheduled_on, :scheduled_time, :company_name)
       scheduled = scheduled.where(fsp_id: @fsp_filter) if @fsp_filter.present?
 
-      @scheduled_by_day = scheduled.group_by(&:scheduled_on)
+      # Per day: AM before PM, then ascending FSP number (unassigned last).
+      @scheduled_by_day = scheduled.group_by(&:scheduled_on).transform_values do |jobs|
+        jobs.sort_by { |job| planner_chip_sort_key(job) }
+      end
     end
 
     private
@@ -28,6 +30,18 @@ module Dashboard
       date.beginning_of_week(:monday)
     rescue Date::Error, ArgumentError
       Date.current.beginning_of_week(:monday)
+    end
+
+    def planner_chip_sort_key(job)
+      period_rank =
+        case job.scheduled_period
+        when "AM" then 0
+        when "PM" then 1
+        else 2
+        end
+
+      fsp_rank = job.fsp&.sequence_number || Float::INFINITY
+      [ period_rank, fsp_rank, job.company_name.to_s.downcase ]
     end
   end
 end
