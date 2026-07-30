@@ -61,9 +61,11 @@ export default class extends Controller {
       'input[name="inspection_request[scheduled_time]"]:checked'
     )
     const timeValue = timeInput?.value || ""
-    const inspector = (
-      this.element.querySelector('[name="inspection_request[assigned_inspector]"]')?.value || ""
-    ).trim()
+    const fspSelect = this.element.querySelector('[name="inspection_request[fsp_id]"]')
+    let inspector = ""
+    if (fspSelect && fspSelect.selectedIndex > 0) {
+      inspector = (fspSelect.options[fspSelect.selectedIndex]?.text || "").trim()
+    }
 
     if (!dateValue && !timeValue && !inspector) {
       this.summaryTextTarget.textContent = this.emptyLabelValue

@@ -1,9 +1,23 @@
-<% content_for :title, "Staff sign in — RopeInspect" %>
+<% if resource_name == :fsp %>
+  <% content_for :title, "FSP sign in — Hey Tec Inspect" %>
+  <% heading = "FSP sign in" %>
+  <% lede = "Sign in to view jobs assigned to you." %>
+  <% submit_label = "Sign in to my jobs" %>
+  <% other_path = new_user_session_path %>
+  <% other_label = "Staff sign in" %>
+<% else %>
+  <% content_for :title, "Staff sign in — Hey Tec Inspect" %>
+  <% heading = "Staff sign in" %>
+  <% lede = "Sign in to review and schedule inspection jobs." %>
+  <% submit_label = "Sign in" %>
+  <% other_path = new_fsp_session_path %>
+  <% other_label = "FSP sign in" %>
+<% end %>
 
 <div class="max-w-md mx-auto">
   <div class="mb-8 text-center">
-    <h1 class="page-title">Staff sign in</h1>
-    <p class="page-lede mx-auto">Sign in to review and schedule inspection jobs.</p>
+    <h1 class="page-title"><%= heading %></h1>
+    <p class="page-lede mx-auto"><%= lede %></p>
   </div>
 
   <div class="card">
@@ -27,14 +41,19 @@
         <% end %>
 
         <div>
-          <%= f.submit "Sign in", class: "btn-primary w-full cursor-pointer" %>
+          <%= f.submit submit_label, class: "btn-primary w-full cursor-pointer" %>
         </div>
       <% end %>
     </div>
   </div>
 
-  <p class="mt-6 text-center text-sm text-[--color-ink-faint]">
-    Looking to request an inspection?
-    <%= link_to "Use the public form", root_path %>.
+  <p class="mt-6 text-center text-sm text-[--color-ink-faint] space-y-1">
+    <span class="block">
+      <%= link_to other_label, other_path %>.
+    </span>
+    <span class="block">
+      Looking to request an inspection?
+      <%= link_to "Use the public form", root_path %>.
+    </span>
   </p>
 </div>

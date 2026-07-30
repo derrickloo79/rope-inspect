@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_07_30_095808) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_30_102001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -37,9 +37,14 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_095808) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "country_code", default: "+65", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
     t.index ["color"], name: "index_fsps_on_color", unique: true
-    t.index ["email"], name: "index_fsps_on_email"
+    t.index ["email"], name: "index_fsps_on_email", unique: true
     t.index ["fsp_number"], name: "index_fsps_on_fsp_number", unique: true
+    t.index ["reset_password_token"], name: "index_fsps_on_reset_password_token", unique: true
     t.index ["sequence_number"], name: "index_fsps_on_sequence_number", unique: true
   end
 
@@ -61,6 +66,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_095808) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "rejected_at"
+    t.bigint "fsp_id"
+    t.index ["fsp_id"], name: "index_inspection_requests_on_fsp_id"
     t.index ["share_token"], name: "index_inspection_requests_on_share_token", unique: true
     t.index ["status"], name: "index_inspection_requests_on_status"
   end
@@ -78,4 +85,5 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_30_095808) do
   end
 
   add_foreign_key "cranes", "inspection_requests"
+  add_foreign_key "inspection_requests", "fsps"
 end

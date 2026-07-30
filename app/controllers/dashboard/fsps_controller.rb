@@ -43,7 +43,21 @@ module Dashboard
     end
 
     def fsp_params
-      params.require(:fsp).permit(:full_name, :country_code, :contact_number, :email, :date_joined, :color)
+      permitted = params.require(:fsp).permit(
+        :full_name,
+        :country_code,
+        :contact_number,
+        :email,
+        :date_joined,
+        :color,
+        :password,
+        :password_confirmation
+      )
+      # Blank password on edit means "leave unchanged" (Devise still validates empty strings).
+      if permitted[:password].blank?
+        permitted = permitted.except(:password, :password_confirmation)
+      end
+      permitted
     end
   end
 end

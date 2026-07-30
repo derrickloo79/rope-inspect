@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
   devise_for :users, skip: [ :registrations ]
+  devise_for :fsps, skip: [ :registrations ], path: "fsp", path_names: {
+    sign_in: "sign_in",
+    sign_out: "sign_out"
+  }
 
   # Public intake
   resources :inspection_requests, only: [ :new, :create ] do
@@ -11,7 +15,7 @@ Rails.application.routes.draw do
   # Public shareable status timeline (token-based)
   get "status/:token", to: "status#show", as: :public_status
 
-  # Internal dashboard
+  # Internal staff dashboard
   namespace :dashboard do
     root to: "home#index"
     get "planner", to: "planner#index", as: :planner
@@ -25,6 +29,12 @@ Rails.application.routes.draw do
         patch :complete
       end
     end
+  end
+
+  # FSP portal — inspectors view only their assigned jobs
+  namespace :portal do
+    root to: "jobs#index"
+    resources :jobs, only: [ :index, :show ]
   end
 
   root "inspection_requests#new"

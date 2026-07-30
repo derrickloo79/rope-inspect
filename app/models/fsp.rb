@@ -1,4 +1,10 @@
 class Fsp < ApplicationRecord
+  # Login so inspectors can view their assigned jobs.
+  devise :database_authenticatable,
+         :recoverable,
+         :rememberable,
+         :validatable
+
   # Distinct palette for chips / planner differentiation.
   COLOR_PALETTE = %w[
     #ef4444
@@ -57,8 +63,9 @@ class Fsp < ApplicationRecord
 
   DEFAULT_COUNTRY_CODE = "+65"
 
-  validates :full_name, :contact_number, :country_code, :email, :date_joined, presence: true
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
+  has_many :inspection_requests, dependent: :nullify, inverse_of: :fsp
+
+  validates :full_name, :contact_number, :country_code, :date_joined, presence: true
   validates :country_code, inclusion: { in: COUNTRY_CODES.map(&:last) }
   validates :contact_number, format: {
     with: /\A[0-9][0-9\s\-]{5,18}\z/,
@@ -85,6 +92,11 @@ class Fsp < ApplicationRecord
   def whatsapp_number
     national = contact_number.to_s.gsub(/\D/, "").sub(/\A0+/, "")
     "#{country_code.to_s.gsub(/\D/, "")}#{national}"
+  end
+
+  # Jobs this FSP can see in the portal (assigned only).
+  def assigned_jobs
+    inspection_requests.includes(:cranes).recent_first
   end
 
   private

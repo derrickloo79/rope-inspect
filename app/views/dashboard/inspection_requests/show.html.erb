@@ -170,11 +170,16 @@
                 </div>
               </div>
               <div>
-                <label class="field-label" for="assigned_inspector">Inspector/FSP</label>
-                <input type="text" name="inspection_request[assigned_inspector]" id="assigned_inspector"
-                       value="<%= @inspection_request.assigned_inspector %>"
-                       class="field-input" placeholder="e.g. Tan Wei Ming"
-                       data-action="input->schedule-form#clearError input->schedule-dock#refreshSummary">
+                <label class="field-label" for="fsp_id">Inspector / FSP</label>
+                <select name="inspection_request[fsp_id]" id="fsp_id" class="field-select"
+                        data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary">
+                  <option value="">Unassigned</option>
+                  <% Fsp.ordered.each do |fsp| %>
+                    <option value="<%= fsp.id %>" <%= "selected" if @inspection_request.fsp_id == fsp.id %>>
+                      <%= fsp.display_name %>
+                    </option>
+                  <% end %>
+                </select>
               </div>
             <% end %>
           </div>
@@ -249,11 +254,16 @@
                 </div>
               </div>
               <div>
-                <label class="field-label" for="assigned_inspector">Inspector/FSP</label>
-                <input type="text" name="inspection_request[assigned_inspector]" id="assigned_inspector"
-                       value="<%= @inspection_request.assigned_inspector %>"
-                       class="field-input" placeholder="e.g. Tan Wei Ming"
-                       data-action="input->schedule-form#clearError">
+                <label class="field-label" for="fsp_id">Inspector / FSP</label>
+                <select name="inspection_request[fsp_id]" id="fsp_id" class="field-select"
+                        data-action="change->schedule-form#clearError">
+                  <option value="">Unassigned</option>
+                  <% Fsp.ordered.each do |fsp| %>
+                    <option value="<%= fsp.id %>" <%= "selected" if @inspection_request.fsp_id == fsp.id %>>
+                      <%= fsp.display_name %>
+                    </option>
+                  <% end %>
+                </select>
               </div>
               <button type="submit" class="btn-secondary w-full cursor-pointer">
                 Update schedule

@@ -73,8 +73,8 @@
                       <% if job.scheduled_period.present? %>
                         <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
                       <% end %>
-                      <% if job.assigned_inspector.present? %>
-                        <span class="planner-chip__inspector"><%= job.assigned_inspector %></span>
+                      <% if job.inspector_label.present? %>
+                        <span class="planner-chip__inspector"><%= job.inspector_label %></span>
                       <% end %>
                     </span>
                   <% end %>

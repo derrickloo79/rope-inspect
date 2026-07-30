@@ -9,6 +9,8 @@ module ApplicationHelper
       controller_path == "dashboard/fsps"
     when :jobs
       controller_path == "dashboard/inspection_requests"
+    when :portal_jobs
+      controller_path == "portal/jobs"
     when :public_form
       controller_path == "inspection_requests" || controller_path == "status"
     else
@@ -97,7 +99,8 @@ module ApplicationHelper
       parts << inspection_request.scheduled_on.strftime("%-d %b, %y")
     end
     parts << inspection_request.scheduled_period if inspection_request.scheduled_period.present?
-    parts << inspection_request.assigned_inspector if inspection_request.assigned_inspector.present?
+    label = inspection_request.inspector_label
+    parts << label if label.present?
     parts.presence&.join(" · ") || "Set schedule"
   end
 end

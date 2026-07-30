@@ -6,11 +6,11 @@ module Dashboard
       @week_days = (@week_start..@week_end).to_a
 
       @accepted_jobs = InspectionRequest.accepted
-        .includes(:cranes)
+        .includes(:cranes, :fsp)
         .order(Arel.sql("accepted_at DESC NULLS LAST"), created_at: :desc)
 
       @scheduled_by_day = InspectionRequest.scheduled
-        .includes(:cranes)
+        .includes(:cranes, :fsp)
         .where(scheduled_on: @week_start..@week_end)
         .order(:scheduled_on, :scheduled_time, :company_name)
         .group_by(&:scheduled_on)

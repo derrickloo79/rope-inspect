@@ -4,7 +4,7 @@ module Dashboard
 
     def index
       @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
-      scope = InspectionRequest.includes(:cranes).recent_first
+      scope = InspectionRequest.includes(:cranes, :fsp).recent_first
       scope = scope.where(status: @status_filter) if @status_filter
       @inspection_requests = scope
       @counts = InspectionRequest.group(:status).count
@@ -47,7 +47,8 @@ module Dashboard
       on = params.dig(:inspection_request, :scheduled_on).presence
       period = params.dig(:inspection_request, :scheduled_time).presence_in(%w[AM PM])
       at = period_to_time(period)
-      inspector = params.dig(:inspection_request, :assigned_inspector).presence
+      fsp_id = params.dig(:inspection_request, :fsp_id).presence
+      fsp = fsp_id.present? ? Fsp.find_by(id: fsp_id) : nil
 
       if on.blank?
         redirect_to dashboard_inspection_request_path(@inspection_request),
@@ -61,7 +62,13 @@ module Dashboard
         return
       end
 
-      if @inspection_request.schedule!(on: on, at: at, inspector: inspector)
+      if fsp_id.present? && fsp.nil?
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "Selected FSP was not found."
+        return
+      end
+
+      if @inspection_request.schedule!(on: on, at: at, fsp: fsp)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Inspection scheduled."
       else
@@ -83,7 +90,7 @@ module Dashboard
     private
 
     def set_inspection_request
-      @inspection_request = InspectionRequest.includes(:cranes).find(params[:id])
+      @inspection_request = InspectionRequest.includes(:cranes, :fsp).find(params[:id])
     end
 
     # Map AM/PM radio values to a time-of-day stored on scheduled_time.

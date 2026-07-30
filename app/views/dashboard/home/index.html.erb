@@ -85,7 +85,7 @@
                         <p class="dash-upcoming-item__meta mt-0.5 truncate">
                           <%= job.company_name %>
                           · <%= pluralize(job.cranes.size, "crane") %>
-                          · <%= job.assigned_inspector.presence || "Unassigned" %>
+                          · <%= job.inspector_label.presence || "Unassigned" %>
                           · <%= job.reference_code %>
                         </p>
                       </div>

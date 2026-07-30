@@ -1,6 +1,7 @@
 class InspectionRequest < ApplicationRecord
   STATUSES = %w[pending accepted scheduled completed rejected].freeze
 
+  belongs_to :fsp, optional: true, inverse_of: :inspection_requests
   has_many :cranes, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :inspection_request
   accepts_nested_attributes_for :cranes, allow_destroy: true, reject_if: :all_blank
 
@@ -11,6 +12,7 @@ class InspectionRequest < ApplicationRecord
 
   before_validation :set_default_status, on: :create
   before_validation :assign_crane_positions
+  before_validation :sync_assigned_inspector_from_fsp
 
   scope :pending, -> { where(status: "pending") }
   scope :accepted, -> { where(status: "accepted") }
@@ -18,6 +20,7 @@ class InspectionRequest < ApplicationRecord
   scope :completed, -> { where(status: "completed") }
   scope :rejected, -> { where(status: "rejected") }
   scope :recent_first, -> { order(created_at: :desc) }
+  scope :for_fsp, ->(fsp) { where(fsp_id: fsp.id) }
   scope :upcoming_within, ->(days = 7) {
     scheduled
       .where.not(scheduled_on: nil)
@@ -81,16 +84,22 @@ class InspectionRequest < ApplicationRecord
     update!(status: "pending", rejected_at: nil)
   end
 
-  def schedule!(on:, at: nil, inspector: nil)
+  # fsp: Fsp record, or nil to leave unassigned.
+  def schedule!(on:, at: nil, fsp: nil)
     return false unless accepted? || scheduled?
 
     update!(
       status: "scheduled",
       scheduled_on: on,
       scheduled_time: at,
-      assigned_inspector: inspector.presence || assigned_inspector,
-      scheduled_at: Time.current
+      scheduled_at: Time.current,
+      fsp: fsp,
+      assigned_inspector: fsp&.display_name
     )
+  end
+
+  def inspector_label
+    fsp&.display_name.presence || assigned_inspector.presence
   end
 
   def complete!
@@ -183,7 +192,14 @@ class InspectionRequest < ApplicationRecord
 
     parts = [ scheduled_on.strftime("%-d %b, %y") ]
     parts << scheduled_period if scheduled_period.present?
-    parts << "· #{assigned_inspector}" if assigned_inspector.present?
+    label = inspector_label
+    parts << "· #{label}" if label.present?
     parts.join(" ")
+  end
+
+  def sync_assigned_inspector_from_fsp
+    return if fsp.blank?
+
+    self.assigned_inspector = fsp.display_name
   end
 end

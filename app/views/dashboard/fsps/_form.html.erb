@@ -47,8 +47,31 @@
   </div>
 
   <div>
-    <%= f.label :email, "Email address", class: "field-label" %>
+    <%= f.label :email, "Email address (login)", class: "field-label" %>
     <%= f.email_field :email, class: "field-input", required: true, autocomplete: "email" %>
+    <p class="field-hint">Used by the FSP to sign in to their job portal.</p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <%= f.label :password, fsp.persisted? ? "New password" : "Password", class: "field-label" %>
+      <%= f.password_field :password,
+                          class: "field-input",
+                          required: !fsp.persisted?,
+                          autocomplete: fsp.persisted? ? "new-password" : "new-password",
+                          minlength: Devise.password_length.min %>
+      <% if fsp.persisted? %>
+        <p class="field-hint">Leave blank to keep the current password.</p>
+      <% end %>
+    </div>
+    <div>
+      <%= f.label :password_confirmation, "Confirm password", class: "field-label" %>
+      <%= f.password_field :password_confirmation,
+                          class: "field-input",
+                          required: !fsp.persisted?,
+                          autocomplete: "new-password",
+                          minlength: Devise.password_length.min %>
+    </div>
   </div>
 
   <div>
