@@ -6,15 +6,16 @@ class Fsp < ApplicationRecord
          :validatable
 
   # Prefixed soft palette (8) for chips / planner differentiation — matches form swatches.
+  # Slightly deeper pastels so badges stay readable on white.
   COLOR_PALETTE = %w[
-    #93c5fd
-    #f5a3a3
-    #f5e08a
-    #86efac
-    #99f6e4
-    #c4b5fd
-    #f9a8d4
-    #d6c3b0
+    #60a5fa
+    #f07171
+    #eab308
+    #4ade80
+    #2dd4bf
+    #a78bfa
+    #f472b6
+    #a8a29e
   ].freeze
 
   # Dial codes for contact / WhatsApp (label, E.164 prefix). SG first as app default.
