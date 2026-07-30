@@ -5,28 +5,16 @@ class Fsp < ApplicationRecord
          :rememberable,
          :validatable
 
-  # Distinct palette for chips / planner differentiation.
+  # Prefixed soft palette (8) for chips / planner differentiation — matches form swatches.
   COLOR_PALETTE = %w[
-    #ef4444
-    #f97316
-    #eab308
-    #84cc16
-    #22c55e
-    #14b8a6
-    #06b6d4
-    #0ea5e9
-    #3b82f6
-    #6366f1
-    #8b5cf6
-    #a855f7
-    #d946ef
-    #ec4899
-    #f43f5e
-    #78716c
-    #0f766e
-    #b45309
-    #1d4ed8
-    #7c3aed
+    #93c5fd
+    #f5a3a3
+    #f5e08a
+    #86efac
+    #99f6e4
+    #c4b5fd
+    #f9a8d4
+    #d6c3b0
   ].freeze
 
   # Dial codes for contact / WhatsApp (label, E.164 prefix). SG first as app default.
@@ -73,6 +61,10 @@ class Fsp < ApplicationRecord
   }
   validates :sequence_number, :fsp_number, :color, presence: true, uniqueness: true
   validates :color, format: { with: /\A#[0-9a-fA-F]{6}\z/, message: "must be a hex color like #3b82f6" }
+  validates :color, inclusion: {
+    in: COLOR_PALETTE,
+    message: "must be one of the available swatches"
+  }, if: -> { color.present? && color.match?(/\A#[0-9a-fA-F]{6}\z/) }
 
   before_validation :assign_identity, on: :create
   before_validation :normalize_contact_number

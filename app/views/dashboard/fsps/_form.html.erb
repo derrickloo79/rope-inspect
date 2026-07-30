@@ -84,14 +84,31 @@
   </div>
 
   <% if fsp.persisted? %>
+    <%
+      selected_color = fsp.color.to_s.downcase
+      palette = Fsp::COLOR_PALETTE
+      # Keep a legacy color visible if it isn't in the current 8-swatch set.
+      unless palette.any? { |c| c.casecmp?(fsp.color.to_s) }
+        palette = palette + [ fsp.color ]
+      end
+    %>
     <div>
-      <%= f.label :color, "Color", class: "field-label" %>
-      <div class="flex items-center gap-3">
-        <%= f.color_field :color,
-                          class: "h-10 w-14 rounded-md border border-[--color-line-strong] cursor-pointer bg-white p-1",
-                          value: fsp.color %>
-        <p class="field-hint !mt-0">Used to distinguish this FSP on the planner and job views. Must be unique.</p>
+      <p class="field-label" id="fsp-color-label">Color</p>
+      <div class="fsp-color-picker" role="radiogroup" aria-labelledby="fsp-color-label">
+        <% palette.each do |hex| %>
+          <label class="fsp-color-option">
+            <%= f.radio_button :color, hex,
+                               checked: hex.casecmp?(selected_color) || (selected_color.blank? && hex == Fsp::COLOR_PALETTE.first),
+                               class: "fsp-color-option__input" %>
+            <span class="fsp-color-option__swatch" style="background-color: <%= hex %>;" title="<%= hex %>">
+              <svg class="fsp-color-option__check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12l5 5L20 7" />
+              </svg>
+            </span>
+          </label>
+        <% end %>
       </div>
+      <p class="field-hint">Used to distinguish this FSP on the planner and job views. Each color can only be used once.</p>
     </div>
   <% else %>
     <p class="text-sm text-[--color-ink-muted]">

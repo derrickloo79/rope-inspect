@@ -779,6 +779,70 @@
     border: 1px solid rgba(0, 0, 0, 0.08);
   }
 
+  /* FSP form: 8 prefixed color swatches in a row */
+  .fsp-color-picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .fsp-color-option {
+    position: relative;
+    display: inline-flex;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .fsp-color-option__input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
+  .fsp-color-option__swatch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .fsp-color-option__check {
+    width: 1rem;
+    height: 1rem;
+    color: #1c1917;
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+  }
+
+  .fsp-color-option__input:checked + .fsp-color-option__swatch {
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+      0 0 0 2px #fff,
+      0 0 0 4px rgba(28, 25, 23, 0.35);
+  }
+
+  .fsp-color-option__input:checked + .fsp-color-option__swatch .fsp-color-option__check {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .fsp-color-option__input:focus-visible + .fsp-color-option__swatch {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  .fsp-color-option:hover .fsp-color-option__swatch {
+    transform: scale(1.06);
+  }
+
   /* Jobs list row: equal-width details + status cols; date fixed on the right */
   .job-list-row {
     display: grid;
