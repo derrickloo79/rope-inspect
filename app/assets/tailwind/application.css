@@ -471,6 +471,15 @@
     padding-right: 1.25rem;
   }
 
+  .planner-accepted-header__title {
+    font-size: .9375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+  .planner-accepted-header__counter {
+    font-size: .9375rem;
+    color: var(--color-ink-muted);
+  }
   .planner-accepted-grid {
     display: grid;
     grid-template-columns: 1fr;

@@ -8,12 +8,9 @@
 
   <%# Section A: Accepted jobs ready to schedule %>
   <section class="space-y-4" aria-labelledby="planner-accepted-heading">
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
-      <div>
-        <h2 id="planner-accepted-heading" class="section-label">Accepted</h2>
-        <p class="text-sm text-[--color-ink-muted] mt-1">Jobs ready to schedule.</p>
-      </div>
-      <p class="text-sm text-[--color-ink-faint]"><%= pluralize(@accepted_jobs.size, "job") %></p>
+    <div class="flex gap-2">
+      <span class="planner-accepted-header__title">Accepted</span>
+      <span class="planner-accepted-header__counter">(<%= @accepted_jobs.size %>)</span>
     </div>
 
     <% if @accepted_jobs.any? %>
