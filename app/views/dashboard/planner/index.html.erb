@@ -73,8 +73,12 @@
                       <% if job.scheduled_period.present? %>
                         <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
                       <% end %>
-                      <% if job.inspector_label.present? %>
-                        <span class="planner-chip__inspector"><%= job.inspector_label %></span>
+                      <% if job.fsp.present? %>
+                        <span class="planner-chip__inspector"
+                              style="background-color: <%= job.fsp.color %>;"
+                              title="<%= job.fsp.display_name %>">
+                          <%= job.fsp.fsp_number %>
+                        </span>
                       <% end %>
                     </span>
                   <% end %>
