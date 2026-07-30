@@ -90,8 +90,11 @@
               <div class="planner-day__body">
                 <% if jobs.any? %>
                   <% jobs.each do |job| %>
+                    <% chip_style = job.fsp.present? ? "background-color: #{job.fsp.color};" : nil %>
                     <%= link_to dashboard_inspection_request_path(job),
-                                class: "planner-chip no-underline",
+                                class: "planner-chip no-underline#{' planner-chip--colored' if job.fsp.present?}",
+                                style: chip_style,
+                                title: job.fsp&.display_name,
                                 data: { turbo_frame: "_top" } do %>
                       <span class="planner-chip__site"><%= job.site_name %></span>
                       <span class="planner-chip__company">
@@ -102,11 +105,7 @@
                           <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
                         <% end %>
                         <% if job.fsp.present? %>
-                          <span class="planner-chip__inspector"
-                                style="background-color: <%= job.fsp.color %>;"
-                                title="<%= job.fsp.display_name %>">
-                            <%= job.fsp.fsp_number %>
-                          </span>
+                          <span class="planner-chip__fsp-number"><%= job.fsp.fsp_number %></span>
                         <% end %>
                       </span>
                     <% end %>
