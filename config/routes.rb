@@ -21,6 +21,8 @@ Rails.application.routes.draw do
   namespace :dashboard do
     root to: "home#index"
     get "planner", to: "planner#index", as: :planner
+    resource :profile, only: [ :edit, :update ]
+    resources :users, path: "admins", except: [ :show ]
     resources :fsps, path: "fsps", except: [ :show ]
     resources :inspection_requests, only: [ :index, :show ], path: "jobs" do
       member do

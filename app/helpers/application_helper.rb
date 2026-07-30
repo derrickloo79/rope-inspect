@@ -7,6 +7,10 @@ module ApplicationHelper
       controller_path == "dashboard/planner"
     when :fsps
       controller_path == "dashboard/fsps"
+    when :admins
+      controller_path == "dashboard/users"
+    when :profile
+      controller_path == "dashboard/profiles"
     when :jobs
       controller_path == "dashboard/inspection_requests"
     when :portal_jobs

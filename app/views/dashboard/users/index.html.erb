@@ -1,0 +1,58 @@
+<% content_for :title, "Admins — Hey Tec Inspect" %>
+
+<div class="space-y-8">
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div>
+      <h1 class="page-title">Admins</h1>
+      <p class="page-lede">Staff accounts that can access the dashboard.</p>
+    </div>
+    <%= link_to "Add admin", new_dashboard_user_path, class: "btn-primary no-underline shrink-0" %>
+  </div>
+
+  <% if @users.any? %>
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="text-[--color-ink-muted] border-b border-[--color-line]">
+            <tr>
+              <th class="px-5 py-3 font-medium">Name</th>
+              <th class="px-5 py-3 font-medium">Email</th>
+              <th class="px-5 py-3 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[--color-line]">
+            <% @users.each do |user| %>
+              <tr class="hover:bg-stone-50">
+                <td class="px-5 py-3 align-middle font-medium text-[--color-ink]">
+                  <%= user.name %>
+                  <% if user == current_user %>
+                    <span class="text-xs font-normal text-[--color-ink-muted]">(you)</span>
+                  <% end %>
+                </td>
+                <td class="px-5 py-3 align-middle text-[--color-ink-muted]"><%= user.email %></td>
+                <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
+                  <%= link_to "Edit", edit_dashboard_user_path(user), class: "text-sm no-underline font-medium" %>
+                  <% unless user == current_user %>
+                    <span class="text-[--color-ink-faint] mx-1">·</span>
+                    <%= button_to "Delete",
+                                  dashboard_user_path(user),
+                                  method: :delete,
+                                  class: "text-sm text-red-700 bg-transparent border-0 p-0 cursor-pointer font-medium inline",
+                                  form: { class: "inline", data: { turbo_confirm: "Delete admin #{user.display_name}?" } } %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="text-center py-12 text-[--color-ink-muted]">
+      <p class="font-medium text-[--color-ink]">No admins yet</p>
+      <p class="text-sm mt-1">
+        <%= link_to "Add the first admin", new_dashboard_user_path %>.
+      </p>
+    </div>
+  <% end %>
+</div>

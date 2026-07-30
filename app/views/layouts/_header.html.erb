@@ -15,11 +15,15 @@
         <%= link_to "Jobs", dashboard_inspection_requests_path, class: site_header_link_class(:jobs) %>
         <%= link_to "Planner", dashboard_planner_path, class: site_header_link_class(:planner) %>
         <%= link_to "FSPs", dashboard_fsps_path, class: site_header_link_class(:fsps) %>
+        <%= link_to "Admins", dashboard_users_path, class: site_header_link_class(:admins) %>
         <%= link_to "Public form", root_path, class: site_header_link_class(:public_form) %>
       </nav>
 
       <div class="site-header-desktop-account">
-        <span class="site-header-email"><%= current_user.email %></span>
+        <%= link_to current_user.display_name,
+                    edit_dashboard_profile_path,
+                    class: "site-header-email no-underline #{'is-active' if nav_link_active?(:profile)}",
+                    title: current_user.email %>
         <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn-ghost !py-1.5 !px-2 text-sm" %>
       </div>
 
@@ -118,13 +122,19 @@
           <%= link_to "FSPs", dashboard_fsps_path,
                       class: site_header_link_class(:fsps),
                       data: { action: "menu#navigate" } %>
+          <%= link_to "Admins", dashboard_users_path,
+                      class: site_header_link_class(:admins),
+                      data: { action: "menu#navigate" } %>
           <%= link_to "Public form", root_path,
                       class: site_header_link_class(:public_form),
+                      data: { action: "menu#navigate" } %>
+          <%= link_to "My profile", edit_dashboard_profile_path,
+                      class: site_header_link_class(:profile),
                       data: { action: "menu#navigate" } %>
         </nav>
 
         <div class="site-header-mobile-account">
-          <span class="site-header-mobile-email"><%= current_user.email %></span>
+          <span class="site-header-mobile-email"><%= current_user.display_name %></span>
           <%= button_to "Sign out",
                         destroy_user_session_path,
                         method: :delete,
