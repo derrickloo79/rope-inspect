@@ -1,0 +1,66 @@
+<% content_for :title, "FSPs — Hey Tec Inspect" %>
+
+<div class="space-y-8">
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div>
+      <h1 class="page-title">FSPs</h1>
+      <p class="page-lede">Inspectors assigned to rope inspection jobs.</p>
+    </div>
+    <%= link_to "Add FSP", new_dashboard_fsp_path, class: "btn-primary no-underline shrink-0" %>
+  </div>
+
+  <% if @fsps.any? %>
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="text-[--color-ink-muted] border-b border-[--color-line]">
+            <tr>
+              <th class="px-5 py-3 font-medium">FSP</th>
+              <th class="px-5 py-3 font-medium">Full name</th>
+              <th class="px-5 py-3 font-medium">Contact</th>
+              <th class="px-5 py-3 font-medium">Email</th>
+              <th class="px-5 py-3 font-medium">Joined</th>
+              <th class="px-5 py-3 font-medium">Color</th>
+              <th class="px-5 py-3 font-medium text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[--color-line]">
+            <% @fsps.each do |fsp| %>
+              <tr class="hover:bg-stone-50">
+                <td class="px-5 py-3">
+                  <span class="inline-flex items-center gap-2 font-mono font-medium text-[--color-ink]">
+                    <span class="fsp-color-swatch" style="background-color: <%= fsp.color %>;" title="<%= fsp.color %>"></span>
+                    <%= fsp.fsp_number %>
+                  </span>
+                </td>
+                <td class="px-5 py-3 font-medium text-[--color-ink]"><%= fsp.full_name %></td>
+                <td class="px-5 py-3 text-[--color-ink-muted] whitespace-nowrap font-mono text-xs sm:text-sm" title="WhatsApp: <%= fsp.whatsapp_number %>">
+                  <%= fsp.full_contact_number %>
+                </td>
+                <td class="px-5 py-3 text-[--color-ink-muted]"><%= fsp.email %></td>
+                <td class="px-5 py-3 text-[--color-ink-muted] whitespace-nowrap"><%= format_date(fsp.date_joined) %></td>
+                <td class="px-5 py-3 text-[--color-ink-muted] font-mono text-xs"><%= fsp.color %></td>
+                <td class="px-5 py-3 text-right whitespace-nowrap">
+                  <%= link_to "Edit", edit_dashboard_fsp_path(fsp), class: "text-sm no-underline font-medium" %>
+                  <span class="text-[--color-ink-faint] mx-1">·</span>
+                  <%= button_to "Delete",
+                                dashboard_fsp_path(fsp),
+                                method: :delete,
+                                class: "text-sm text-red-700 bg-transparent border-0 p-0 cursor-pointer font-medium inline",
+                                form: { class: "inline", data: { turbo_confirm: "Delete #{fsp.fsp_number} (#{fsp.full_name})?" } } %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="text-center py-12 text-[--color-ink-muted]">
+      <p class="font-medium text-[--color-ink]">No FSPs yet</p>
+      <p class="text-sm mt-1">
+        <%= link_to "Add the first FSP", new_dashboard_fsp_path %> to start assigning inspectors.
+      </p>
+    </div>
+  <% end %>
+</div>

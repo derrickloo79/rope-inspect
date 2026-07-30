@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_07_24_105211) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_30_095808) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -24,6 +24,23 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_24_105211) do
     t.datetime "updated_at", null: false
     t.index ["inspection_request_id", "position"], name: "index_cranes_on_inspection_request_id_and_position"
     t.index ["inspection_request_id"], name: "index_cranes_on_inspection_request_id"
+  end
+
+  create_table "fsps", force: :cascade do |t|
+    t.string "full_name", null: false
+    t.string "contact_number", null: false
+    t.string "email", null: false
+    t.integer "sequence_number", null: false
+    t.string "fsp_number", null: false
+    t.date "date_joined", null: false
+    t.string "color", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "country_code", default: "+65", null: false
+    t.index ["color"], name: "index_fsps_on_color", unique: true
+    t.index ["email"], name: "index_fsps_on_email"
+    t.index ["fsp_number"], name: "index_fsps_on_fsp_number", unique: true
+    t.index ["sequence_number"], name: "index_fsps_on_sequence_number", unique: true
   end
 
   create_table "inspection_requests", force: :cascade do |t|

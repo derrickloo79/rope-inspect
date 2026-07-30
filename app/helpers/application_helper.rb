@@ -5,6 +5,8 @@ module ApplicationHelper
       controller_path == "dashboard/home"
     when :planner
       controller_path == "dashboard/planner"
+    when :fsps
+      controller_path == "dashboard/fsps"
     when :jobs
       controller_path == "dashboard/inspection_requests"
     when :public_form

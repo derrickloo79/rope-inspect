@@ -1,0 +1,15 @@
+<% content_for :title, "Add FSP — Hey Tec Inspect" %>
+
+<div class="space-y-6 max-w-xl">
+  <div>
+    <%= link_to "← All FSPs", dashboard_fsps_path, class: "text-sm no-underline text-[--color-ink-muted] hover:text-[--color-ink]" %>
+    <h1 class="page-title mt-3">Add FSP</h1>
+    <p class="page-lede">Create a new field service person / inspector.</p>
+  </div>
+
+  <section class="card">
+    <div class="card-section">
+      <%= render "form", fsp: @fsp %>
+    </div>
+  </section>
+</div>
