@@ -32,64 +32,93 @@
     <% end %>
   </section>
 
-  <%# Section B: Weekly calendar %>
-  <section class="space-y-4" aria-labelledby="planner-week-heading">
-    <div class="planner-week-header">
-      <h2 id="planner-week-heading" class="planner-week-range">
-        <%= format_week_range(@week_start, @week_end) %>
-      </h2>
-      <div class="planner-week-toggles" role="group" aria-label="Change week">
-        <%= link_to dashboard_planner_path(week: (@week_start - 7.days).iso8601),
-                    class: "planner-week-toggle no-underline",
-                    aria: { label: "Previous week" } do %>
-          ←
-        <% end %>
-        <%= link_to dashboard_planner_path(week: (@week_start + 7.days).iso8601),
-                    class: "planner-week-toggle no-underline",
-                    aria: { label: "Next week" } do %>
-          →
-        <% end %>
-      </div>
-    </div>
+  <%# Section B: Weekly calendar (Turbo Frame — filter/week nav refresh only this block) %>
+  <% planner_query = { week: @week_start.iso8601 } %>
+  <% planner_query[:fsp_id] = @fsp_filter if @fsp_filter.present? %>
+  <%= turbo_frame_tag "planner_week", class: "block space-y-4" do %>
+    <section class="space-y-4" aria-labelledby="planner-week-heading">
+      <div class="planner-week-header">
+        <h2 id="planner-week-heading" class="planner-week-range">
+          <%= format_week_range(@week_start, @week_end) %>
+        </h2>
 
-    <div class="planner-calendar-scroll">
-      <div class="planner-calendar" role="grid" aria-label="Scheduled jobs this week">
-        <% @week_days.each do |day| %>
-          <% jobs = @scheduled_by_day[day] || [] %>
-          <div class="planner-day<%= " is-today" if day == Date.current %>" role="gridcell">
-            <div class="planner-day__header">
-              <span class="planner-day__weekday"><%= day.strftime("%a") %></span>
-              <span class="planner-day__date"><%= day.strftime("%-d") %></span>
-            </div>
-            <div class="planner-day__body">
-              <% if jobs.any? %>
-                <% jobs.each do |job| %>
-                  <%= link_to dashboard_inspection_request_path(job), class: "planner-chip no-underline" do %>
-                    <span class="planner-chip__site"><%= job.site_name %></span>
-                    <span class="planner-chip__company">
-                      <%= job.company_name %> · <%= pluralize(job.cranes.size, "crane") %>
-                    </span>
-                    <span class="planner-chip__meta">
-                      <% if job.scheduled_period.present? %>
-                        <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
-                      <% end %>
-                      <% if job.fsp.present? %>
-                        <span class="planner-chip__inspector"
-                              style="background-color: <%= job.fsp.color %>;"
-                              title="<%= job.fsp.display_name %>">
-                          <%= job.fsp.fsp_number %>
-                        </span>
-                      <% end %>
-                    </span>
-                  <% end %>
-                <% end %>
-              <% else %>
-                <p class="planner-day__empty">—</p>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
+        <div class="planner-week-toggles" role="group" aria-label="Change week">
+          <%= link_to dashboard_planner_path(planner_query.merge(week: (@week_start - 7.days).iso8601)),
+                      class: "planner-week-toggle no-underline",
+                      data: { turbo_action: "advance" },
+                      aria: { label: "Previous week" } do %>
+            ←
+          <% end %>
+          <%= link_to dashboard_planner_path(planner_query.merge(week: (@week_start + 7.days).iso8601)),
+                      class: "planner-week-toggle no-underline",
+                      data: { turbo_action: "advance" },
+                      aria: { label: "Next week" } do %>
+            →
+          <% end %>
+        </div>
+
+        <div class="planner-week-divider" aria-hidden="true"></div>
+
+        <div class="planner-week-filter">
+          <%= form_with url: dashboard_planner_path,
+                        method: :get,
+                        class: "planner-week-filter__form",
+                        data: { turbo_frame: "planner_week", turbo_action: "advance" } do %>
+            <%= hidden_field_tag :week, @week_start.iso8601 %>
+            <label for="planner-fsp-filter" class="sr-only">Filter by FSP</label>
+            <%= select_tag :fsp_id,
+                           options_for_select(
+                             [[ "All FSPs", "" ]] + @fsps.map { |f| [ "#{f.fsp_number} · #{f.full_name}", f.id ] },
+                             @fsp_filter
+                           ),
+                           id: "planner-fsp-filter",
+                           class: "planner-week-filter__select field-select",
+                           onchange: "this.form.requestSubmit()" %>
+          <% end %>
+        </div>
       </div>
-    </div>
-  </section>
+
+      <div class="planner-calendar-scroll">
+        <div class="planner-calendar" role="grid" aria-label="Scheduled jobs this week">
+          <% @week_days.each do |day| %>
+            <% jobs = @scheduled_by_day[day] || [] %>
+            <div class="planner-day<%= " is-today" if day == Date.current %>" role="gridcell">
+              <div class="planner-day__header">
+                <span class="planner-day__weekday"><%= day.strftime("%a") %></span>
+                <span class="planner-day__date"><%= day.strftime("%-d") %></span>
+              </div>
+              <div class="planner-day__body">
+                <% if jobs.any? %>
+                  <% jobs.each do |job| %>
+                    <%= link_to dashboard_inspection_request_path(job),
+                                class: "planner-chip no-underline",
+                                data: { turbo_frame: "_top" } do %>
+                      <span class="planner-chip__site"><%= job.site_name %></span>
+                      <span class="planner-chip__company">
+                        <%= job.company_name %> · <%= pluralize(job.cranes.size, "crane") %>
+                      </span>
+                      <span class="planner-chip__meta">
+                        <% if job.scheduled_period.present? %>
+                          <span class="dash-period-pill dash-period-pill--<%= job.scheduled_period.downcase %>"><%= job.scheduled_period %></span>
+                        <% end %>
+                        <% if job.fsp.present? %>
+                          <span class="planner-chip__inspector"
+                                style="background-color: <%= job.fsp.color %>;"
+                                title="<%= job.fsp.display_name %>">
+                            <%= job.fsp.fsp_number %>
+                          </span>
+                        <% end %>
+                      </span>
+                    <% end %>
+                  <% end %>
+                <% else %>
+                  <p class="planner-day__empty">—</p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  <% end %>
 </div>
