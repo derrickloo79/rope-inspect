@@ -17,8 +17,10 @@ class InspectionRequest < ApplicationRecord
   }
   validates :status, inclusion: { in: STATUSES }
   validates :share_token, uniqueness: true, allow_nil: true
+  MAP_URL_FORMAT = %r{\Ahttps?://[^\s]+\z}i
+
   validates :map_url, format: {
-    with: /\Ahttps?:\/\/.+/i,
+    with: MAP_URL_FORMAT,
     message: "must be a full URL starting with http:// or https://"
   }, allow_blank: true
   validate :must_have_at_least_one_crane
@@ -204,6 +206,20 @@ class InspectionRequest < ApplicationRecord
 
   def site_access?
     map_url.present? || site_note.present?
+  end
+
+  # Only return http(s) URLs for use in link hrefs (avoids javascript: etc.).
+  def safe_map_url
+    url = map_url.to_s.strip
+    return nil if url.blank?
+    return nil unless url.match?(MAP_URL_FORMAT)
+
+    uri = URI.parse(url)
+    return url if uri.is_a?(URI::HTTP)
+
+    nil
+  rescue URI::InvalidURIError
+    nil
   end
 
   private
