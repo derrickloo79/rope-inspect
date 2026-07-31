@@ -80,6 +80,11 @@ test:
 #
 production:
   <<: *default
+  <% if ENV["DATABASE_URL"].present? %>
+  # Render / Heroku-style managed Postgres
+  url: <%= ENV["DATABASE_URL"] %>
+  <% else %>
   database: rope_inspect_production
   username: rope_inspect
   password: <%= ENV["ROPE_INSPECT_DATABASE_PASSWORD"] %>
+  <% end %>
