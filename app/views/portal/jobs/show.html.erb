@@ -70,6 +70,18 @@
           </dd>
         </div>
         <div class="min-w-0">
+          <dt class="text-ink-muted">Point of contact</dt>
+          <dd class="font-medium mt-0.5 break-words">
+            <%= @job.point_of_contact? ? @job.poc_name : "—" %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-ink-muted">POC phone</dt>
+          <dd class="font-medium mt-0.5 break-words"<% if @job.point_of_contact? %> title="WhatsApp: <%= @job.poc_whatsapp_number %>"<% end %>>
+            <%= @job.point_of_contact? ? @job.full_poc_contact_number : "—" %>
+          </dd>
+        </div>
+        <div class="min-w-0">
           <dt class="text-ink-muted">Google Maps</dt>
           <dd class="font-medium mt-0.5 break-words">
             <% if (map_href = @job.safe_map_url) %>
@@ -115,7 +127,7 @@
           <tbody class="divide-y divide-[--color-line]">
             <% @job.cranes.each do |crane| %>
               <tr>
-                <td class="py-2.5 pr-4 font-medium"><%= crane.crane_type %></td>
+                <td class="py-2.5 pr-4 font-medium"><%= crane.crane_type_label %></td>
                 <td class="py-2.5 pr-4 font-mono text-xs sm:text-sm"><%= crane.lm_number %></td>
                 <td class="py-2.5"><%= crane.rope_diameter_mm %></td>
               </tr>
