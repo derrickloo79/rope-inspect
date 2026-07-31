@@ -32,6 +32,7 @@ Rails.application.routes.draw do
         patch :schedule
         patch :complete
         patch :site_access
+        patch :point_of_contact
       end
     end
   end

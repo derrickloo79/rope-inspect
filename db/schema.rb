@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_07_31_033338) do
+ActiveRecord::Schema[7.2].define(version: 2026_07_31_082605) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -70,6 +70,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_07_31_033338) do
     t.string "country_code", default: "+65", null: false
     t.string "map_url"
     t.text "site_note"
+    t.string "poc_name"
+    t.string "poc_country_code", default: "+65"
+    t.string "poc_contact_number"
     t.index ["fsp_id"], name: "index_inspection_requests_on_fsp_id"
     t.index ["share_token"], name: "index_inspection_requests_on_share_token", unique: true
     t.index ["status"], name: "index_inspection_requests_on_status"

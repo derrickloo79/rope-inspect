@@ -23,13 +23,20 @@ class InspectionRequest < ApplicationRecord
     with: MAP_URL_FORMAT,
     message: "must be a full URL starting with http:// or https://"
   }, allow_blank: true
+  validates :poc_country_code, inclusion: { in: COUNTRY_CODES.map(&:last) }, allow_blank: true
+  validates :poc_contact_number, format: {
+    with: /\A[0-9][0-9\s\-]{5,18}\z/,
+    message: "should be digits only (spaces or dashes allowed)"
+  }, allow_blank: true
   validate :must_have_at_least_one_crane
+  validate :poc_name_and_contact_together
 
   before_validation :set_default_status, on: :create
   before_validation :default_country_code
   before_validation :normalize_contact_number
   before_validation :normalize_map_url
   before_validation :normalize_site_note
+  before_validation :normalize_poc_fields
   before_validation :assign_crane_positions
   before_validation :sync_assigned_inspector_from_fsp
 
@@ -208,6 +215,22 @@ class InspectionRequest < ApplicationRecord
     map_url.present? || site_note.present?
   end
 
+  def point_of_contact?
+    poc_name.present? && poc_contact_number.present?
+  end
+
+  def full_poc_contact_number
+    [ poc_country_code.presence || DEFAULT_COUNTRY_CODE, poc_contact_number ].compact_blank.join(" ")
+  end
+
+  def poc_whatsapp_number
+    return nil if poc_contact_number.blank?
+
+    national = poc_contact_number.to_s.gsub(/\D/, "").sub(/\A0+/, "")
+    code = (poc_country_code.presence || DEFAULT_COUNTRY_CODE).to_s.gsub(/\D/, "")
+    "#{code}#{national}"
+  end
+
   # Only return http(s) URLs for use in link hrefs (avoids javascript: etc.).
   def safe_map_url
     url = map_url.to_s.strip
@@ -244,6 +267,22 @@ class InspectionRequest < ApplicationRecord
 
   def normalize_site_note
     self.site_note = site_note.to_s.strip.presence
+  end
+
+  def normalize_poc_fields
+    self.poc_name = poc_name.to_s.strip.presence
+    self.poc_contact_number = poc_contact_number.to_s.strip.gsub(/[^\d\s\-]/, "").presence
+    self.poc_country_code = poc_country_code.to_s.strip.presence
+    self.poc_country_code = DEFAULT_COUNTRY_CODE if poc_contact_number.present? && poc_country_code.blank?
+  end
+
+  def poc_name_and_contact_together
+    name_set = poc_name.present?
+    number_set = poc_contact_number.present?
+    return if name_set == number_set
+
+    errors.add(:poc_name, "can't be blank when contact number is set") if number_set && !name_set
+    errors.add(:poc_contact_number, "can't be blank when name is set") if name_set && !number_set
   end
 
   def assign_crane_positions

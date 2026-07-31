@@ -1,7 +1,7 @@
 module Dashboard
   class InspectionRequestsController < BaseController
     before_action :set_inspection_request, only: [
-      :show, :accept, :reject, :reopen, :schedule, :complete, :site_access
+      :show, :accept, :reject, :reopen, :schedule, :complete, :site_access, :point_of_contact
     ]
 
     def index
@@ -95,6 +95,16 @@ module Dashboard
       end
     end
 
+    def point_of_contact
+      if @inspection_request.update(point_of_contact_params)
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    notice: "Point of contact saved."
+      else
+        flash.now[:alert] = @inspection_request.errors.full_messages.to_sentence
+        render :show, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def set_inspection_request
@@ -103,6 +113,10 @@ module Dashboard
 
     def site_access_params
       params.require(:inspection_request).permit(:map_url, :site_note)
+    end
+
+    def point_of_contact_params
+      params.require(:inspection_request).permit(:poc_name, :poc_country_code, :poc_contact_number)
     end
 
     # Map AM/PM radio values to a time-of-day stored on scheduled_time.
