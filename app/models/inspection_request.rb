@@ -17,11 +17,16 @@ class InspectionRequest < ApplicationRecord
   }
   validates :status, inclusion: { in: STATUSES }
   validates :share_token, uniqueness: true, allow_nil: true
+  validates :map_url, format: {
+    with: /\Ahttps?:\/\/.+/i,
+    message: "must be a full URL starting with http:// or https://"
+  }, allow_blank: true
   validate :must_have_at_least_one_crane
 
   before_validation :set_default_status, on: :create
   before_validation :default_country_code
   before_validation :normalize_contact_number
+  before_validation :normalize_map_url
   before_validation :assign_crane_positions
   before_validation :sync_assigned_inspector_from_fsp
 
@@ -196,6 +201,10 @@ class InspectionRequest < ApplicationRecord
     "#{country_code.to_s.gsub(/\D/, "")}#{national}"
   end
 
+  def site_access?
+    map_url.present? || site_note.present?
+  end
+
   private
 
   def set_default_status
@@ -210,6 +219,10 @@ class InspectionRequest < ApplicationRecord
     return if contact_number.blank?
 
     self.contact_number = contact_number.to_s.strip.gsub(/[^\d\s\-]/, "")
+  end
+
+  def normalize_map_url
+    self.map_url = map_url.to_s.strip.presence
   end
 
   def assign_crane_positions

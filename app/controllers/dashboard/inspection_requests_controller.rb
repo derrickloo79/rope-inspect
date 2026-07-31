@@ -1,6 +1,8 @@
 module Dashboard
   class InspectionRequestsController < BaseController
-    before_action :set_inspection_request, only: [ :show, :accept, :reject, :reopen, :schedule, :complete ]
+    before_action :set_inspection_request, only: [
+      :show, :accept, :reject, :reopen, :schedule, :complete, :site_access
+    ]
 
     def index
       @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
@@ -87,10 +89,24 @@ module Dashboard
       end
     end
 
+    def site_access
+      if @inspection_request.update(site_access_params)
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    notice: "Site access details saved."
+      else
+        flash.now[:alert] = @inspection_request.errors.full_messages.to_sentence
+        render :show, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def set_inspection_request
       @inspection_request = InspectionRequest.includes(:cranes, :fsp).find(params[:id])
+    end
+
+    def site_access_params
+      params.require(:inspection_request).permit(:map_url, :site_note)
     end
 
     # Map AM/PM radio values to a time-of-day stored on scheduled_time.

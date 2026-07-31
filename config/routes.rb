@@ -31,6 +31,7 @@ Rails.application.routes.draw do
         patch :reopen
         patch :schedule
         patch :complete
+        patch :site_access
       end
     end
   end

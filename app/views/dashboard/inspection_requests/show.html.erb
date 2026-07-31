@@ -21,22 +21,91 @@
     <section class="card">
       <div class="card-section">
         <h2 class="section-label mb-4">Requestor</h2>
-        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          <div>
+        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+          <div class="min-w-0">
             <dt class="text-[--color-ink-muted]">Name</dt>
-            <dd class="font-medium mt-0.5"><%= @inspection_request.requestor_name %></dd>
+            <dd class="font-medium mt-0.5 break-words"><%= @inspection_request.requestor_name %></dd>
           </div>
-          <div>
+          <div class="min-w-0">
             <dt class="text-[--color-ink-muted]">Phone</dt>
-            <dd class="font-medium mt-0.5" title="WhatsApp: <%= @inspection_request.whatsapp_number %>">
+            <dd class="font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.whatsapp_number %>">
               <%= @inspection_request.full_contact_number %>
             </dd>
           </div>
-          <div>
+          <div class="min-w-0">
             <dt class="text-[--color-ink-muted]">Submitted</dt>
-            <dd class="font-medium mt-0.5"><%= format_datetime(@inspection_request.created_at) %></dd>
+            <dd class="font-medium mt-0.5 break-words"><%= format_datetime(@inspection_request.created_at) %></dd>
           </div>
         </dl>
+      </div>
+    </section>
+
+    <section class="card" id="site-access">
+      <div class="card-section space-y-4">
+        <div>
+          <h2 class="section-label">Site access</h2>
+          <p class="text-sm text-[--color-ink-muted] mt-1">
+            Approximate map location and notes for the inspector (gate, parking, landmark).
+          </p>
+        </div>
+
+        <% if @inspection_request.errors[:map_url].any? || @inspection_request.errors[:site_note].any? %>
+          <div class="error-list" role="alert">
+            <ul class="list-disc list-inside">
+              <% (@inspection_request.errors[:map_url] + @inspection_request.errors[:site_note]).each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if @inspection_request.site_access? && !@inspection_request.errors[:map_url].any? && !@inspection_request.errors[:site_note].any? %>
+          <div class="space-y-3 rounded-md border border-[--color-line] bg-stone-50 px-4 py-3 text-sm">
+            <% if @inspection_request.map_url.present? %>
+              <div>
+                <p class="text-[--color-ink-muted] text-xs font-medium uppercase tracking-wide">Google Maps</p>
+                <p class="mt-1">
+                  <%= link_to "Open in Google Maps",
+                              @inspection_request.map_url,
+                              class: "font-medium no-underline break-all",
+                              target: "_blank",
+                              rel: "noopener noreferrer" %>
+                </p>
+              </div>
+            <% end %>
+            <% if @inspection_request.site_note.present? %>
+              <div>
+                <p class="text-[--color-ink-muted] text-xs font-medium uppercase tracking-wide">Note</p>
+                <p class="mt-1 font-medium text-[--color-ink] whitespace-pre-wrap"><%= @inspection_request.site_note %></p>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%= form_with model: @inspection_request,
+                      url: site_access_dashboard_inspection_request_path(@inspection_request),
+                      method: :patch,
+                      class: "space-y-4" do |f| %>
+          <div>
+            <%= f.label :map_url, "Google Maps link", class: "field-label" %>
+            <%= f.url_field :map_url,
+                            class: "field-input",
+                            placeholder: "https://maps.google.com/… or https://maps.app.goo.gl/…",
+                            autocomplete: "off" %>
+            <p class="field-hint">Paste a share link from Google Maps for the approximate site location.</p>
+          </div>
+          <div>
+            <%= f.label :site_note, "Site note", class: "field-label" %>
+            <%= f.text_area :site_note,
+                            class: "field-input min-h-[5.5rem]",
+                            rows: 3,
+                            placeholder: "e.g. Enter via Gate 3, visitor parking on the left, ask for site office." %>
+            <p class="field-hint">Gate number, closest parking, landmarks, or access instructions.</p>
+          </div>
+          <div>
+            <%= f.submit "Save site access", class: "btn-secondary cursor-pointer" %>
+          </div>
+        <% end %>
       </div>
     </section>
 
