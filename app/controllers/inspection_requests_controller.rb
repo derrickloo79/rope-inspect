@@ -1,7 +1,7 @@
 class InspectionRequestsController < ApplicationController
   # Public intake form — no authentication required.
   def new
-    @inspection_request = InspectionRequest.new
+    @inspection_request = InspectionRequest.new(country_code: InspectionRequest::DEFAULT_COUNTRY_CODE)
     @inspection_request.cranes.build(crane_type: "tower_crane")
   end
 
@@ -30,6 +30,7 @@ class InspectionRequestsController < ApplicationController
     params.require(:inspection_request).permit(
       :company_name,
       :requestor_name,
+      :country_code,
       :contact_number,
       :site_name,
       cranes_attributes: [ :id, :crane_type, :lm_number, :rope_diameter_mm, :position, :_destroy ]

@@ -28,7 +28,9 @@
           </div>
           <div>
             <dt class="text-[--color-ink-muted]">Phone</dt>
-            <dd class="font-medium mt-0.5"><%= @inspection_request.contact_number %></dd>
+            <dd class="font-medium mt-0.5" title="WhatsApp: <%= @inspection_request.whatsapp_number %>">
+              <%= @inspection_request.full_contact_number %>
+            </dd>
           </div>
           <div>
             <dt class="text-[--color-ink-muted]">Submitted</dt>

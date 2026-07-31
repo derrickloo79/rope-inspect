@@ -50,7 +50,9 @@
         </div>
         <div>
           <dt class="text-[--color-ink-muted]">Phone</dt>
-          <dd class="font-medium mt-0.5"><%= @job.contact_number %></dd>
+          <dd class="font-medium mt-0.5" title="WhatsApp: <%= @job.whatsapp_number %>">
+            <%= @job.full_contact_number %>
+          </dd>
         </div>
       </dl>
     </div>

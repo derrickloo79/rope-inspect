@@ -43,7 +43,28 @@
 
           <div>
             <%= f.label :contact_number, "Contact number", class: "field-label" %>
-            <%= f.telephone_field :contact_number, class: "field-input", required: true, placeholder: "e.g. 91234567", autocomplete: "tel" %>
+            <div class="grid grid-cols-4 gap-2">
+              <div class="col-span-1 min-w-0">
+                <%= f.select :country_code,
+                             options_for_select(
+                               InspectionRequest::COUNTRY_CODES,
+                               @inspection_request.country_code.presence || InspectionRequest::DEFAULT_COUNTRY_CODE
+                             ),
+                             {},
+                             class: "field-select",
+                             required: true,
+                             aria: { label: "Country code" } %>
+              </div>
+              <div class="col-span-3 min-w-0">
+                <%= f.telephone_field :contact_number,
+                                      class: "field-input",
+                                      required: true,
+                                      placeholder: "e.g. 91234567",
+                                      autocomplete: "tel-national",
+                                      inputmode: "tel" %>
+              </div>
+            </div>
+            <p class="field-hint">Include country code for WhatsApp. Local number only in the right field.</p>
           </div>
         </div>
       </div>

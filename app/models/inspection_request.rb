@@ -5,12 +5,23 @@ class InspectionRequest < ApplicationRecord
   has_many :cranes, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :inspection_request
   accepts_nested_attributes_for :cranes, allow_destroy: true, reject_if: :all_blank
 
-  validates :company_name, :requestor_name, :contact_number, :site_name, presence: true
+  # Same dial codes as FSP / admin (WhatsApp-ready).
+  COUNTRY_CODES = Fsp::COUNTRY_CODES
+  DEFAULT_COUNTRY_CODE = Fsp::DEFAULT_COUNTRY_CODE
+
+  validates :company_name, :requestor_name, :contact_number, :country_code, :site_name, presence: true
+  validates :country_code, inclusion: { in: COUNTRY_CODES.map(&:last) }
+  validates :contact_number, format: {
+    with: /\A[0-9][0-9\s\-]{5,18}\z/,
+    message: "should be digits only (spaces or dashes allowed)"
+  }
   validates :status, inclusion: { in: STATUSES }
   validates :share_token, uniqueness: true, allow_nil: true
   validate :must_have_at_least_one_crane
 
   before_validation :set_default_status, on: :create
+  before_validation :default_country_code
+  before_validation :normalize_contact_number
   before_validation :assign_crane_positions
   before_validation :sync_assigned_inspector_from_fsp
 
@@ -176,10 +187,29 @@ class InspectionRequest < ApplicationRecord
     scheduled_time.hour < 12 ? "AM" : "PM"
   end
 
+  def full_contact_number
+    [ country_code, contact_number ].compact_blank.join(" ")
+  end
+
+  def whatsapp_number
+    national = contact_number.to_s.gsub(/\D/, "").sub(/\A0+/, "")
+    "#{country_code.to_s.gsub(/\D/, "")}#{national}"
+  end
+
   private
 
   def set_default_status
     self.status ||= "pending"
+  end
+
+  def default_country_code
+    self.country_code = DEFAULT_COUNTRY_CODE if country_code.blank?
+  end
+
+  def normalize_contact_number
+    return if contact_number.blank?
+
+    self.contact_number = contact_number.to_s.strip.gsub(/[^\d\s\-]/, "")
   end
 
   def assign_crane_positions
