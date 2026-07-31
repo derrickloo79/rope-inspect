@@ -33,17 +33,21 @@
 
         <div>
           <%= f.label :contact_number, "Contact number", class: "field-label" %>
-          <div class="flex gap-2" data-controller="country-code-select">
-            <%= f.select :country_code,
-                         country_code_select_options(@user.country_code),
-                         {},
-                         country_code_select_html_options(class: "field-select country-code-select !w-auto min-w-[5.5rem] shrink-0") %>
-            <%= f.telephone_field :contact_number,
-                                  class: "field-input min-w-0 flex-1",
-                                  required: true,
-                                  placeholder: "91234567",
-                                  autocomplete: "tel-national",
-                                  inputmode: "tel" %>
+          <div class="grid grid-cols-4 gap-2" data-controller="country-code-select">
+            <div class="col-span-1 min-w-0">
+              <%= f.select :country_code,
+                           country_code_select_options(@user.country_code),
+                           {},
+                           country_code_select_html_options %>
+            </div>
+            <div class="col-span-3 min-w-0">
+              <%= f.telephone_field :contact_number,
+                                    class: "field-input",
+                                    required: true,
+                                    placeholder: "91234567",
+                                    autocomplete: "tel-national",
+                                    inputmode: "tel" %>
+            </div>
           </div>
           <p class="field-hint">Country code is required for WhatsApp. Enter the local number without the country code.</p>
         </div>
