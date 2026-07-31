@@ -17,6 +17,7 @@
             <tr>
               <th class="px-5 py-3 font-medium">Name</th>
               <th class="px-5 py-3 font-medium">Email</th>
+              <th class="px-5 py-3 font-medium">Contact</th>
               <th class="px-5 py-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
@@ -30,6 +31,9 @@
                   <% end %>
                 </td>
                 <td class="px-5 py-3 align-middle text-[--color-ink-muted]"><%= user.email %></td>
+                <td class="px-5 py-3 align-middle text-[--color-ink-muted] whitespace-nowrap font-mono text-xs sm:text-sm" title="WhatsApp: <%= user.whatsapp_number %>">
+                  <%= user.full_contact_number %>
+                </td>
                 <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
                   <%= link_to "Edit", edit_dashboard_user_path(user), class: "text-sm no-underline font-medium" %>
                   <% unless user == current_user %>

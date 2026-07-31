@@ -27,6 +27,8 @@ module Dashboard
     def profile_params
       permitted = params.require(:user).permit(
         :name,
+        :country_code,
+        :contact_number,
         :password,
         :password_confirmation
       )

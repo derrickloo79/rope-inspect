@@ -7,7 +7,7 @@ module Dashboard
     end
 
     def new
-      @user = User.new
+      @user = User.new(country_code: User::DEFAULT_COUNTRY_CODE)
     end
 
     def create
@@ -60,6 +60,8 @@ module Dashboard
       permitted = params.require(:user).permit(
         :name,
         :email,
+        :country_code,
+        :contact_number,
         :password,
         :password_confirmation
       )
