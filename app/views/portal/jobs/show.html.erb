@@ -36,23 +36,50 @@
     <div class="card-section">
       <h2 class="section-label mb-4">Site &amp; requestor</h2>
       <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-        <div>
-          <dt class="text-[--color-ink-muted]">Site</dt>
-          <dd class="font-medium mt-0.5"><%= @job.site_name %></dd>
+        <div class="min-w-0">
+          <dt class="text-ink-muted">Site</dt>
+          <dd class="font-medium mt-0.5 break-words"><%= @job.site_name %></dd>
         </div>
-        <div>
-          <dt class="text-[--color-ink-muted]">Company</dt>
-          <dd class="font-medium mt-0.5"><%= @job.company_name %></dd>
+        <div class="min-w-0">
+          <dt class="text-ink-muted">Company</dt>
+          <dd class="font-medium mt-0.5 break-words"><%= @job.company_name %></dd>
         </div>
-        <div>
-          <dt class="text-[--color-ink-muted]">Requestor</dt>
-          <dd class="font-medium mt-0.5"><%= @job.requestor_name %></dd>
+        <div class="min-w-0">
+          <dt class="text-ink-muted">Requestor</dt>
+          <dd class="font-medium mt-0.5 break-words"><%= @job.requestor_name %></dd>
         </div>
-        <div>
-          <dt class="text-[--color-ink-muted]">Phone</dt>
-          <dd class="font-medium mt-0.5" title="WhatsApp: <%= @job.whatsapp_number %>">
+        <div class="min-w-0">
+          <dt class="text-ink-muted">Phone</dt>
+          <dd class="font-medium mt-0.5 break-words" title="WhatsApp: <%= @job.whatsapp_number %>">
             <%= @job.full_contact_number %>
           </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-ink-muted">Google Maps</dt>
+          <dd class="font-medium mt-0.5 break-words">
+            <% if @job.map_url.present? %>
+              <%= link_to "Open in Google Maps",
+                          @job.map_url,
+                          class: "no-underline break-all",
+                          target: "_blank",
+                          rel: "noopener noreferrer" %>
+              <span class="text-ink-muted font-normal"
+                    data-controller="clipboard"
+                    data-clipboard-text-value="<%= @job.map_url %>">
+                (<button type="button"
+                        class="bg-transparent border-0 p-0 cursor-pointer font-medium text-accent underline-offset-2 hover:underline"
+                        data-action="clipboard#copy"
+                        data-clipboard-target="label"
+                        aria-label="Copy Google Maps link">Copy</button>)
+              </span>
+            <% else %>
+              <span class="text-ink-muted">—</span>
+            <% end %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-ink-muted">Site note</dt>
+          <dd class="font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @job.site_note.to_s.strip.presence || "—" %></dd>
         </div>
       </dl>
     </div>
