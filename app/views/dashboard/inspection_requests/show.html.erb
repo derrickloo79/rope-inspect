@@ -66,103 +66,105 @@
       </div>
     </section>
 
-    <% site_access_errors = @inspection_request.errors[:map_url].any? || @inspection_request.errors[:site_note].any? %>
-    <% site_access_editing = site_access_errors || !@inspection_request.site_access? %>
-    <section class="card"
-             id="site-access"
-             data-controller="site-access"
-             data-site-access-editing-value="<%= site_access_editing %>">
-      <div class="card-section space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-          <div>
-            <h2 class="section-label">Site access</h2>
-            <p class="text-sm text-ink-muted mt-1">
-              Approximate map location and notes for the inspector (gate, parking, landmark).
-            </p>
-          </div>
-          <button type="button"
-                  class="btn-ghost !py-1.5 !px-3 text-sm shrink-0 self-start"
-                  data-action="site-access#edit"
-                  data-site-access-target="view">
-            <%= @inspection_request.site_access? ? "Edit" : "Add details" %>
-          </button>
-        </div>
-
-        <% if site_access_errors %>
-          <div class="error-list" role="alert">
-            <ul class="list-disc list-inside">
-              <% (@inspection_request.errors[:map_url] + @inspection_request.errors[:site_note]).each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
-        <%# View mode %>
-        <div data-site-access-target="view" class="space-y-3">
-          <% if @inspection_request.site_access? %>
-            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <div class="min-w-0">
-                <dt class="text-ink-muted">Google Maps</dt>
-                <dd class="font-medium mt-0.5 break-words">
-                  <% if @inspection_request.map_url.present? %>
-                    <%= link_to "Open in Google Maps",
-                                @inspection_request.map_url,
-                                class: "no-underline break-all",
-                                target: "_blank",
-                                rel: "noopener noreferrer" %>
-                  <% else %>
-                    <span class="text-ink-muted">—</span>
-                  <% end %>
-                </dd>
-              </div>
-              <div class="min-w-0">
-                <dt class="text-ink-muted">Site note</dt>
-                <dd class="font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @inspection_request.site_note.to_s.strip.presence || "—" %></dd>
-              </div>
-            </dl>
-          <% else %>
-            <p class="text-sm text-ink-muted">
-              No map link or site note yet.
-              <button type="button" class="font-medium text-accent bg-transparent border-0 p-0 cursor-pointer underline-offset-2 hover:underline" data-action="site-access#edit">
-                Add details
-              </button>
-            </p>
-          <% end %>
-        </div>
-
-        <%# Edit mode %>
-        <div data-site-access-target="form" hidden>
-          <%= form_with model: @inspection_request,
-                        url: site_access_dashboard_inspection_request_path(@inspection_request),
-                        method: :patch,
-                        class: "space-y-4" do |f| %>
+    <% unless @inspection_request.pending? %>
+      <% site_access_errors = @inspection_request.errors[:map_url].any? || @inspection_request.errors[:site_note].any? %>
+      <% site_access_editing = site_access_errors || !@inspection_request.site_access? %>
+      <section class="card"
+               id="site-access"
+               data-controller="site-access"
+               data-site-access-editing-value="<%= site_access_editing %>">
+        <div class="card-section space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             <div>
-              <%= f.label :map_url, "Google Maps link", class: "field-label" %>
-              <%= f.url_field :map_url,
-                              class: "field-input",
-                              placeholder: "https://maps.google.com/… or https://maps.app.goo.gl/…",
-                              autocomplete: "off" %>
-              <p class="field-hint">Paste a share link from Google Maps for the approximate site location.</p>
+              <h2 class="section-label">Site access</h2>
+              <p class="text-sm text-ink-muted mt-1">
+                Approximate map location and notes for the inspector (gate, parking, landmark).
+              </p>
             </div>
-            <div>
-              <%= f.label :site_note, "Site note", class: "field-label" %>
-              <%= f.text_area :site_note,
-                              class: "field-input min-h-[5.5rem]",
-                              rows: 3,
-                              placeholder: "e.g. Enter via Gate 3, visitor parking on the left, ask for site office." %>
-              <p class="field-hint">Gate number, closest parking, landmarks, or access instructions.</p>
-            </div>
-            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-              <%= f.submit "Save site access", class: "btn-primary cursor-pointer" %>
-              <button type="button" class="btn-secondary cursor-pointer" data-action="site-access#cancel">
-                Cancel
-              </button>
+            <button type="button"
+                    class="btn-ghost !py-1.5 !px-3 text-sm shrink-0 self-start"
+                    data-action="site-access#edit"
+                    data-site-access-target="view">
+              <%= @inspection_request.site_access? ? "Edit" : "Add details" %>
+            </button>
+          </div>
+
+          <% if site_access_errors %>
+            <div class="error-list" role="alert">
+              <ul class="list-disc list-inside">
+                <% (@inspection_request.errors[:map_url] + @inspection_request.errors[:site_note]).each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
             </div>
           <% end %>
+
+          <%# View mode %>
+          <div data-site-access-target="view" class="space-y-3">
+            <% if @inspection_request.site_access? %>
+              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div class="min-w-0">
+                  <dt class="text-ink-muted">Google Maps</dt>
+                  <dd class="font-medium mt-0.5 break-words">
+                    <% if @inspection_request.map_url.present? %>
+                      <%= link_to "Open in Google Maps",
+                                  @inspection_request.map_url,
+                                  class: "no-underline break-all",
+                                  target: "_blank",
+                                  rel: "noopener noreferrer" %>
+                    <% else %>
+                      <span class="text-ink-muted">—</span>
+                    <% end %>
+                  </dd>
+                </div>
+                <div class="min-w-0">
+                  <dt class="text-ink-muted">Site note</dt>
+                  <dd class="font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @inspection_request.site_note.to_s.strip.presence || "—" %></dd>
+                </div>
+              </dl>
+            <% else %>
+              <p class="text-sm text-ink-muted">
+                No map link or site note yet.
+                <button type="button" class="font-medium text-accent bg-transparent border-0 p-0 cursor-pointer underline-offset-2 hover:underline" data-action="site-access#edit">
+                  Add details
+                </button>
+              </p>
+            <% end %>
+          </div>
+
+          <%# Edit mode %>
+          <div data-site-access-target="form" hidden>
+            <%= form_with model: @inspection_request,
+                          url: site_access_dashboard_inspection_request_path(@inspection_request),
+                          method: :patch,
+                          class: "space-y-4" do |f| %>
+              <div>
+                <%= f.label :map_url, "Google Maps link", class: "field-label" %>
+                <%= f.url_field :map_url,
+                                class: "field-input",
+                                placeholder: "https://maps.google.com/… or https://maps.app.goo.gl/…",
+                                autocomplete: "off" %>
+                <p class="field-hint">Paste a share link from Google Maps for the approximate site location.</p>
+              </div>
+              <div>
+                <%= f.label :site_note, "Site note", class: "field-label" %>
+                <%= f.text_area :site_note,
+                                class: "field-input min-h-[5.5rem]",
+                                rows: 3,
+                                placeholder: "e.g. Enter via Gate 3, visitor parking on the left, ask for site office." %>
+                <p class="field-hint">Gate number, closest parking, landmarks, or access instructions.</p>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <%= f.submit "Save site access", class: "btn-primary cursor-pointer" %>
+                <button type="button" class="btn-secondary cursor-pointer" data-action="site-access#cancel">
+                  Cancel
+                </button>
+              </div>
+            <% end %>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    <% end %>
 
     <section class="card">
       <div class="card-section">
