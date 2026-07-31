@@ -39,6 +39,33 @@ module ApplicationHelper
     classes.join(" ")
   end
 
+  # Country dial codes for selects: closed shows "+65", open shows "Singapore (+65)".
+  # Used with data-controller="country-code-select".
+  def country_code_select_options(selected = nil)
+    options = Fsp::COUNTRY_CODES.map do |label, code|
+      [ code, code, { data: { full: label, short: code } } ]
+    end
+    options_for_select(options, selected.presence || Fsp::DEFAULT_COUNTRY_CODE)
+  end
+
+  def country_code_select_html_options(extra = {})
+    {
+      class: "field-select country-code-select",
+      required: true,
+      aria: { label: "Country code" },
+      data: {
+        country_code_select_target: "select",
+        action: [
+          "focus->country-code-select#expand",
+          "mousedown->country-code-select#expand",
+          "change->country-code-select#collapseSelected",
+          "blur->country-code-select#collapseSelected"
+        ].join(" ")
+      }
+    }.deep_merge(extra)
+  end
+
+
   def status_badge(status)
     css = case status.to_s
     when "pending" then "badge-pending"

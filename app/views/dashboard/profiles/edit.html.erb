@@ -33,13 +33,11 @@
 
         <div>
           <%= f.label :contact_number, "Contact number", class: "field-label" %>
-          <div class="flex gap-2">
+          <div class="flex gap-2" data-controller="country-code-select">
             <%= f.select :country_code,
-                         options_for_select(User::COUNTRY_CODES, @user.country_code.presence || User::DEFAULT_COUNTRY_CODE),
+                         country_code_select_options(@user.country_code),
                          {},
-                         class: "field-select !w-auto min-w-[11rem] shrink-0",
-                         required: true,
-                         aria: { label: "Country code" } %>
+                         country_code_select_html_options(class: "field-select country-code-select !w-auto min-w-[5.5rem] shrink-0") %>
             <%= f.telephone_field :contact_number,
                                   class: "field-input min-w-0 flex-1",
                                   required: true,

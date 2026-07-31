@@ -43,17 +43,12 @@
 
           <div>
             <%= f.label :contact_number, "Contact number", class: "field-label" %>
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-4 gap-2" data-controller="country-code-select">
               <div class="col-span-1 min-w-0">
                 <%= f.select :country_code,
-                             options_for_select(
-                               InspectionRequest::COUNTRY_CODES,
-                               @inspection_request.country_code.presence || InspectionRequest::DEFAULT_COUNTRY_CODE
-                             ),
+                             country_code_select_options(@inspection_request.country_code),
                              {},
-                             class: "field-select",
-                             required: true,
-                             aria: { label: "Country code" } %>
+                             country_code_select_html_options %>
               </div>
               <div class="col-span-3 min-w-0">
                 <%= f.telephone_field :contact_number,
