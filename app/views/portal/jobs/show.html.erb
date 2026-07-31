@@ -29,18 +29,18 @@
     <section class="card">
       <div class="card-section">
         <h2 class="section-label mb-4">Schedule</h2>
-        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <dt class="text-[--color-ink-muted]">Date</dt>
-            <dd class="font-medium mt-0.5"><%= format_date(@job.scheduled_on) %></dd>
+            <dt class="text-sm text-[--color-ink-muted]">Date</dt>
+            <dd class="text-base font-medium mt-0.5"><%= format_date(@job.scheduled_on) %></dd>
           </div>
           <div>
-            <dt class="text-[--color-ink-muted]">Time</dt>
-            <dd class="font-medium mt-0.5"><%= @job.scheduled_period.presence || "—" %></dd>
+            <dt class="text-sm text-[--color-ink-muted]">Time</dt>
+            <dd class="text-base font-medium mt-0.5"><%= @job.scheduled_period.presence || "—" %></dd>
           </div>
           <div>
-            <dt class="text-[--color-ink-muted]">Assigned to</dt>
-            <dd class="font-medium mt-0.5"><%= @job.inspector_label.presence || "—" %></dd>
+            <dt class="text-sm text-[--color-ink-muted]">Assigned to</dt>
+            <dd class="text-base font-medium mt-0.5"><%= @job.inspector_label.presence || "—" %></dd>
           </div>
         </dl>
       </div>
@@ -50,40 +50,40 @@
   <section class="card">
     <div class="card-section">
       <h2 class="section-label mb-4">Site &amp; requestor</h2>
-      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="min-w-0">
-          <dt class="text-ink-muted">Site</dt>
-          <dd class="font-medium mt-0.5 break-words"><%= @job.site_name %></dd>
+          <dt class="text-sm text-ink-muted">Site</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"><%= @job.site_name %></dd>
         </div>
         <div class="min-w-0">
-          <dt class="text-ink-muted">Company</dt>
-          <dd class="font-medium mt-0.5 break-words"><%= @job.company_name %></dd>
+          <dt class="text-sm text-ink-muted">Company</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"><%= @job.company_name %></dd>
         </div>
         <div class="min-w-0">
-          <dt class="text-ink-muted">Requestor</dt>
-          <dd class="font-medium mt-0.5 break-words"><%= @job.requestor_name %></dd>
+          <dt class="text-sm text-ink-muted">Requestor</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"><%= @job.requestor_name %></dd>
         </div>
         <div class="min-w-0">
-          <dt class="text-ink-muted">Phone</dt>
-          <dd class="font-medium mt-0.5 break-words" title="WhatsApp: <%= @job.whatsapp_number %>">
+          <dt class="text-sm text-ink-muted">Phone</dt>
+          <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @job.whatsapp_number %>">
             <%= @job.full_contact_number %>
           </dd>
         </div>
         <div class="min-w-0">
-          <dt class="text-ink-muted">Point of contact</dt>
-          <dd class="font-medium mt-0.5 break-words">
+          <dt class="text-sm text-ink-muted">Point of contact</dt>
+          <dd class="text-base font-medium mt-0.5 break-words">
             <%= @job.point_of_contact? ? @job.poc_name : "—" %>
           </dd>
         </div>
         <div class="min-w-0">
-          <dt class="text-ink-muted">POC phone</dt>
-          <dd class="font-medium mt-0.5 break-words"<% if @job.point_of_contact? %> title="WhatsApp: <%= @job.poc_whatsapp_number %>"<% end %>>
+          <dt class="text-sm text-ink-muted">POC phone</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"<% if @job.point_of_contact? %> title="WhatsApp: <%= @job.poc_whatsapp_number %>"<% end %>>
             <%= @job.point_of_contact? ? @job.full_poc_contact_number : "—" %>
           </dd>
         </div>
         <div class="min-w-0">
-          <dt class="text-ink-muted">Google Maps</dt>
-          <dd class="font-medium mt-0.5 break-words">
+          <dt class="text-sm text-ink-muted">Google Maps</dt>
+          <dd class="text-base font-medium mt-0.5 break-words">
             <% if (map_href = @job.safe_map_url) %>
               <%= content_tag :a, "Open in Google Maps",
                           href: map_href,
@@ -105,8 +105,8 @@
           </dd>
         </div>
         <div class="min-w-0">
-          <dt class="text-ink-muted">Site note</dt>
-          <dd class="font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @job.site_note.to_s.strip.presence || "—" %></dd>
+          <dt class="text-sm text-ink-muted">Site note</dt>
+          <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @job.site_note.to_s.strip.presence || "—" %></dd>
         </div>
       </dl>
     </div>
@@ -116,20 +116,20 @@
     <div class="card-section">
       <h2 class="section-label mb-4">Cranes</h2>
       <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
-          <thead class="text-[--color-ink-muted] border-b border-[--color-line]">
+        <table class="w-full text-left">
+          <thead class="text-sm text-[--color-ink-muted] border-b border-[--color-line]">
             <tr>
               <th class="py-2 pr-4 font-medium">Type</th>
               <th class="py-2 pr-4 font-medium">LM number</th>
               <th class="py-2 font-medium">Rope Diameter (S/M/B) (mm)</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[--color-line]">
+          <tbody class="divide-y divide-[--color-line] text-base">
             <% @job.cranes.each do |crane| %>
               <tr>
                 <td class="py-2.5 pr-4 font-medium"><%= crane.crane_type_label %></td>
-                <td class="py-2.5 pr-4 font-mono text-xs sm:text-sm"><%= crane.lm_number %></td>
-                <td class="py-2.5"><%= crane.rope_diameter_mm %></td>
+                <td class="py-2.5 pr-4 font-mono text-ink-muted"><%= crane.lm_number %></td>
+                <td class="py-2.5 font-mono text-ink-muted"><%= crane.rope_diameter_mm %></td>
               </tr>
             <% end %>
           </tbody>
@@ -142,7 +142,7 @@
     <section class="card">
       <div class="card-section">
         <h2 class="section-label mb-2">Notes</h2>
-        <p class="text-sm whitespace-pre-wrap"><%= @job.notes %></p>
+        <p class="text-base whitespace-pre-wrap"><%= @job.notes %></p>
       </div>
     </section>
   <% end %>

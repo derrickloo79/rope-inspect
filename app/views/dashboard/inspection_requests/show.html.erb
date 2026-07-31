@@ -34,20 +34,20 @@
     <section class="card">
       <div class="card-section">
         <h2 class="section-label mb-4">Requestor</h2>
-        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+        <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="min-w-0">
-            <dt class="text-[--color-ink-muted]">Name</dt>
-            <dd class="font-medium mt-0.5 break-words"><%= @inspection_request.requestor_name %></dd>
+            <dt class="text-sm text-[--color-ink-muted]">Name</dt>
+            <dd class="text-base font-medium mt-0.5 break-words"><%= @inspection_request.requestor_name %></dd>
           </div>
           <div class="min-w-0">
-            <dt class="text-[--color-ink-muted]">Phone</dt>
-            <dd class="font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.whatsapp_number %>">
+            <dt class="text-sm text-[--color-ink-muted]">Phone</dt>
+            <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.whatsapp_number %>">
               <%= @inspection_request.full_contact_number %>
             </dd>
           </div>
           <div class="min-w-0">
-            <dt class="text-[--color-ink-muted]">Submitted</dt>
-            <dd class="font-medium mt-0.5 break-words"><%= format_datetime(@inspection_request.created_at) %></dd>
+            <dt class="text-sm text-[--color-ink-muted]">Submitted</dt>
+            <dd class="text-base font-medium mt-0.5 break-words"><%= format_datetime(@inspection_request.created_at) %></dd>
           </div>
         </dl>
       </div>
@@ -95,14 +95,14 @@
           <%# View mode %>
           <div data-site-access-target="view" class="space-y-3">
             <% if @inspection_request.point_of_contact? %>
-              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="min-w-0">
-                  <dt class="text-ink-muted">Name</dt>
-                  <dd class="font-medium mt-0.5 break-words"><%= @inspection_request.poc_name %></dd>
+                  <dt class="text-sm text-ink-muted">Name</dt>
+                  <dd class="text-base font-medium mt-0.5 break-words"><%= @inspection_request.poc_name %></dd>
                 </div>
                 <div class="min-w-0">
-                  <dt class="text-ink-muted">Contact number</dt>
-                  <dd class="font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.poc_whatsapp_number %>">
+                  <dt class="text-sm text-ink-muted">Contact number</dt>
+                  <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.poc_whatsapp_number %>">
                     <%= @inspection_request.full_poc_contact_number %>
                   </dd>
                 </div>
@@ -165,15 +165,15 @@
       <div class="card-section">
         <h2 class="section-label mb-4">Cranes</h2>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left">
-            <thead class="text-[--color-ink-muted] border-b border-[--color-line]">
+          <table class="w-full text-left">
+            <thead class="text-sm text-[--color-ink-muted] border-b border-[--color-line]">
               <tr>
                 <th class="py-2 pr-4 font-medium">Type</th>
                 <th class="py-2 pr-4 font-medium">LM number</th>
                 <th class="py-2 font-medium">Rope Diameter (S/M/B) (mm)</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-[--color-line]">
+            <tbody class="divide-y divide-[--color-line] text-base">
               <% @inspection_request.cranes.each do |crane| %>
                 <tr>
                   <td class="py-3 pr-4 font-medium"><%= crane.crane_type_label %></td>
@@ -223,10 +223,10 @@
           <%# View mode %>
           <div data-site-access-target="view" class="space-y-3">
             <% if @inspection_request.site_access? %>
-              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="min-w-0">
-                  <dt class="text-ink-muted">Google Maps</dt>
-                  <dd class="font-medium mt-0.5 break-words">
+                  <dt class="text-sm text-ink-muted">Google Maps</dt>
+                  <dd class="text-base font-medium mt-0.5 break-words">
                     <% if (map_href = @inspection_request.safe_map_url) %>
                       <%= content_tag :a, "Open in Google Maps",
                                   href: map_href,
@@ -248,8 +248,8 @@
                   </dd>
                 </div>
                 <div class="min-w-0">
-                  <dt class="text-ink-muted">Site note</dt>
-                  <dd class="font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @inspection_request.site_note.to_s.strip.presence || "—" %></dd>
+                  <dt class="text-sm text-ink-muted">Site note</dt>
+                  <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @inspection_request.site_note.to_s.strip.presence || "—" %></dd>
                 </div>
               </dl>
             <% else %>
