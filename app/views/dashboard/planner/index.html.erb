@@ -1,9 +1,10 @@
 <% content_for :title, "Planner — Hey Tec Inspect" %>
 
-<div class="planner planner--wide space-y-10">
+<div class="planner planner--wide space-y-10"
+     data-controller="planner-schedule">
   <div>
     <h1 class="page-title">Planner</h1>
-    <p class="page-lede">Schedule accepted jobs and scan the week ahead.</p>
+    <p class="page-lede">Schedule accepted jobs and scan the week ahead. Click a card to set date, time, and inspector.</p>
   </div>
 
   <%# Section A: Accepted jobs ready to schedule %>
@@ -16,7 +17,15 @@
     <% if @accepted_jobs.any? %>
       <div class="planner-accepted-grid">
         <% @accepted_jobs.each do |job| %>
-          <%= link_to dashboard_inspection_request_path(job), class: "planner-accepted-card no-underline" do %>
+          <button type="button"
+                  class="planner-accepted-card text-left"
+                  data-action="planner-schedule#open"
+                  data-planner-schedule-job-id-param="<%= job.id %>"
+                  data-planner-schedule-title-param="<%= job.site_name %>"
+                  data-planner-schedule-subtitle-param="<%= job.company_name %> · <%= job.reference_code %>"
+                  data-planner-schedule-date-param="<%= job.scheduled_on %>"
+                  data-planner-schedule-period-param="<%= job.scheduled_period %>"
+                  data-planner-schedule-fsp-id-param="<%= job.fsp_id %>">
             <p class="planner-accepted-card__title"><%= job.site_name %></p>
             <p class="planner-accepted-card__meta">
               <%= job.company_name %>
@@ -24,11 +33,11 @@
               · <%= job.reference_code %>
             </p>
             <span class="planner-accepted-card__cta">Schedule →</span>
-          <% end %>
+          </button>
         <% end %>
       </div>
     <% else %>
-      <p class="text-sm text-[--color-ink-muted] py-4">No accepted jobs waiting to schedule.</p>
+      <p class="text-sm text-ink-muted py-4">No accepted jobs waiting to schedule.</p>
     <% end %>
   </section>
 
@@ -91,11 +100,17 @@
                 <% if jobs.any? %>
                   <% jobs.each do |job| %>
                     <% chip_style = job.fsp.present? ? "background-color: #{job.fsp.color};" : nil %>
-                    <%= link_to dashboard_inspection_request_path(job),
-                                class: "planner-chip no-underline#{' planner-chip--colored' if job.fsp.present?}",
-                                style: chip_style,
-                                title: job.fsp&.display_name,
-                                data: { turbo_frame: "_top" } do %>
+                    <button type="button"
+                            class="planner-chip text-left<%= " planner-chip--colored" if job.fsp.present? %>"
+                            style="<%= chip_style %>"
+                            title="<%= job.fsp&.display_name %>"
+                            data-action="planner-schedule#open"
+                            data-planner-schedule-job-id-param="<%= job.id %>"
+                            data-planner-schedule-title-param="<%= job.site_name %>"
+                            data-planner-schedule-subtitle-param="<%= job.company_name %> · <%= job.reference_code %>"
+                            data-planner-schedule-date-param="<%= job.scheduled_on %>"
+                            data-planner-schedule-period-param="<%= job.scheduled_period %>"
+                            data-planner-schedule-fsp-id-param="<%= job.fsp_id %>">
                       <span class="planner-chip__site"><%= job.site_name %></span>
                       <span class="planner-chip__company">
                         <%= job.company_name %> · <%= pluralize(job.cranes.size, "crane") %>
@@ -108,7 +123,7 @@
                           <span class="planner-chip__fsp-number"><%= job.fsp.fsp_number %></span>
                         <% end %>
                       </span>
-                    <% end %>
+                    </button>
                   <% end %>
                 <% else %>
                   <p class="planner-day__empty">—</p>
@@ -120,4 +135,121 @@
       </div>
     </section>
   <% end %>
+
+  <%# Schedule modal (outside turbo frame so it stays mounted) %>
+  <div class="planner-schedule-modal"
+       data-planner-schedule-target="dialog"
+       data-action="click->planner-schedule#backdropClose"
+       hidden>
+    <div class="planner-schedule-modal__dialog"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="planner-schedule-title">
+      <div class="planner-schedule-modal__header">
+        <div class="min-w-0">
+          <h2 id="planner-schedule-title" class="planner-schedule-modal__title" data-planner-schedule-target="title">
+            Schedule inspection
+          </h2>
+          <p class="planner-schedule-modal__subtitle" data-planner-schedule-target="subtitle"></p>
+        </div>
+        <button type="button"
+                class="planner-schedule-modal__close"
+                data-action="planner-schedule#close"
+                aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6L6 18" />
+            <path d="M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="error-list hidden"
+           role="alert"
+           hidden
+           data-planner-schedule-target="error">
+        <p class="font-medium" data-planner-schedule-target="errorText"></p>
+      </div>
+
+      <%= form_with url: "#",
+                    method: :patch,
+                    html: {
+                      id: "planner-schedule-form",
+                      class: "space-y-4",
+                      data: {
+                        planner_schedule_target: "form",
+                        action: "submit->planner-schedule#submit"
+                      },
+                      novalidate: true
+                    } do %>
+        <input type="hidden" name="return_to" value="planner">
+        <input type="hidden" name="week" value="<%= @week_start.iso8601 %>">
+        <input type="hidden" name="fsp_filter" value="<%= @fsp_filter %>">
+
+        <div>
+          <label class="field-label" for="planner_scheduled_on">Schedule date</label>
+          <input type="text"
+                 name="inspection_request[scheduled_on]"
+                 id="planner_scheduled_on"
+                 class="field-input"
+                 placeholder="dd/mm/yyyy"
+                 autocomplete="off"
+                 data-controller="datepicker"
+                 data-datepicker-position-value="below"
+                 data-planner-schedule-target="dateField"
+                 inputmode="none">
+        </div>
+
+        <div>
+          <span class="field-label" id="planner_scheduled_time_label">Time</span>
+          <div class="job-schedule-form__time" role="radiogroup" aria-labelledby="planner_scheduled_time_label" aria-required="true">
+            <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+              <input type="radio"
+                     name="inspection_request[scheduled_time]"
+                     value="AM"
+                     class="h-4 w-4 accent-[var(--color-accent)]"
+                     data-planner-schedule-target="periodAm">
+              <span>AM</span>
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
+              <input type="radio"
+                     name="inspection_request[scheduled_time]"
+                     value="PM"
+                     class="h-4 w-4 accent-[var(--color-accent)]"
+                     data-planner-schedule-target="periodPm">
+              <span>PM</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label" for="planner_fsp_id">Inspector / FSP</label>
+          <select name="inspection_request[fsp_id]"
+                  id="planner_fsp_id"
+                  class="field-select"
+                  data-planner-schedule-target="fspSelect">
+            <option value="">Unassigned</option>
+            <% @fsps.each do |fsp| %>
+              <option value="<%= fsp.id %>"><%= fsp.display_name %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+          <button type="submit" class="btn-primary cursor-pointer">
+            Save schedule
+          </button>
+          <button type="button" class="btn-secondary cursor-pointer" data-action="planner-schedule#close">
+            Cancel
+          </button>
+        </div>
+      <% end %>
+
+      <p class="planner-schedule-modal__footer">
+        <%= link_to "Open full job details",
+                    "#",
+                    class: "text-sm no-underline",
+                    data: { planner_schedule_target: "viewJob", turbo_frame: "_top" } %>
+      </p>
+    </div>
+  </div>
 </div>

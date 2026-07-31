@@ -53,28 +53,24 @@ module Dashboard
       fsp = fsp_id.present? ? Fsp.find_by(id: fsp_id) : nil
 
       if on.blank?
-        redirect_to dashboard_inspection_request_path(@inspection_request),
-                    alert: "Pick a schedule date."
+        redirect_to after_schedule_path, alert: "Pick a schedule date."
         return
       end
 
       if period.blank?
-        redirect_to dashboard_inspection_request_path(@inspection_request),
-                    alert: "Select a time (AM or PM)."
+        redirect_to after_schedule_path, alert: "Select a time (AM or PM)."
         return
       end
 
       if fsp_id.present? && fsp.nil?
-        redirect_to dashboard_inspection_request_path(@inspection_request),
-                    alert: "Selected FSP was not found."
+        redirect_to after_schedule_path, alert: "Selected FSP was not found."
         return
       end
 
       if @inspection_request.schedule!(on: on, at: at, fsp: fsp)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
-                    notice: "Inspection scheduled."
+        redirect_to after_schedule_path, notice: "Inspection scheduled."
       else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to after_schedule_path,
                     alert: "Could not schedule from the current state. Accept the request first."
       end
     end
@@ -114,6 +110,19 @@ module Dashboard
       case period
       when "AM" then Time.zone.parse("09:00")
       when "PM" then Time.zone.parse("14:00")
+      end
+    end
+
+    # Stay on planner when scheduling from the planner modal.
+    def after_schedule_path
+      return_to = params[:return_to].presence || params.dig(:inspection_request, :return_to)
+      if return_to == "planner"
+        dashboard_planner_path(
+          week: params[:week].presence || params.dig(:inspection_request, :week),
+          fsp_id: params[:fsp_filter].presence || params.dig(:inspection_request, :fsp_filter)
+        )
+      else
+        dashboard_inspection_request_path(@inspection_request)
       end
     end
   end

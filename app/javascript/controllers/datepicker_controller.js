@@ -1,8 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 import flatpickr from "flatpickr"
 
-// Date field that opens a calendar above the input (avoids overflow under sticky bars).
+// Date field with calendar popup. Default opens above (sticky bars).
+// Set data-datepicker-position-value="below" to open under the field (e.g. modals).
 export default class extends Controller {
+  static values = {
+    position: { type: String, default: "above" }
+  }
+
   connect() {
     this.picker = flatpickr(this.element, {
       dateFormat: "Y-m-d",
@@ -11,8 +16,9 @@ export default class extends Controller {
       altInputClass: "field-input flatpickr-alt-input",
       allowInput: false,
       disableMobile: true,
-      // Prefer opening above so sticky bottom action bars do not clip the calendar.
-      position: "above",
+      clickOpens: true,
+      // Job detail sticky bars: above. Planner modal: below (position value).
+      position: this.positionValue === "below" ? "below" : "above",
       appendTo: document.body,
       static: false,
       monthSelectorType: "static",
