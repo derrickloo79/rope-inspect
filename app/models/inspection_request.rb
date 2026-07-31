@@ -27,6 +27,7 @@ class InspectionRequest < ApplicationRecord
   before_validation :default_country_code
   before_validation :normalize_contact_number
   before_validation :normalize_map_url
+  before_validation :normalize_site_note
   before_validation :assign_crane_positions
   before_validation :sync_assigned_inspector_from_fsp
 
@@ -223,6 +224,10 @@ class InspectionRequest < ApplicationRecord
 
   def normalize_map_url
     self.map_url = map_url.to_s.strip.presence
+  end
+
+  def normalize_site_note
+    self.site_note = site_note.to_s.strip.presence
   end
 
   def assign_crane_positions
