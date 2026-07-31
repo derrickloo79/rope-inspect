@@ -3,11 +3,13 @@ module Portal
     before_action :set_job, only: :show
 
     def index
-      @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
-      scope = current_fsp.assigned_jobs
-      scope = scope.where(status: @status_filter) if @status_filter
-      @jobs = scope
-      @counts = current_fsp.inspection_requests.group(:status).count
+      # FSP dashboard: upcoming scheduled jobs for this inspector only.
+      @upcoming_jobs = InspectionRequest.upcoming_within(7)
+        .where(fsp_id: current_fsp.id)
+        .includes(:cranes, :fsp)
+      @upcoming_by_day = @upcoming_jobs.group_by(&:scheduled_on).transform_values do |jobs|
+        jobs.sort_by(&:schedule_sort_key)
+      end
     end
 
     def show

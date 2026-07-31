@@ -1,0 +1,76 @@
+<%#
+  locals:
+    upcoming_by_day: Hash[Date => Array<InspectionRequest>]
+    job_path: :dashboard_inspection_request_path | :portal_job_path
+%>
+<% job_path = local_assigns.fetch(:job_path, :dashboard_inspection_request_path) %>
+
+<section class="space-y-4" aria-labelledby="upcoming-heading">
+  <h2 id="upcoming-heading" class="section-label">Upcoming · next 7 days</h2>
+
+  <% if upcoming_by_day.any? %>
+    <div class="space-y-6">
+      <% upcoming_by_day.each do |date, jobs| %>
+        <% am_jobs, rest = jobs.partition { |j| j.scheduled_period == "AM" } %>
+        <% pm_jobs = rest %>
+        <div class="dash-day-block">
+          <h3 class="dash-day-heading">
+            <% if date == Date.current %>
+              Today · <%= date.strftime("%-d %b") %>
+            <% elsif date == Date.current + 1 %>
+              Tomorrow · <%= date.strftime("%-d %b") %>
+            <% else %>
+              <%= date.strftime("%A, %-d %b") %>
+            <% end %>
+          </h3>
+
+          <div class="dash-period-cols mt-3">
+            <% [
+              [ "AM", am_jobs, "am" ],
+              [ "PM", pm_jobs, "pm" ]
+            ].each do |label, period_jobs, period_key| %>
+              <div class="dash-period-col">
+                <div class="dash-period-col__header">
+                  <span class="dash-period-pill dash-period-pill--<%= period_key %>"><%= label %></span>
+                </div>
+                <% if period_jobs.any? %>
+                  <ul class="dash-upcoming-list">
+                    <% period_jobs.each do |job| %>
+                      <li>
+                        <%= link_to send(job_path, job),
+                                    class: "dash-upcoming-item no-underline block" do %>
+                          <span class="dash-upcoming-item__title truncate"><%= job.site_name %></span>
+                          <p class="dash-upcoming-item__meta mt-0.5 truncate">
+                            <%= job.company_name %>
+                            · <%= pluralize(job.cranes.size, "crane") %>
+                            · <%= job.reference_code %>
+                          </p>
+                          <div class="dash-upcoming-item__fsp mt-1.5">
+                            <% if job.fsp.present? %>
+                              <span class="fsp-color-swatch dash-upcoming-item__swatch"
+                                    style="background-color: <%= job.fsp.color %>;"
+                                    title="<%= job.fsp.display_name %>"></span>
+                              <span class="dash-upcoming-item__fsp-number"><%= job.fsp.fsp_number %></span>
+                            <% else %>
+                              <span class="dash-upcoming-item__unassigned">Unassigned</span>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <p class="dash-period-col__empty">No jobs</p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12 text-ink-muted">
+      <p class="font-medium text-ink">No inspections scheduled in the next 7 days.</p>
+    </div>
+  <% end %>
+</section>

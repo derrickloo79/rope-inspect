@@ -48,7 +48,7 @@
     <% elsif fsp_signed_in? %>
       <%# FSP portal nav %>
       <nav class="site-header-desktop" aria-label="Main">
-        <%= link_to "My jobs", portal_root_path, class: site_header_link_class(:portal_jobs) %>
+        <%= link_to "Dashboard", portal_root_path, class: site_header_link_class(:portal_jobs) %>
       </nav>
 
       <div class="site-header-desktop-account">
@@ -168,7 +168,7 @@
         </div>
 
         <nav class="site-header-mobile-nav" aria-label="Mobile main">
-          <%= link_to "My jobs", portal_root_path,
+          <%= link_to "Dashboard", portal_root_path,
                       class: site_header_link_class(:portal_jobs),
                       data: { action: "menu#navigate" } %>
         </nav>

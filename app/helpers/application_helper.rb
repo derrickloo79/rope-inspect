@@ -39,6 +39,19 @@ module ApplicationHelper
     classes.join(" ")
   end
 
+  # Greeting for FSP portal (Singapore time via app time zone).
+  def greeting_for_time(time = Time.zone.now)
+    hour = time.hour
+    if hour < 12
+      "Good morning"
+    elsif hour < 18
+      "Good afternoon"
+    else
+      "Good evening"
+    end
+  end
+
+
   # Country dial codes for selects: closed shows "+65", open shows "Singapore (+65)".
   # Used with data-controller="country-code-select".
   def country_code_select_options(selected = nil)
