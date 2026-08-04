@@ -52,10 +52,12 @@
       </nav>
 
       <div class="site-header-desktop-account">
-        <span class="site-header-email inline-flex items-center gap-2">
+        <%= link_to edit_portal_profile_path,
+                    class: "site-header-email no-underline inline-flex items-center gap-2 #{'is-active' if nav_link_active?(:portal_profile)}",
+                    title: "My profile · #{current_fsp.email}" do %>
           <span class="fsp-color-swatch" style="background-color: <%= current_fsp.color %>;" title="<%= current_fsp.fsp_number %>"></span>
           <%= current_fsp.full_name %>
-        </span>
+        <% end %>
         <%= button_to "Sign out", destroy_fsp_session_path, method: :delete, class: "btn-ghost !py-1.5 !px-2 text-sm" %>
       </div>
 
@@ -170,6 +172,9 @@
         <nav class="site-header-mobile-nav" aria-label="Mobile main">
           <%= link_to "Dashboard", portal_root_path,
                       class: site_header_link_class(:portal_jobs),
+                      data: { action: "menu#navigate" } %>
+          <%= link_to "My profile", edit_portal_profile_path,
+                      class: site_header_link_class(:portal_profile),
                       data: { action: "menu#navigate" } %>
         </nav>
 

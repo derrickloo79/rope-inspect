@@ -40,6 +40,7 @@ Rails.application.routes.draw do
   # FSP portal — inspectors view only their assigned jobs
   namespace :portal do
     root to: "jobs#index"
+    resource :profile, only: [ :edit, :update ]
     resources :jobs, only: [ :index, :show ]
   end
 

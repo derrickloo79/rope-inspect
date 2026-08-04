@@ -15,6 +15,8 @@ module ApplicationHelper
       controller_path == "dashboard/inspection_requests"
     when :portal_jobs
       controller_path == "portal/jobs"
+    when :portal_profile
+      controller_path == "portal/profiles"
     when :public_form
       controller_path == "inspection_requests" || controller_path == "status"
     else
