@@ -78,6 +78,13 @@ module ApplicationHelper
     }.deep_merge(extra)
   end
 
+  # Browser key for Google Places Autocomplete (HTTP referrer restricted).
+  # Set GOOGLE_MAPS_API_KEY or credentials.google_maps_api_key.
+  def google_maps_api_key
+    ENV["GOOGLE_MAPS_API_KEY"].presence ||
+      Rails.application.credentials.dig(:google_maps_api_key).presence
+  end
+
 
   def status_badge(status)
     css = case status.to_s

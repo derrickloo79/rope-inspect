@@ -269,12 +269,36 @@
                           method: :patch,
                           class: "space-y-4" do |f| %>
               <div>
-                <%= f.label :map_url, "Google Maps link", class: "field-label" %>
-                <%= f.url_field :map_url,
-                                class: "field-input",
-                                placeholder: "https://maps.google.com/… or https://maps.app.goo.gl/…",
-                                autocomplete: "off" %>
-                <p class="field-hint">Paste a share link from Google Maps for the approximate site location.</p>
+                <%= f.label :map_url, "Map location", class: "field-label" %>
+                <div class="field-clearable"
+                     data-controller="map-location"
+                     data-map-location-api-key-value="<%= google_maps_api_key %>">
+                  <%= f.text_field :map_url,
+                                  class: "field-input field-input--clearable",
+                                  placeholder: "Search address or paste a Google Maps link",
+                                  autocomplete: "off",
+                                  data: {
+                                    map_location_target: "input",
+                                    action: "input->map-location#refresh"
+                                  } %>
+                  <button type="button"
+                          class="field-clear-btn"
+                          data-map-location-target="clear"
+                          data-action="map-location#clear"
+                          hidden
+                          aria-label="Clear map location">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <p class="field-hint">
+                  <% if google_maps_api_key.present? %>
+                    Start typing a site address for suggestions, or paste a Google Maps share link.
+                  <% else %>
+                    Paste a Google Maps share link (or set GOOGLE_MAPS_API_KEY for address search).
+                  <% end %>
+                </p>
               </div>
               <div>
                 <%= f.label :site_note, "Site note", class: "field-label" %>

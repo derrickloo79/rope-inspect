@@ -18,11 +18,11 @@ class InspectionRequest < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :share_token, uniqueness: true, allow_nil: true
   MAP_URL_FORMAT = %r{\Ahttps?://[^\s]+\z}i
+  MAP_URL_MAX_LENGTH = 2000
 
-  validates :map_url, format: {
-    with: MAP_URL_FORMAT,
-    message: "must be a full URL starting with http:// or https://"
-  }, allow_blank: true
+  # Accepts a Google Maps share link or a free-text address (Places autocomplete / typed).
+  validates :map_url, length: { maximum: MAP_URL_MAX_LENGTH }, allow_blank: true
+  validate :map_url_must_be_safe_location
   validates :poc_country_code, inclusion: { in: COUNTRY_CODES.map(&:last) }, allow_blank: true
   validates :poc_contact_number, format: {
     with: /\A[0-9][0-9\s\-]{5,18}\z/,
@@ -231,21 +231,40 @@ class InspectionRequest < ApplicationRecord
     "#{code}#{national}"
   end
 
-  # Only return http(s) URLs for use in link hrefs (avoids javascript: etc.).
+  # Safe http(s) href for "Open in Google Maps".
+  # - Stored share/search links are returned as-is when valid.
+  # - Free-text addresses become a Google Maps search URL.
   def safe_map_url
-    url = map_url.to_s.strip
-    return nil if url.blank?
-    return nil unless url.match?(MAP_URL_FORMAT)
+    value = map_url.to_s.strip
+    return nil if value.blank?
 
-    uri = URI.parse(url)
-    return url if uri.is_a?(URI::HTTP)
+    if value.match?(MAP_URL_FORMAT)
+      uri = URI.parse(value)
+      return value if uri.is_a?(URI::HTTP)
 
-    nil
+      return nil
+    end
+
+    "https://www.google.com/maps/search/?api=1&query=#{ERB::Util.url_encode(value)}"
   rescue URI::InvalidURIError
     nil
   end
 
   private
+
+  def map_url_must_be_safe_location
+    return if map_url.blank?
+
+    if map_url.match?(%r{\A\s*(javascript|data|vbscript):}i)
+      errors.add(:map_url, "is not a valid location")
+      return
+    end
+
+    return unless map_url.match?(%r{\Ahttps?://}i)
+    return if map_url.match?(MAP_URL_FORMAT)
+
+    errors.add(:map_url, "must be a valid http(s) URL or an address")
+  end
 
   def set_default_status
     self.status ||= "pending"
