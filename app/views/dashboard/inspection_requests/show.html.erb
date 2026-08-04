@@ -544,7 +544,14 @@
                             accept_dashboard_inspection_request_path(@inspection_request),
                             method: :patch,
                             class: "btn-primary w-full cursor-pointer",
-                            form: { class: "job-actions-pending-row__item" } %>
+                            form: {
+                              class: "job-actions-pending-row__item",
+                              data: {
+                                turbo_confirm: "Are you sure you wish to accept this inspection request?\n\n" \
+                                  "Once accepted, the status cannot be returned to pending. " \
+                                  "The requestor will also receive a WhatsApp notification when the job is accepted."
+                              }
+                            } %>
               <%= button_to "Reject request",
                             reject_dashboard_inspection_request_path(@inspection_request),
                             method: :patch,
