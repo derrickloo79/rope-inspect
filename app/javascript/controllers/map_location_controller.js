@@ -115,15 +115,26 @@ export default class extends Controller {
       this.inputTarget.value = place.url
     }
 
+    this.closeSuggestions()
     this.refresh()
-    this.inputTarget.dispatchEvent(new Event("input", { bubbles: true }))
+  }
+
+  closeSuggestions() {
+    // Google's .pac-container can linger after a click selection (esp. when we
+    // rewrite the input value). Hide it and blur so it doesn't stay open.
+    document.querySelectorAll(".pac-container").forEach((el) => {
+      el.style.display = "none"
+    })
+    this.inputTarget.blur()
   }
 
   bumpPacZIndex() {
-    // Google injects .pac-container on the body; ensure it stacks above UI chrome.
+    // Google injects .pac-container on the body; ensure it stacks above UI chrome
+    // and re-show if it was hidden after a previous selection.
     requestAnimationFrame(() => {
       document.querySelectorAll(".pac-container").forEach((el) => {
         el.style.zIndex = "10000"
+        el.style.display = ""
       })
     })
   }
