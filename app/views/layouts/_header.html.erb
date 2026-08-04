@@ -48,7 +48,8 @@
     <% elsif fsp_signed_in? %>
       <%# FSP portal nav %>
       <nav class="site-header-desktop" aria-label="Main">
-        <%= link_to "Dashboard", portal_root_path, class: site_header_link_class(:portal_jobs) %>
+        <%= link_to "Dashboard", portal_root_path, class: site_header_link_class(:portal_dashboard) %>
+        <%= link_to "Jobs", portal_jobs_path, class: site_header_link_class(:portal_jobs) %>
       </nav>
 
       <div class="site-header-desktop-account">
@@ -171,6 +172,9 @@
 
         <nav class="site-header-mobile-nav" aria-label="Mobile main">
           <%= link_to "Dashboard", portal_root_path,
+                      class: site_header_link_class(:portal_dashboard),
+                      data: { action: "menu#navigate" } %>
+          <%= link_to "Jobs", portal_jobs_path,
                       class: site_header_link_class(:portal_jobs),
                       data: { action: "menu#navigate" } %>
           <%= link_to "My profile", edit_portal_profile_path,

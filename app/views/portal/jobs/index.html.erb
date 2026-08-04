@@ -1,12 +1,93 @@
-<% content_for :title, "Dashboard — Hey Tec Inspect" %>
+<% content_for :title, "Jobs — Hey Tec Inspect" %>
 
 <div class="space-y-8">
-  <div>
-    <h1 class="page-title"><%= greeting_for_time %>, <%= current_fsp.full_name %></h1>
-    <p class="page-lede">Here are your assigned inspections.</p>
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div>
+      <h1 class="page-title">My jobs</h1>
+      <p class="page-lede">Current and past inspections assigned to you.</p>
+    </div>
   </div>
 
-  <%= render "shared/upcoming_schedule",
-             upcoming_by_day: @upcoming_by_day,
-             job_path: :portal_job_path %>
+  <%# Status filter pills — All / Scheduled / Completed %>
+  <div class="job-filter-pills" role="tablist" aria-label="Filter jobs by status">
+    <%= link_to portal_jobs_path,
+                class: "job-filter-pill no-underline #{@status_filter.nil? ? "is-active" : ""}",
+                role: "tab",
+                "aria-selected": @status_filter.nil? do %>
+      All
+      <span class="job-filter-pill__count"><%= @all_count %></span>
+    <% end %>
+    <% Portal::JobsController::FILTERS.each do |status| %>
+      <%= link_to portal_jobs_path(status: status),
+                  class: "job-filter-pill no-underline #{@status_filter == status ? "is-active" : ""}",
+                  role: "tab",
+                  "aria-selected": @status_filter == status do %>
+        <%= status.humanize %>
+        <span class="job-filter-pill__count"><%= @counts[status] || 0 %></span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @jobs.any? %>
+    <div class="card overflow-hidden">
+      <ul class="divide-y divide-[--color-line]">
+        <% @jobs.each do |request| %>
+          <li>
+            <%= link_to portal_job_path(request), class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>
+              <div class="job-list-row">
+                <div class="job-list-details min-w-0">
+                  <div class="job-list-title-row">
+                    <span class="job-list-title truncate"><%= request.site_name %></span>
+                  </div>
+                  <p class="job-list-meta mt-0.5 truncate">
+                    <%= request.company_name %>
+                    · <%= pluralize(request.cranes.size, "crane") %>
+                    · <%= request.reference_code %>
+                  </p>
+                </div>
+                <div class="job-list-schedule">
+                  <% if request.scheduled_on.present? %>
+                    <div class="job-list-schedule__when">
+                      <span class="job-list-schedule__date"><%= format_date(request.scheduled_on) %></span>
+                      <% if request.scheduled_period.present? %>
+                        <span class="dash-period-pill dash-period-pill--<%= request.scheduled_period.downcase %>"><%= request.scheduled_period %></span>
+                      <% end %>
+                    </div>
+                    <div class="job-list-schedule__fsp">
+                      <% if request.fsp.present? %>
+                        <span class="fsp-color-swatch" style="background-color: <%= request.fsp.color %>;" title="<%= request.fsp.display_name %>"></span>
+                        <span class="job-list-schedule__fsp-number"><%= request.fsp.fsp_number %></span>
+                      <% else %>
+                        <span class="job-list-schedule__unassigned">Unassigned</span>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <span class="job-list-schedule__empty">—</span>
+                  <% end %>
+                </div>
+                <div class="job-list-status">
+                  <%= status_badge(request.status) %>
+                </div>
+                <div class="job-list-timestamp whitespace-nowrap">
+                  <%= format_list_timestamp(request.created_at) %>
+                </div>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <div class="text-center py-12 text-[--color-ink-muted]">
+      <p class="font-medium text-[--color-ink]">No jobs here yet</p>
+      <p class="text-sm mt-1">
+        <% if @status_filter %>
+          Nothing in <strong><%= @status_filter %></strong>.
+          <%= link_to "View all", portal_jobs_path %>
+        <% else %>
+          Jobs assigned to you will show up here.
+        <% end %>
+      </p>
+    </div>
+  <% end %>
 </div>

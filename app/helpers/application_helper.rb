@@ -13,6 +13,8 @@ module ApplicationHelper
       controller_path == "dashboard/profiles"
     when :jobs
       controller_path == "dashboard/inspection_requests"
+    when :portal_dashboard
+      controller_path == "portal/home"
     when :portal_jobs
       controller_path == "portal/jobs"
     when :portal_profile

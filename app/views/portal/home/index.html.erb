@@ -1,0 +1,12 @@
+<% content_for :title, "Dashboard — Hey Tec Inspect" %>
+
+<div class="space-y-8">
+  <div>
+    <h1 class="page-title"><%= greeting_for_time %>, <%= current_fsp.full_name %></h1>
+    <p class="page-lede">Here are your assigned inspections.</p>
+  </div>
+
+  <%= render "shared/upcoming_schedule",
+             upcoming_by_day: @upcoming_by_day,
+             job_path: :portal_job_path %>
+</div>
