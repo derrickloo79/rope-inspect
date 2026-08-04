@@ -51,6 +51,7 @@
           <%= format_week_range(@week_start, @week_end) %>
         </h2>
 
+        <% current_week_start = Date.current.beginning_of_week(:monday) %>
         <div class="planner-week-toggles" role="group" aria-label="Change week">
           <%= link_to dashboard_planner_path(planner_query.merge(week: (@week_start - 7.days).iso8601)),
                       class: "planner-week-toggle no-underline",
@@ -63,6 +64,13 @@
                       data: { turbo_action: "advance" },
                       aria: { label: "Next week" } do %>
             →
+          <% end %>
+          <% if @week_start != current_week_start %>
+            <%= link_to "Today",
+                        dashboard_planner_path(planner_query.merge(week: current_week_start.iso8601)),
+                        class: "planner-week-today btn-primary no-underline",
+                        data: { turbo_action: "advance" },
+                        aria: { label: "Go to current week" } %>
           <% end %>
         </div>
 
