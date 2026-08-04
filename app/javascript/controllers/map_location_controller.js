@@ -107,16 +107,30 @@ export default class extends Controller {
     const place = this.autocomplete?.getPlace()
     if (!place) return
 
-    // Prefer a human-readable address; fall back to Maps place URL if needed.
-    const address = place.formatted_address || place.name
-    if (address) {
-      this.inputTarget.value = address
-    } else if (place.url) {
-      this.inputTarget.value = place.url
+    // Use the place *name* when present. Relying only on formatted_address often
+    // collapses a specific site (e.g. "Woh Hup WCP Site 2") to a nearby street
+    // ("Woodlands Centre Rd"). Prefer "Name, Address" for establishments.
+    const value = this.displayValueForPlace(place)
+    if (value) {
+      this.inputTarget.value = value
     }
 
     this.closeSuggestions()
     this.refresh()
+  }
+
+  displayValueForPlace(place) {
+    const name = (place.name || "").trim()
+    const formatted = (place.formatted_address || "").trim()
+
+    if (name && formatted) {
+      if (formatted.toLowerCase().includes(name.toLowerCase())) {
+        return formatted
+      }
+      return `${name}, ${formatted}`
+    }
+
+    return name || formatted || place.url || ""
   }
 
   closeSuggestions() {
