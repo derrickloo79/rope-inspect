@@ -386,7 +386,12 @@
                           html: {
                             id: "job-schedule-form",
                             class: "job-schedule-form space-y-3",
-                            data: { action: "submit->schedule-form#submit" },
+                            data: {
+                              controller: "fsp-session-warning",
+                              fsp_session_warning_url_value: dashboard_schedule_session_check_path,
+                              fsp_session_warning_exclude_job_id_value: @inspection_request.id,
+                              action: "submit->schedule-form#submit change->fsp-session-warning#check"
+                            },
                             novalidate: true
                           } do %>
               <div class="job-schedule-form__when">
@@ -401,7 +406,8 @@
                          autocomplete="off"
                          data-controller="datepicker"
                          data-schedule-form-target="dateField"
-                         data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary"
+                         data-fsp-session-warning-target="dateField"
+                         data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary change->fsp-session-warning#check"
                          inputmode="none">
                 </div>
                 <div class="job-schedule-form__field">
@@ -411,14 +417,14 @@
                     <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
                       <input type="radio" name="inspection_request[scheduled_time]" value="AM"
                              class="h-4 w-4 accent-[var(--color-accent)]"
-                             data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary"
+                             data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary change->fsp-session-warning#check"
                              <%= "checked" if selected_period == "AM" %>>
                       <span>AM</span>
                     </label>
                     <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
                       <input type="radio" name="inspection_request[scheduled_time]" value="PM"
                              class="h-4 w-4 accent-[var(--color-accent)]"
-                             data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary"
+                             data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary change->fsp-session-warning#check"
                              <%= "checked" if selected_period == "PM" %>>
                       <span>PM</span>
                     </label>
@@ -428,7 +434,8 @@
               <div>
                 <label class="field-label" for="fsp_id">Inspector / FSP</label>
                 <select name="inspection_request[fsp_id]" id="fsp_id" class="field-select"
-                        data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary">
+                        data-fsp-session-warning-target="fspSelect"
+                        data-action="change->schedule-form#clearError change->schedule-dock#refreshSummary change->fsp-session-warning#check">
                   <option value="">Unassigned</option>
                   <% Fsp.ordered.each do |fsp| %>
                     <option value="<%= fsp.id %>" <%= "selected" if @inspection_request.fsp_id == fsp.id %>>
@@ -436,6 +443,12 @@
                     </option>
                   <% end %>
                 </select>
+                <div class="field-warning-callout hidden mt-2"
+                     role="status"
+                     hidden
+                     data-fsp-session-warning-target="warning">
+                  <p class="field-warning-callout__text" data-fsp-session-warning-target="warningText"></p>
+                </div>
               </div>
             <% end %>
           </div>
@@ -470,7 +483,12 @@
                           html: {
                             id: "job-schedule-form",
                             class: "job-schedule-form space-y-3",
-                            data: { action: "submit->schedule-form#submit" },
+                            data: {
+                              controller: "fsp-session-warning",
+                              fsp_session_warning_url_value: dashboard_schedule_session_check_path,
+                              fsp_session_warning_exclude_job_id_value: @inspection_request.id,
+                              action: "submit->schedule-form#submit change->fsp-session-warning#check"
+                            },
                             novalidate: true
                           } do %>
               <div class="job-schedule-form__when">
@@ -485,7 +503,8 @@
                          autocomplete="off"
                          data-controller="datepicker"
                          data-schedule-form-target="dateField"
-                         data-action="change->schedule-form#clearError"
+                         data-fsp-session-warning-target="dateField"
+                         data-action="change->schedule-form#clearError change->fsp-session-warning#check"
                          inputmode="none">
                 </div>
                 <div class="job-schedule-form__field">
@@ -495,14 +514,14 @@
                     <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
                       <input type="radio" name="inspection_request[scheduled_time]" value="AM"
                              class="h-4 w-4 accent-[var(--color-accent)]"
-                             data-action="change->schedule-form#clearError"
+                             data-action="change->schedule-form#clearError change->fsp-session-warning#check"
                              <%= "checked" if selected_period == "AM" %>>
                       <span>AM</span>
                     </label>
                     <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
                       <input type="radio" name="inspection_request[scheduled_time]" value="PM"
                              class="h-4 w-4 accent-[var(--color-accent)]"
-                             data-action="change->schedule-form#clearError"
+                             data-action="change->schedule-form#clearError change->fsp-session-warning#check"
                              <%= "checked" if selected_period == "PM" %>>
                       <span>PM</span>
                     </label>
@@ -512,7 +531,8 @@
               <div>
                 <label class="field-label" for="fsp_id">Inspector / FSP</label>
                 <select name="inspection_request[fsp_id]" id="fsp_id" class="field-select"
-                        data-action="change->schedule-form#clearError">
+                        data-fsp-session-warning-target="fspSelect"
+                        data-action="change->schedule-form#clearError change->fsp-session-warning#check">
                   <option value="">Unassigned</option>
                   <% Fsp.ordered.each do |fsp| %>
                     <option value="<%= fsp.id %>" <%= "selected" if @inspection_request.fsp_id == fsp.id %>>
@@ -520,6 +540,12 @@
                     </option>
                   <% end %>
                 </select>
+                <div class="field-warning-callout hidden mt-2"
+                     role="status"
+                     hidden
+                     data-fsp-session-warning-target="warning">
+                  <p class="field-warning-callout__text" data-fsp-session-warning-target="warningText"></p>
+                </div>
               </div>
               <button type="submit" class="btn-secondary w-full cursor-pointer">
                 Update schedule

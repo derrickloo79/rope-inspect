@@ -61,6 +61,17 @@ class InspectionRequest < ApplicationRecord
       .order(:scheduled_on, :scheduled_time, :company_name)
   }
 
+  # Soft schedule rule: one job per FSP per calendar date + AM/PM session.
+  # Period is resolved in Ruby (same as scheduled_period) to avoid DB time TZ quirks.
+  def self.find_fsp_session_conflict(fsp_id:, date:, period:, exclude_id: nil)
+    period = period.to_s.upcase
+    return nil unless fsp_id.present? && date.present? && %w[AM PM].include?(period)
+
+    scope = scheduled.where(fsp_id: fsp_id, scheduled_on: date)
+    scope = scope.where.not(id: exclude_id) if exclude_id.present?
+    scope.includes(:fsp).find { |job| job.scheduled_period == period }
+  end
+
   def pending?
     status == "pending"
   end

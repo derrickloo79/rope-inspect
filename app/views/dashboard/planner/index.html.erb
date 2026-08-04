@@ -184,8 +184,10 @@
                       id: "planner-schedule-form",
                       class: "space-y-4",
                       data: {
+                        controller: "fsp-session-warning",
+                        fsp_session_warning_url_value: dashboard_schedule_session_check_path,
                         planner_schedule_target: "form",
-                        action: "submit->planner-schedule#submit"
+                        action: "submit->planner-schedule#submit change->fsp-session-warning#check"
                       },
                       novalidate: true
                     } do %>
@@ -204,6 +206,8 @@
                  data-controller="datepicker"
                  data-datepicker-position-value="below"
                  data-planner-schedule-target="dateField"
+                 data-fsp-session-warning-target="dateField"
+                 data-action="change->fsp-session-warning#check"
                  inputmode="none">
         </div>
 
@@ -215,7 +219,8 @@
                      name="inspection_request[scheduled_time]"
                      value="AM"
                      class="h-4 w-4 accent-[var(--color-accent)]"
-                     data-planner-schedule-target="periodAm">
+                     data-planner-schedule-target="periodAm"
+                     data-action="change->fsp-session-warning#check">
               <span>AM</span>
             </label>
             <label class="inline-flex items-center gap-2 text-sm cursor-pointer">
@@ -223,7 +228,8 @@
                      name="inspection_request[scheduled_time]"
                      value="PM"
                      class="h-4 w-4 accent-[var(--color-accent)]"
-                     data-planner-schedule-target="periodPm">
+                     data-planner-schedule-target="periodPm"
+                     data-action="change->fsp-session-warning#check">
               <span>PM</span>
             </label>
           </div>
@@ -234,12 +240,20 @@
           <select name="inspection_request[fsp_id]"
                   id="planner_fsp_id"
                   class="field-select"
-                  data-planner-schedule-target="fspSelect">
+                  data-planner-schedule-target="fspSelect"
+                  data-fsp-session-warning-target="fspSelect"
+                  data-action="change->fsp-session-warning#check">
             <option value="">Unassigned</option>
             <% @fsps.each do |fsp| %>
               <option value="<%= fsp.id %>"><%= fsp.display_name %></option>
             <% end %>
           </select>
+          <div class="field-warning-callout hidden mt-2"
+               role="status"
+               hidden
+               data-fsp-session-warning-target="warning">
+            <p class="field-warning-callout__text" data-fsp-session-warning-target="warningText"></p>
+          </div>
         </div>
 
         <div class="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">

@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   namespace :dashboard do
     root to: "home#index"
     get "planner", to: "planner#index", as: :planner
+    get "schedule_session_check", to: "schedule_session_checks#show", as: :schedule_session_check
     resource :profile, only: [ :edit, :update ]
     resources :users, path: "admins", except: [ :show ]
     resources :fsps, path: "fsps", except: [ :show ]
@@ -36,6 +37,7 @@ Rails.application.routes.draw do
       end
     end
   end
+
 
   # FSP portal — inspectors view only their assigned jobs
   namespace :portal do

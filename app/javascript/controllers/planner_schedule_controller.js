@@ -48,7 +48,9 @@ export default class extends Controller {
     this.setDate(date || "")
     this.setPeriod(period || "")
     this.setFsp(fspId != null && fspId !== "" ? String(fspId) : "")
+    this.setSessionWarningExclude(jobId)
     this.clearError()
+    this.refreshSessionWarning()
 
     this.dialogTarget.hidden = false
     this.lockScroll()
@@ -70,6 +72,17 @@ export default class extends Controller {
     this.unlockScroll()
     document.removeEventListener("keydown", this._onKeydown)
     this.clearError()
+    this.hideSessionWarning()
+  }
+
+  hideSessionWarning() {
+    const form = this.hasFormTarget ? this.formTarget : null
+    if (!form) return
+    const warning = this.application.getControllerForElementAndIdentifier(
+      form,
+      "fsp-session-warning"
+    )
+    if (warning && typeof warning.hide === "function") warning.hide()
   }
 
   // Click on backdrop only (not the dialog panel).
@@ -102,6 +115,33 @@ export default class extends Controller {
   setFsp(fspId) {
     if (!this.hasFspSelectTarget) return
     this.fspSelectTarget.value = fspId || ""
+  }
+
+  setSessionWarningExclude(jobId) {
+    const form = this.hasFormTarget ? this.formTarget : null
+    if (!form) return
+    form.dataset.fspSessionWarningExcludeJobIdValue = jobId ? String(jobId) : ""
+
+    const warning = this.application.getControllerForElementAndIdentifier(
+      form,
+      "fsp-session-warning"
+    )
+    if (warning) {
+      warning.excludeJobIdValue = jobId ? String(jobId) : ""
+    }
+  }
+
+  refreshSessionWarning() {
+    const form = this.hasFormTarget ? this.formTarget : null
+    if (!form) return
+    const warning = this.application.getControllerForElementAndIdentifier(
+      form,
+      "fsp-session-warning"
+    )
+    if (warning && typeof warning.check === "function") {
+      // Defer so date/period/FSP fields are fully updated first.
+      requestAnimationFrame(() => warning.check())
+    }
   }
 
   clearError() {
