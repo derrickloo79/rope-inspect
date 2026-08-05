@@ -113,7 +113,7 @@
       <h2 class="section-label mb-5">Timeline</h2>
       <ol class="relative space-y-0">
         <% @inspection_request.status_timeline.each_with_index do |event, index| %>
-          <li class="flex gap-4 pb-8 last:pb-0">
+          <li class="flex gap-4 pb-1 last:pb-0">
             <div class="flex flex-col items-center">
               <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold
                 <%= if event[:failed]
@@ -129,7 +129,7 @@
                 <span class="w-px flex-1 mt-1 <%= event[:failed] ? 'bg-red-200' : (event[:done] ? 'bg-green-300' : 'bg-[--color-line]') %>"></span>
               <% end %>
             </div>
-            <div class="pt-1 min-w-0">
+            <div class="pt-1 min-w-0 pb-3">
               <p class="font-medium <%= if event[:failed]
                                           'text-red-700'
                                         elsif event[:done]
