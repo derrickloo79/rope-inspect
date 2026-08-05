@@ -2065,4 +2065,64 @@
     line-height: 1.4;
     color: #92400e;
   }
+
+  /* Cranes table — shared job detail / portal / public status */
+  .cranes-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .cranes-table thead th {
+    padding: 0.5rem 1rem 0.625rem 0;
+    /* Match detail-field labels (e.g. “Name” above values): sm, medium, muted */
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-ink-muted);
+    border-bottom: 1px solid var(--color-line);
+    white-space: nowrap;
+  }
+
+  .cranes-table thead th:last-child {
+    padding-right: 0;
+  }
+
+  .cranes-table tbody tr {
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .cranes-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .cranes-table tbody td {
+    padding: 0.875rem 1rem 0.875rem 0;
+    vertical-align: middle;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .cranes-table tbody td:last-child {
+    padding-right: 0;
+  }
+
+  .cranes-table__type {
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  .cranes-table__lm,
+  .cranes-table__rope {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink-muted);
+  }
+
+  .cranes-table__empty {
+    margin: 0;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    color: var(--color-ink-muted);
+  }
 }

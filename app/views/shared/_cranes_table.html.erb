@@ -9,25 +9,29 @@
 <section class="card">
   <div class="card-section">
     <h2 class="section-label mb-4"><%= title %></h2>
-    <div class="overflow-x-auto">
-      <table class="w-full text-left">
-        <thead class="text-sm text-[--color-ink-muted] border-b border-[--color-line]">
-          <tr>
-            <th class="py-2 pr-4 font-medium">Type</th>
-            <th class="py-2 pr-4 font-medium">LM number</th>
-            <th class="py-2 font-medium">Rope Diameter (S/M/B) (mm)</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[--color-line] text-base">
-          <% cranes.each do |crane| %>
+    <% if cranes.any? %>
+      <div class="overflow-x-auto">
+        <table class="cranes-table">
+          <thead>
             <tr>
-              <td class="py-3 pr-4 font-medium"><%= crane.crane_type_label %></td>
-              <td class="py-3 pr-4 font-mono text-ink-muted"><%= crane.lm_number %></td>
-              <td class="py-3 font-mono text-ink-muted"><%= crane.rope_diameter_mm %></td>
+              <th scope="col">Type</th>
+              <th scope="col">LM number</th>
+              <th scope="col">Rope diameter (S/M/B) (mm)</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            <% cranes.each do |crane| %>
+              <tr>
+                <td class="cranes-table__type"><%= crane.crane_type_label %></td>
+                <td class="cranes-table__lm"><%= crane.lm_number %></td>
+                <td class="cranes-table__rope"><%= crane.rope_diameter_mm %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="cranes-table__empty">No cranes listed for this job.</p>
+    <% end %>
   </div>
 </section>
