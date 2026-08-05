@@ -3,12 +3,110 @@
 <div class="space-y-8">
   <div>
     <p class="section-label mb-2">Inspection status</p>
-    <h1 class="page-title"><%= @inspection_request.company_name %></h1>
-    <p class="page-lede">
-      <%= @inspection_request.site_name %> · <%= @inspection_request.reference_code %>
-    </p>
-    <div class="mt-3"><%= status_badge(@inspection_request.status) %></div>
+    <div class="job-detail-heading">
+      <% if @inspection_request.scheduled_on.present? %>
+        <div class="job-cal" aria-label="<%= @inspection_request.scheduled_on.strftime("%-d %B") %><%= " #{@inspection_request.scheduled_period}" if @inspection_request.scheduled_period.present? %>">
+          <div class="job-cal__badge">
+            <span class="job-cal__month"><%= @inspection_request.scheduled_on.strftime("%b") %></span>
+            <span class="job-cal__day"><%= @inspection_request.scheduled_on.strftime("%-d") %></span>
+            <% if @inspection_request.scheduled_period.present? %>
+              <span class="job-cal__period job-cal__period--<%= @inspection_request.scheduled_period.downcase %>">
+                <%= @inspection_request.scheduled_period %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <div class="job-detail-heading__body min-w-0">
+        <h1 class="page-title"><%= @inspection_request.site_name %></h1>
+        <p class="page-lede">
+          <%= @inspection_request.company_name %> · <%= @inspection_request.reference_code %>
+        </p>
+        <div class="mt-2"><%= status_badge(@inspection_request.status) %></div>
+      </div>
+    </div>
   </div>
+
+  <section class="card">
+    <div class="card-section">
+      <h2 class="section-label mb-4">Inspection details</h2>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Site</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"><%= @inspection_request.site_name %></dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Company</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"><%= @inspection_request.company_name %></dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Requestor</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"><%= @inspection_request.requestor_name %></dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Phone</dt>
+          <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.whatsapp_number %>">
+            <%= @inspection_request.full_contact_number %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Point of contact</dt>
+          <dd class="text-base font-medium mt-0.5 break-words">
+            <%= @inspection_request.point_of_contact? ? @inspection_request.poc_name : "—" %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">POC phone</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"<% if @inspection_request.point_of_contact? %> title="WhatsApp: <%= @inspection_request.poc_whatsapp_number %>"<% end %>>
+            <%= @inspection_request.point_of_contact? ? @inspection_request.full_poc_contact_number : "—" %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Inspector (FSP)</dt>
+          <dd class="text-base font-medium mt-0.5 break-words">
+            <%= @inspection_request.fsp&.full_name.presence || @inspection_request.inspector_label.presence || "—" %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">FSP phone</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"<% if @inspection_request.fsp.present? %> title="WhatsApp: <%= @inspection_request.fsp.whatsapp_number %>"<% end %>>
+            <%= @inspection_request.fsp&.full_contact_number.presence || "—" %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Google Maps</dt>
+          <dd class="text-base font-medium mt-0.5 break-words">
+            <% if (map_href = @inspection_request.safe_map_url) %>
+              <%= content_tag :a, "Open in Google Maps",
+                          href: map_href,
+                          class: "no-underline break-all",
+                          target: "_blank",
+                          rel: "noopener noreferrer" %>
+              <span class="text-ink-muted font-normal"
+                    data-controller="clipboard"
+                    data-clipboard-text-value="<%= map_href %>">
+                (<button type="button"
+                        class="bg-transparent border-0 p-0 cursor-pointer font-medium text-accent underline-offset-2 hover:underline"
+                        data-action="clipboard#copy"
+                        data-clipboard-target="label"
+                        aria-label="Copy Google Maps link">Copy</button>)
+              </span>
+            <% else %>
+              <span class="text-ink-muted">—</span>
+            <% end %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Site note</dt>
+          <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @inspection_request.site_note.to_s.strip.presence || "—" %></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <%= render "shared/cranes_table",
+             cranes: @inspection_request.cranes,
+             title: "Cranes on this job" %>
 
   <section class="card">
     <div class="card-section">
@@ -53,21 +151,6 @@
           </li>
         <% end %>
       </ol>
-    </div>
-  </section>
-
-  <section class="card">
-    <div class="card-section">
-      <h2 class="section-label mb-4">Cranes on this job</h2>
-      <ul class="divide-y divide-[--color-line]">
-        <% @inspection_request.cranes.each do |crane| %>
-          <li class="py-3 first:pt-0 last:pb-0 flex flex-wrap gap-x-6 gap-y-1 text-sm">
-            <span class="font-medium text-[--color-ink]"><%= crane.crane_type_label %></span>
-            <span class="text-[--color-ink-muted]">LM <%= crane.lm_number %></span>
-            <span class="text-[--color-ink-muted]">A/M/B <%= crane.rope_diameter_mm %> cm</span>
-          </li>
-        <% end %>
-      </ul>
     </div>
   </section>
 </div>

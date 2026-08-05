@@ -112,31 +112,7 @@
     </div>
   </section>
 
-  <section class="card">
-    <div class="card-section">
-      <h2 class="section-label mb-4">Cranes</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left">
-          <thead class="text-sm text-[--color-ink-muted] border-b border-[--color-line]">
-            <tr>
-              <th class="py-2 pr-4 font-medium">Type</th>
-              <th class="py-2 pr-4 font-medium">LM number</th>
-              <th class="py-2 font-medium">Rope Diameter (S/M/B) (mm)</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[--color-line] text-base">
-            <% @job.cranes.each do |crane| %>
-              <tr>
-                <td class="py-2.5 pr-4 font-medium"><%= crane.crane_type_label %></td>
-                <td class="py-2.5 pr-4 font-mono text-ink-muted"><%= crane.lm_number %></td>
-                <td class="py-2.5 font-mono text-ink-muted"><%= crane.rope_diameter_mm %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+  <%= render "shared/cranes_table", cranes: @job.cranes %>
 
   <% if @job.notes.present? %>
     <section class="card">
