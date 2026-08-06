@@ -5,7 +5,7 @@
     <h1 class="page-title">Rope Inspection Request Form</h1>
     <p class="page-lede">
       Tell us who you are, where the site is, and which cranes need inspecting.
-      We’ll review the request and get back to you via Whatsapp with a schedule.
+      We’ll review the request and get back to you via WhatsApp with a schedule.
     </p>
   </div>
 
@@ -20,56 +20,107 @@
     </div>
   <% end %>
 
-  <%= form_with model: @inspection_request, url: inspection_requests_path, class: "space-y-6", data: { controller: "nested-form" } do |f| %>
-    <section class="card">
-      <div class="card-section">
-        <h2 class="section-label mb-4">Requestor details</h2>
+  <%= form_with model: @inspection_request,
+                url: inspection_requests_path,
+                html: {
+                  multipart: true,
+                  class: "space-y-6",
+                  data: {
+                    controller: "nested-form request-form-steps",
+                    request_form_steps_step_value: (
+                      @inspection_request.errors.any? &&
+                        @inspection_request.cranes.any? { |c|
+                          c.errors[:lm_certificate].any? || c.errors[:mill_certificates].any?
+                        }
+                    ) ? 2 : 1
+                  }
+                } do |f| %>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div>
-            <%= f.label :company_name, "Company name", class: "field-label" %>
-            <%= f.text_field :company_name, class: "field-input", required: true, placeholder: "e.g. Acme Pte Ltd", autocomplete: "organization" %>
+    <nav class="form-stepper" aria-label="Request form progress" data-request-form-steps-target="stepper">
+      <ol class="form-stepper__list">
+        <li class="form-stepper__item is-active" data-request-form-steps-target="stepItem" data-step="1">
+          <div class="form-stepper__node">
+            <span class="form-stepper__marker" aria-hidden="true">
+              <span class="form-stepper__number">1</span>
+              <svg class="form-stepper__check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12l5 5L20 7" />
+              </svg>
+            </span>
+            <span class="form-stepper__connector" aria-hidden="true"></span>
           </div>
-
-          <div>
-            <%= f.label :site_name, "Site / location", class: "field-label" %>
-            <%= f.text_field :site_name, class: "field-input", required: true, placeholder: "e.g. Seletar South Link, N109, etc.." %>
+          <span class="form-stepper__label">Request details</span>
+        </li>
+        <li class="form-stepper__item" data-request-form-steps-target="stepItem" data-step="2">
+          <div class="form-stepper__node">
+            <span class="form-stepper__marker" aria-hidden="true">
+              <span class="form-stepper__number">2</span>
+              <svg class="form-stepper__check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12l5 5L20 7" />
+              </svg>
+            </span>
           </div>
+          <span class="form-stepper__label">Certificates</span>
+        </li>
+      </ol>
+    </nav>
 
-          <div>
-            <%= f.label :requestor_name, "Your name", class: "field-label" %>
-            <%= f.text_field :requestor_name, class: "field-input", required: true, placeholder: "e.g. John Doe", autocomplete: "name" %>
-          </div>
+    <div class="error-list hidden" role="alert" hidden data-request-form-steps-target="stepError"></div>
 
-          <div>
-            <%= f.label :contact_number, "Contact number", class: "field-label" %>
-            <div class="grid grid-cols-4 gap-2" data-controller="country-code-select">
-              <div class="col-span-1 min-w-0">
-                <%= f.select :country_code,
-                             country_code_select_options(@inspection_request.country_code),
-                             {},
-                             country_code_select_html_options %>
-              </div>
-              <div class="col-span-3 min-w-0">
-                <%= f.telephone_field :contact_number,
-                                      class: "field-input",
-                                      required: true,
-                                      placeholder: "e.g. 91234567",
-                                      autocomplete: "tel-national",
-                                      inputmode: "tel" %>
-              </div>
+    <%# Step 1 only: requestor %>
+    <div data-request-form-steps-target="step1Panel">
+      <section class="card">
+        <div class="card-section">
+          <h2 class="section-label mb-4">Requestor details</h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <%= f.label :company_name, "Company name", class: "field-label" %>
+              <%= f.text_field :company_name, class: "field-input", required: true, placeholder: "e.g. Acme Pte Ltd", autocomplete: "organization" %>
             </div>
-            <p class="field-hint">Include country code for WhatsApp. Local number only in the right field.</p>
+
+            <div>
+              <%= f.label :site_name, "Site / location", class: "field-label" %>
+              <%= f.text_field :site_name, class: "field-input", required: true, placeholder: "e.g. Seletar South Link, N109, etc.." %>
+            </div>
+
+            <div>
+              <%= f.label :requestor_name, "Your name", class: "field-label" %>
+              <%= f.text_field :requestor_name, class: "field-input", required: true, placeholder: "e.g. John Doe", autocomplete: "name" %>
+            </div>
+
+            <div>
+              <%= f.label :contact_number, "Contact number", class: "field-label" %>
+              <div class="grid grid-cols-4 gap-2" data-controller="country-code-select">
+                <div class="col-span-1 min-w-0">
+                  <%= f.select :country_code,
+                               country_code_select_options(@inspection_request.country_code),
+                               {},
+                               country_code_select_html_options %>
+                </div>
+                <div class="col-span-3 min-w-0">
+                  <%= f.telephone_field :contact_number,
+                                        class: "field-input",
+                                        required: true,
+                                        placeholder: "e.g. 91234567",
+                                        autocomplete: "tel-national",
+                                        inputmode: "tel" %>
+                </div>
+              </div>
+              <p class="field-hint">Include country code for WhatsApp. Local number only in the right field.</p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
+    <%# Always present: cranes (details on step 1, docs on step 2) %>
     <section class="card">
       <div class="card-section">
-        <div class="mb-4">
-          <h2 class="section-label">Cranes to inspect</h2>
-          <p class="text-sm text-[--color-ink-muted] mt-1">Add rope diameter is this order: Single / Main / Boom.</p>
+        <div class="mb-4" data-request-form-steps-target="craneSectionIntro">
+          <h2 class="section-label" data-request-form-steps-target="craneSectionTitle">Cranes to inspect</h2>
+          <p class="text-sm text-ink-muted mt-1" data-request-form-steps-target="craneSectionHint">
+            Add rope diameter in this order: Single / Main / Boom.
+          </p>
         </div>
 
         <div class="space-y-4" data-nested-form-target="container">
@@ -78,7 +129,7 @@
           <% end %>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-4" data-request-form-steps-target="addCrane">
           <button type="button" class="btn-secondary !py-1.5 !px-3 text-sm" data-action="nested-form#add">
             + Add crane
           </button>
@@ -92,7 +143,20 @@
       </div>
     </section>
 
-    <div class="flex flex-col pt-1 sm:flex-row sm:justify-end">
+    <div class="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-end" data-request-form-steps-target="step1Actions">
+      <button type="button" class="btn-primary cursor-pointer" data-action="request-form-steps#next">
+        Continue to certificates
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14" />
+          <path d="M13 6l6 6-6 6" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-3 pt-1 sm:flex-row sm:justify-between" data-request-form-steps-target="step2Actions" hidden>
+      <button type="button" class="btn-secondary cursor-pointer" data-action="request-form-steps#back">
+        ← Back to details
+      </button>
       <button type="submit" class="btn-primary cursor-pointer">
         Submit request
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

@@ -36,6 +36,7 @@ Rails.application.routes.draw do
         patch :point_of_contact
       end
     end
+    resources :cranes, only: [ :update ]
   end
 
 

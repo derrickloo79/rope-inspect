@@ -33,7 +33,16 @@ class InspectionRequestsController < ApplicationController
       :country_code,
       :contact_number,
       :site_name,
-      cranes_attributes: [ :id, :crane_type, :lm_number, :rope_diameter_mm, :position, :_destroy ]
+      cranes_attributes: [
+        :id,
+        :crane_type,
+        :lm_number,
+        :rope_diameter_mm,
+        :position,
+        :_destroy,
+        :lm_certificate,
+        { mill_certificates: [] }
+      ]
     )
   end
 end

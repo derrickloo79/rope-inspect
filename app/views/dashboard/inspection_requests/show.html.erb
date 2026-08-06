@@ -162,6 +162,7 @@
     <% end %>
 
     <%= render "shared/cranes_table", cranes: @inspection_request.cranes %>
+    <%= render "crane_certificates" %>
 
     <% unless @inspection_request.pending? %>
       <% site_access_errors = @inspection_request.errors[:map_url].any? || @inspection_request.errors[:site_note].any? %>

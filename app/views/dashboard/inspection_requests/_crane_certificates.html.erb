@@ -1,0 +1,98 @@
+<%# Admin: view / upload optional LM + Mill certificates per crane. %>
+<section class="card">
+  <div class="card-section space-y-5">
+    <div>
+      <h2 class="section-label">Crane certificates</h2>
+      <p class="text-sm text-ink-muted mt-1">
+        LM certificate (one file) and Mill certificates (one or more). PDF, JPG, or PNG. Optional — can be added any time.
+      </p>
+    </div>
+
+    <% @inspection_request.cranes.each do |crane| %>
+      <div class="rounded-md border border-line bg-stone-50/60 p-4 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+          <p class="text-base font-medium text-ink">
+            <%= crane.crane_type_label %> · <%= crane.lm_number %>
+          </p>
+          <% if crane.certificates_complete? %>
+            <span class="text-xs font-medium text-green-700">LM + Mill on file</span>
+          <% elsif crane.lm_certificate.attached? || crane.mill_certificates.attached? %>
+            <span class="text-xs font-medium text-amber-700">Partial</span>
+          <% else %>
+            <span class="text-xs font-medium text-ink-muted">None yet</span>
+          <% end %>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-ink-muted mb-1">LM certificate</p>
+            <% if crane.lm_certificate.attached? %>
+              <p class="break-all">
+                <%= link_to crane.lm_certificate.filename,
+                            rails_blob_path(crane.lm_certificate, disposition: "attachment"),
+                            class: "no-underline font-medium" %>
+                <span class="text-ink-muted">(<%= number_to_human_size(crane.lm_certificate.byte_size) %>)</span>
+              </p>
+            <% else %>
+              <p class="text-ink-muted">—</p>
+            <% end %>
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-ink-muted mb-1">Mill certificate(s)</p>
+            <% if crane.mill_certificates.attached? %>
+              <ul class="list-disc list-inside space-y-0.5">
+                <% crane.mill_certificates.each do |file| %>
+                  <li class="break-all">
+                    <%= link_to file.filename,
+                                rails_blob_path(file, disposition: "attachment"),
+                                class: "no-underline font-medium" %>
+                    <span class="text-ink-muted">(<%= number_to_human_size(file.byte_size) %>)</span>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="text-ink-muted">—</p>
+            <% end %>
+          </div>
+        </div>
+
+        <%= form_with model: crane,
+                      url: dashboard_crane_path(crane),
+                      method: :patch,
+                      html: { multipart: true, class: "space-y-3 pt-1 border-t border-line" } do |f| %>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <%= f.label :lm_certificate, crane.lm_certificate.attached? ? "Replace LM certificate" : "Upload LM certificate", class: "field-label" %>
+              <%= f.file_field :lm_certificate,
+                               class: "field-file",
+                               accept: "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" %>
+            </div>
+            <div>
+              <%= f.label :mill_certificates, "Add Mill certificate(s)", class: "field-label" %>
+              <%= f.file_field :mill_certificates,
+                               multiple: true,
+                               class: "field-file",
+                               accept: "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" %>
+            </div>
+          </div>
+          <% if crane.mill_certificates.attached? %>
+            <div>
+              <p class="field-label">Remove Mill certificate(s)</p>
+              <div class="space-y-1">
+                <% crane.mill_certificates.each do |file| %>
+                  <label class="flex items-center gap-2 text-sm cursor-pointer">
+                    <%= check_box_tag "crane[remove_mill_certificate_ids][]", file.id, false, id: "remove_mill_#{file.id}" %>
+                    <span class="break-all"><%= file.filename %></span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+          <div>
+            <%= f.submit "Save certificates", class: "btn-secondary !py-1.5 !px-3 text-sm cursor-pointer" %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</section>
