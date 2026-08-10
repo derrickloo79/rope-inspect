@@ -2274,11 +2274,11 @@
     color: var(--color-ink-muted);
   }
 
-  /* Admin job detail: per-crane card (details + certificates) */
+  /* Admin / portal job detail: per-crane card (details + certificates) */
   .crane-card {
     border-radius: 0.5rem;
     border: 1px solid var(--color-line);
-    background-color: #fff;
+    background-color: #faf9f6; /* slight off-white vs paper/white */
     padding: 1.25rem 1.25rem;
   }
 
