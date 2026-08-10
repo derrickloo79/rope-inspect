@@ -3,8 +3,8 @@ module Dashboard
     before_action :set_crane
 
     def update
-      # Optional attachments — admin can add/replace later.
-      if @crane.update(crane_cert_params)
+      # Optional attachments — admin can add/replace LM, append mills, remove by id.
+      if update_certificates
         redirect_to dashboard_inspection_request_path(@crane.inspection_request),
                     notice: "Certificates updated for #{@crane.crane_type_label} (#{@crane.lm_number})."
       else
@@ -19,9 +19,10 @@ module Dashboard
       @crane = Crane.find(params[:id])
     end
 
-    def crane_cert_params
+    def update_certificates
       permitted = params.require(:crane).permit(
         :lm_certificate,
+        :remove_lm_certificate,
         mill_certificates: [],
         remove_mill_certificate_ids: []
       )
@@ -31,17 +32,23 @@ module Dashboard
         @crane.mill_certificates.attachments.where(id: ids).find_each(&:purge)
       end
 
-      # Ignore empty file inputs so we don't clear existing attachments.
-      permitted = permitted.except(:lm_certificate) if permitted[:lm_certificate].blank?
-      mills = Array(permitted[:mill_certificates]).reject(&:blank?)
-      permitted =
-        if mills.any?
-          permitted.merge(mill_certificates: mills)
-        else
-          permitted.except(:mill_certificates)
-        end
+      remove_lm = ActiveModel::Type::Boolean.new.cast(permitted[:remove_lm_certificate])
+      if remove_lm && permitted[:lm_certificate].blank? && @crane.lm_certificate.attached?
+        @crane.lm_certificate.purge
+      end
 
-      permitted.except(:remove_mill_certificate_ids)
+      # Append new mill files — never replace existing ones via mass-assignment.
+      mills = Array(permitted[:mill_certificates]).reject(&:blank?)
+      @crane.mill_certificates.attach(mills) if mills.any?
+
+      # LM is has_one_attached: assign only when a new file is present (replaces).
+      if permitted[:lm_certificate].present?
+        @crane.lm_certificate.attach(permitted[:lm_certificate])
+      end
+
+      # Re-run model validations (content type / size) after attaching.
+      @crane.valid?
+      @crane.errors.empty?
     end
   end
 end

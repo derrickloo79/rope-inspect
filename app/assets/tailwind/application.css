@@ -2273,4 +2273,181 @@
     font-size: 0.875rem;
     color: var(--color-ink-muted);
   }
+
+  /* Admin job detail: per-crane card (details + certificates) */
+  .crane-card {
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-line);
+    background-color: #fff;
+    padding: 1.25rem 1.25rem;
+  }
+
+  .file-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    width: 100%;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-line-strong);
+    background-color: #fff;
+    padding: 0.5rem 0.625rem 0.5rem 0.75rem;
+  }
+
+  .file-chip__name {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .file-chip__name:hover {
+    text-decoration: underline;
+  }
+
+  .file-chip__size {
+    flex-shrink: 0;
+    font-size: 0.8125rem;
+    color: var(--color-ink-muted);
+  }
+
+  .file-chip__remove {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+
+  .file-chip__remove:hover {
+    color: #991b1b;
+    background-color: #fef2f2;
+  }
+
+  .file-chip__remove:focus-visible {
+    outline: 2px solid #f87171;
+    outline-offset: 2px;
+  }
+
+  .file-dropzone {
+    position: relative;
+    border-radius: 0.5rem;
+    border: 1.5px dashed var(--color-line-strong);
+    background-color: #fafaf9;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .file-dropzone.is-dragover {
+    border-color: var(--color-accent);
+    background-color: #eff6ff;
+  }
+
+  /* Files chosen but not yet saved */
+  .file-dropzone.is-picked {
+    border-style: solid;
+    border-color: #bfdbfe;
+    background-color: #f8fafc;
+  }
+
+  .file-dropzone__label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    min-height: 5.5rem;
+    padding: 1rem 1.25rem;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .file-dropzone.is-picked .file-dropzone__label {
+    min-height: 0;
+    padding: 0.625rem 1rem 0.875rem;
+    border-top: 1px dashed var(--color-line);
+  }
+
+  .file-dropzone__action {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .file-dropzone__or {
+    font-size: 0.875rem;
+    color: var(--color-ink-muted);
+  }
+
+  .file-dropzone__hint {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.75rem;
+    color: var(--color-ink-faint, var(--color-ink-muted));
+  }
+
+  .file-dropzone__pending {
+    padding: 0.75rem;
+  }
+
+  .file-dropzone__pending-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .file-dropzone__pending-hint {
+    margin: 0.5rem 0 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+    text-align: center;
+  }
+
+  .file-chip--pending {
+    border-color: #bfdbfe;
+    background-color: #eff6ff;
+  }
+
+  .file-chip--pending .file-chip__name {
+    color: var(--color-ink);
+    text-decoration: none;
+    cursor: default;
+  }
+
+  .file-chip--pending .file-chip__name:hover {
+    text-decoration: none;
+  }
+
+  .file-chip__status {
+    flex-shrink: 0;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+    background-color: #dbeafe;
+    border-radius: 9999px;
+    padding: 0.125rem 0.5rem;
+  }
+
+  /* Inline "Upload a file or drag and drop" on one line when space allows */
+  .file-dropzone__label .file-dropzone__action,
+  .file-dropzone__label .file-dropzone__or {
+    display: inline;
+  }
 }
