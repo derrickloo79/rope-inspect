@@ -1,0 +1,18 @@
+<%# Clickable certificate filename that opens the document viewer.
+    locals: file (ActiveStorage attachment) %>
+<%
+  filename = file.filename.to_s
+  inline_url = rails_blob_path(file, disposition: "inline")
+  download_url = rails_blob_path(file, disposition: "attachment")
+  content_type = file.content_type.to_s
+%>
+<%= link_to filename,
+            inline_url,
+            class: "file-chip__name",
+            data: {
+              action: "click->doc-viewer#open",
+              doc_viewer_url_param: inline_url,
+              doc_viewer_download_url_param: download_url,
+              doc_viewer_name_param: filename,
+              doc_viewer_type_param: content_type
+            } %>
