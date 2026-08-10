@@ -13,9 +13,9 @@
               Crane <%= index + 1 %> · <%= crane.crane_type_label %> · <%= crane.lm_number %>
             </h3>
             <% if crane.certificates_complete? %>
-              <span class="badge-completed shrink-0 self-start">Complete Certificates</span>
+              <span class="badge-completed shrink-0 self-start">Certificates on file</span>
             <% else %>
-              <span class="badge-pending shrink-0 self-start">Incomplete Certificates</span>
+              <span class="badge-pending shrink-0 self-start">Certificates needed</span>
             <% end %>
           </div>
 
