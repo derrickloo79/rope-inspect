@@ -1,5 +1,6 @@
 <%# Clickable certificate filename that opens the document viewer.
-    locals: file (ActiveStorage attachment) %>
+    locals: file (ActiveStorage attachment)
+    Requires an ancestor with data-controller="doc-viewer". %>
 <%
   filename = file.filename.to_s
   inline_url = rails_blob_path(file, disposition: "inline")

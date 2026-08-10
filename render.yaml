@@ -1,11 +1,24 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Two isolated stacks so you can test on staging without touching production:
+#
+#   Production  → branch main     → rope-inspect          + rope-inspect-db
+#   Staging     → branch staging  → rope-inspect-staging  + rope-inspect-staging-db
+#
+# Both run RAILS_ENV=production (correct for Docker on Render). Isolation is
+# via separate services, databases, APP_HOST values, and Git branches.
+#
 # Deploy: Dashboard → New → Blueprint → connect this repo, or `render blueprint launch`
+# After first deploy, create a `staging` branch from main if it does not exist yet.
+
 services:
+  # ── Production ─────────────────────────────────────────────────────────────
   - type: web
     name: rope-inspect
     runtime: docker
     plan: free
     region: singapore
+    branch: main
     healthCheckPath: /up
     # docker-entrypoint runs db:prepare (create + migrate) on boot
     envVars:
@@ -22,12 +35,41 @@ services:
       # Paste value of config/master.key (never commit the key file)
       - key: RAILS_MASTER_KEY
         sync: false
-      # Set after first deploy to your service URL, e.g. rope-inspect.onrender.com
+      # e.g. rope-inspect.onrender.com (set after first deploy)
       - key: APP_HOST
         sync: false
       - key: DATABASE_URL
         fromDatabase:
           name: rope-inspect-db
+          property: connectionString
+
+  # ── Staging (test server) ──────────────────────────────────────────────────
+  - type: web
+    name: rope-inspect-staging
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: staging
+    healthCheckPath: /up
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_SERVE_STATIC_FILES
+        value: "true"
+      - key: RAILS_LOG_TO_STDOUT
+        value: "true"
+      - key: WEB_CONCURRENCY
+        value: "1"
+      - key: RAILS_MAX_THREADS
+        value: "3"
+      - key: RAILS_MASTER_KEY
+        sync: false
+      # e.g. rope-inspect-staging.onrender.com (set after first deploy)
+      - key: APP_HOST
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rope-inspect-staging-db
           property: connectionString
 
 databases:
@@ -36,3 +78,9 @@ databases:
     region: singapore
     databaseName: rope_inspect_production
     user: rope_inspect
+
+  - name: rope-inspect-staging-db
+    plan: free
+    region: singapore
+    databaseName: rope_inspect_staging
+    user: rope_inspect_staging

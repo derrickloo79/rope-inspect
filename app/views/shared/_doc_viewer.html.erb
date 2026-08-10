@@ -1,0 +1,34 @@
+<%# Document viewer modal. Parent must have data-controller="doc-viewer". %>
+<div class="doc-viewer"
+     data-doc-viewer-target="dialog"
+     data-action="click->doc-viewer#backdropClose"
+     hidden
+     role="presentation">
+  <div class="doc-viewer__dialog"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="doc-viewer-title">
+    <div class="doc-viewer__header">
+      <h2 id="doc-viewer-title" class="doc-viewer__title" data-doc-viewer-target="title">Document</h2>
+      <div class="doc-viewer__actions">
+        <a href="#"
+           class="doc-viewer__download"
+           data-doc-viewer-target="download"
+           target="_blank"
+           rel="noopener">
+          Download
+        </a>
+        <button type="button"
+                class="doc-viewer__close"
+                data-doc-viewer-target="close"
+                data-action="doc-viewer#close"
+                aria-label="Close document viewer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="doc-viewer__body" data-doc-viewer-target="body"></div>
+  </div>
+</div>

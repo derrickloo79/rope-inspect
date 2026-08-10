@@ -108,7 +108,9 @@ module Dashboard
     private
 
     def set_inspection_request
-      @inspection_request = InspectionRequest.includes(:cranes, :fsp).find(params[:id])
+      @inspection_request = InspectionRequest
+        .includes(:fsp, cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
+        .find(params[:id])
     end
 
     def site_access_params

@@ -19,7 +19,9 @@ module Portal
     private
 
     def set_job
-      @job = current_fsp.assigned_jobs.find(params[:id])
+      @job = current_fsp.assigned_jobs
+                        .includes(cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
+                        .find(params[:id])
     end
   end
 end

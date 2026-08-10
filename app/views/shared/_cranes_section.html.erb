@@ -1,0 +1,66 @@
+<%#
+  Cranes + certificates section (admin job detail / FSP portal).
+  locals:
+    cranes:   (required) collection of Crane
+    editable: (optional) true = upload/remove/save (admin). false = view only (FSP).
+%>
+<% editable = local_assigns.fetch(:editable, false) %>
+
+<section class="card" data-controller="doc-viewer">
+  <div class="card-section flex flex-col gap-4">
+    <h2 class="section-label">Cranes</h2>
+
+    <% if cranes.any? %>
+      <% cranes.each_with_index do |crane, index| %>
+        <div class="crane-card"<% if editable %>
+             data-controller="cert-attachments"
+             data-action="change->cert-attachments#refresh"<% end %>>
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+            <h3 class="text-base font-semibold text-ink">
+              Crane <%= index + 1 %> · <%= crane.crane_type_label %> · <%= crane.lm_number %>
+            </h3>
+            <% if crane.certificates_complete? %>
+              <span class="badge-completed shrink-0 self-start">Certificates on file</span>
+            <% else %>
+              <span class="badge-pending shrink-0 self-start">Certificates needed</span>
+            <% end %>
+          </div>
+
+          <dl class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="min-w-0">
+              <dt class="text-sm text-ink-muted">Type</dt>
+              <dd class="text-base font-medium mt-0.5 break-words"><%= crane.crane_type_label %></dd>
+            </div>
+            <div class="min-w-0">
+              <dt class="text-sm text-ink-muted">LM Number</dt>
+              <dd class="text-base font-medium mt-0.5 break-words"><%= crane.lm_number %></dd>
+            </div>
+            <div class="min-w-0">
+              <dt class="text-sm text-ink-muted">Rope diameter (S/M/B) (mm)</dt>
+              <dd class="text-base font-medium mt-0.5 break-words"><%= crane.rope_diameter_mm %></dd>
+            </div>
+          </dl>
+
+          <div class="mt-4 border-t border-line pt-4">
+            <% if editable %>
+              <%= form_with model: crane,
+                            url: dashboard_crane_path(crane),
+                            method: :patch,
+                            html: { multipart: true, class: "flex flex-col gap-4" } do |f| %>
+                <%= render "shared/crane_certificates_fields", crane: crane, f: f, editable: true %>
+              <% end %>
+            <% else %>
+              <div class="flex flex-col gap-4">
+                <%= render "shared/crane_certificates_fields", crane: crane, f: nil, editable: false %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-sm text-ink-muted">No cranes listed for this job.</p>
+    <% end %>
+  </div>
+
+  <%= render "shared/doc_viewer" %>
+</section>

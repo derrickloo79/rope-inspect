@@ -1,0 +1,134 @@
+<%#
+  LM + Mill certificate block for one crane.
+  locals:
+    crane:    (required)
+    editable: (required) boolean
+    f:        form builder when editable
+%>
+<%# LM certificate — one file %>
+<div>
+  <p class="text-sm font-medium text-ink mb-2">LM Certificate</p>
+
+  <% if crane.lm_certificate.attached? %>
+    <div class="file-chip<%= " mb-2" if editable %>"<% if editable %> data-cert-attachments-target="lmChip"<% end %>>
+      <%= render "shared/cert_file_link", file: crane.lm_certificate %>
+      <span class="file-chip__size">(<%= number_to_human_size(crane.lm_certificate.byte_size) %>)</span>
+      <% if editable %>
+        <button type="button"
+                class="file-chip__remove"
+                data-action="cert-attachments#removeLm"
+                aria-label="Remove <%= crane.lm_certificate.filename %>">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+          </svg>
+        </button>
+      <% end %>
+    </div>
+    <% if editable %>
+      <%= hidden_field_tag "crane[remove_lm_certificate]", "0",
+                           id: "crane_#{crane.id}_remove_lm",
+                           data: { cert_attachments_target: "removeLmInput" } %>
+    <% end %>
+  <% elsif !editable %>
+    <p class="text-sm text-ink-muted">Not on file</p>
+  <% end %>
+
+  <% if editable %>
+    <div class="file-dropzone<%= " hidden" if crane.lm_certificate.attached? %>"
+         data-controller="file-dropzone"
+         data-cert-attachments-target="lmDropzone"
+         data-action="dragover->file-dropzone#dragover dragleave->file-dropzone#dragleave drop->file-dropzone#drop">
+      <%= f.file_field :lm_certificate,
+                       id: "crane_#{crane.id}_lm_certificate",
+                       class: "sr-only",
+                       accept: "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png",
+                       data: {
+                         file_dropzone_target: "input",
+                         action: "change->file-dropzone#changed"
+                       } %>
+      <div class="file-dropzone__pending" data-file-dropzone-target="pending" hidden>
+        <div class="file-dropzone__pending-list" data-file-dropzone-target="list"></div>
+        <p class="file-dropzone__pending-hint">Selected — click <strong>Update</strong> to upload.</p>
+      </div>
+      <label class="file-dropzone__label"
+             for="crane_<%= crane.id %>_lm_certificate"
+             data-file-dropzone-target="prompt">
+        <span>
+          <span class="file-dropzone__action">Upload a file</span><span class="file-dropzone__or"> or drag and drop</span>
+        </span>
+        <span class="file-dropzone__hint">PDF, JPG, or PNG · up to 15 MB</span>
+      </label>
+    </div>
+  <% end %>
+</div>
+
+<%# Mill certificates — one or more %>
+<div>
+  <p class="text-sm font-medium text-ink mb-2">Mill certificate(s)</p>
+
+  <% if crane.mill_certificates.attached? %>
+    <div class="flex flex-col gap-2<%= " mb-2" if editable %>">
+      <% crane.mill_certificates.each do |file| %>
+        <div class="file-chip"<% if editable %> data-cert-attachments-target="millChip"<% end %>>
+          <%= render "shared/cert_file_link", file: file %>
+          <span class="file-chip__size">(<%= number_to_human_size(file.byte_size) %>)</span>
+          <% if editable %>
+            <button type="button"
+                    class="file-chip__remove"
+                    data-action="cert-attachments#removeMill"
+                    data-cert-attachments-file-id-param="<%= file.id %>"
+                    aria-label="Remove <%= file.filename %>">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+              </svg>
+            </button>
+            <%= check_box_tag "crane[remove_mill_certificate_ids][]",
+                              file.id,
+                              false,
+                              id: "remove_mill_#{file.id}",
+                              class: "hidden",
+                              data: { cert_attachments_target: "removeMillInput" } %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% elsif !editable %>
+    <p class="text-sm text-ink-muted">Not on file</p>
+  <% end %>
+
+  <% if editable %>
+    <div class="file-dropzone"
+         data-controller="file-dropzone"
+         data-action="dragover->file-dropzone#dragover dragleave->file-dropzone#dragleave drop->file-dropzone#drop">
+      <%= f.file_field :mill_certificates,
+                       id: "crane_#{crane.id}_mill_certificates",
+                       multiple: true,
+                       class: "sr-only",
+                       accept: "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png",
+                       data: {
+                         file_dropzone_target: "input",
+                         action: "change->file-dropzone#changed"
+                       } %>
+      <div class="file-dropzone__pending" data-file-dropzone-target="pending" hidden>
+        <div class="file-dropzone__pending-list" data-file-dropzone-target="list"></div>
+        <p class="file-dropzone__pending-hint">Selected — click <strong>Update</strong> to upload.</p>
+      </div>
+      <label class="file-dropzone__label"
+             for="crane_<%= crane.id %>_mill_certificates"
+             data-file-dropzone-target="prompt">
+        <span>
+          <span class="file-dropzone__action">
+            <%= crane.mill_certificates.attached? ? "Upload files" : "Upload a file" %>
+          </span><span class="file-dropzone__or"> or drag and drop</span>
+        </span>
+        <span class="file-dropzone__hint">PDF, JPG, or PNG · up to 15 MB each</span>
+      </label>
+    </div>
+  <% end %>
+</div>
+
+<% if editable %>
+  <div data-cert-attachments-target="save" hidden>
+    <%= f.submit "Update", class: "btn-secondary !py-1.5 !px-3 text-sm cursor-pointer" %>
+  </div>
+<% end %>

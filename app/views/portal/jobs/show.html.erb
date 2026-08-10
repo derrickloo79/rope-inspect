@@ -112,7 +112,7 @@
     </div>
   </section>
 
-  <%= render "shared/cranes_table", cranes: @job.cranes %>
+  <%= render "shared/cranes_section", cranes: @job.cranes, editable: false %>
 
   <% if @job.notes.present? %>
     <section class="card">

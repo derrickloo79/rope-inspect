@@ -62,6 +62,10 @@ Crane
 | `GET /dashboard/inspection_requests/:id` | Job detail + transitions |
 | `GET /users/sign_in` | Staff sign in |
 
+## Deploy (Render)
+
+Production and staging are defined in `render.yaml` as two isolated stacks (`main` → production, `staging` → staging). See [docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md).
+
 ## Next iterations
 
 - Email notifications on accept / schedule
