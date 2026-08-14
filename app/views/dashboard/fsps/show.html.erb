@@ -1,0 +1,58 @@
+<% content_for :title, "#{@fsp.fsp_number} — Hey Tec Inspect" %>
+
+<div class="space-y-8">
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div>
+      <%= link_to "← All FSPs", dashboard_fsps_path, class: "text-sm no-underline text-ink-muted hover:text-ink" %>
+      <div class="mt-3 flex items-center gap-3">
+        <span class="fsp-color-swatch" style="background-color: <%= @fsp.color %>;" title="<%= @fsp.color %>"></span>
+        <h1 class="page-title"><%= @fsp.fsp_number %></h1>
+      </div>
+      <p class="page-lede"><%= @fsp.full_name %></p>
+    </div>
+    <%= link_to "Edit", edit_dashboard_fsp_path(@fsp), class: "btn-secondary no-underline shrink-0" %>
+  </div>
+
+  <section class="card">
+    <div class="card-section">
+      <h2 class="section-label mb-4">Details</h2>
+      <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Contact</dt>
+          <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @fsp.whatsapp_number %>">
+            <%= @fsp.full_contact_number %>
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Email</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"><%= @fsp.email %></dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-sm text-ink-muted">Joined</dt>
+          <dd class="text-base font-medium mt-0.5 break-words"><%= format_date(@fsp.date_joined) %></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-label mb-4">Assigned jobs</h2>
+
+    <% if @jobs.any? %>
+      <div class="card overflow-hidden">
+        <ul class="divide-y divide-[--color-line]">
+          <% @jobs.each do |request| %>
+            <%= render "shared/job_list_item",
+                       request: request,
+                       url: dashboard_inspection_request_path(request) %>
+          <% end %>
+        </ul>
+      </div>
+    <% else %>
+      <div class="text-center py-12 text-ink-muted">
+        <p class="font-medium text-ink">No jobs assigned</p>
+        <p class="text-sm mt-1">Jobs scheduled to this inspector will show up here.</p>
+      </div>
+    <% end %>
+  </section>
+</div>

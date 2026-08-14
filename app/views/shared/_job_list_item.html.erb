@@ -1,0 +1,43 @@
+<%# locals: request, url %>
+<li>
+  <%= link_to url, class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>
+    <div class="job-list-row">
+      <div class="job-list-details min-w-0">
+        <div class="job-list-title-row">
+          <span class="job-list-title truncate"><%= request.site_name %></span>
+        </div>
+        <p class="job-list-meta mt-0.5 truncate">
+          <%= request.company_name %>
+          · <%= pluralize(request.cranes.size, "crane") %>
+          · <%= request.reference_code %>
+        </p>
+      </div>
+      <div class="job-list-schedule">
+        <% if request.scheduled_on.present? %>
+          <div class="job-list-schedule__when">
+            <span class="job-list-schedule__date"><%= format_date(request.scheduled_on) %></span>
+            <% if request.scheduled_period.present? %>
+              <span class="dash-period-pill dash-period-pill--<%= request.scheduled_period.downcase %>"><%= request.scheduled_period %></span>
+            <% end %>
+          </div>
+          <div class="job-list-schedule__fsp">
+            <% if request.fsp.present? %>
+              <span class="fsp-color-swatch" style="background-color: <%= request.fsp.color %>;" title="<%= request.fsp.display_name %>"></span>
+              <span class="job-list-schedule__fsp-number"><%= request.fsp.fsp_number %></span>
+            <% else %>
+              <span class="job-list-schedule__unassigned">Unassigned</span>
+            <% end %>
+          </div>
+        <% else %>
+          <span class="job-list-schedule__empty">—</span>
+        <% end %>
+      </div>
+      <div class="job-list-status">
+        <%= status_badge(request.status) %>
+      </div>
+      <div class="job-list-timestamp whitespace-nowrap">
+        <%= format_list_timestamp(request.created_at) %>
+      </div>
+    </div>
+  <% end %>
+</li>

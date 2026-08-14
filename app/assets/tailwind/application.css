@@ -939,6 +939,20 @@
     box-shadow: inset 0 0 0 1px #e7e5e4;
   }
 
+  /* FSP list: clickable row (opens details; Edit/Delete stay their own targets) */
+  .fsp-list-row {
+    cursor: pointer;
+  }
+
+  .fsp-list-row:focus {
+    outline: none;
+  }
+
+  .fsp-list-row:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
   /* FSP list: id cell (swatch + number) vertically centered in the row */
   .fsp-list-id-cell {
     vertical-align: middle;

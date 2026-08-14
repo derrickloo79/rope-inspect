@@ -126,6 +126,8 @@
 
   <div class="flex flex-col sm:flex-row sm:items-center gap-3 pt-2">
     <%= f.submit fsp.persisted? ? "Save changes" : "Create FSP", class: "btn-primary cursor-pointer" %>
-    <%= link_to "Cancel", dashboard_fsps_path, class: "btn-secondary no-underline text-center" %>
+    <%= link_to "Cancel",
+                fsp.persisted? ? dashboard_fsp_path(fsp) : dashboard_fsps_path,
+                class: "btn-secondary no-underline text-center" %>
   </div>
 <% end %>

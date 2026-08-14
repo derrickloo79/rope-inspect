@@ -24,7 +24,7 @@ Rails.application.routes.draw do
     get "schedule_session_check", to: "schedule_session_checks#show", as: :schedule_session_check
     resource :profile, only: [ :edit, :update ]
     resources :users, path: "admins", except: [ :show ]
-    resources :fsps, path: "fsps", except: [ :show ]
+    resources :fsps, path: "fsps"
     resources :inspection_requests, only: [ :index, :show ], path: "jobs" do
       member do
         patch :accept

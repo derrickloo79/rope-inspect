@@ -25,7 +25,13 @@
           </thead>
           <tbody class="divide-y divide-[--color-line]">
             <% @fsps.each do |fsp| %>
-              <tr class="hover:bg-stone-50">
+              <tr class="fsp-list-row hover:bg-stone-50"
+                  tabindex="0"
+                  role="link"
+                  aria-label="View <%= fsp.display_name %>"
+                  data-controller="clickable-row"
+                  data-clickable-row-url-value="<%= dashboard_fsp_path(fsp) %>"
+                  data-action="click->clickable-row#go keydown->clickable-row#keydown">
                 <td class="fsp-list-id-cell px-5 py-3">
                   <span class="fsp-list-id">
                     <span class="fsp-color-swatch" style="background-color: <%= fsp.color %>;" title="<%= fsp.color %>"></span>

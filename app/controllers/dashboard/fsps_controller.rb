@@ -1,9 +1,13 @@
 module Dashboard
   class FspsController < BaseController
-    before_action :set_fsp, only: [ :edit, :update, :destroy ]
+    before_action :set_fsp, only: [ :show, :edit, :update, :destroy ]
 
     def index
       @fsps = Fsp.ordered
+    end
+
+    def show
+      @jobs = @fsp.assigned_jobs.includes(:fsp)
     end
 
     def new
@@ -13,7 +17,7 @@ module Dashboard
     def create
       @fsp = Fsp.new(fsp_params)
       if @fsp.save
-        redirect_to dashboard_fsps_path, notice: "#{@fsp.fsp_number} was created."
+        redirect_to dashboard_fsp_path(@fsp), notice: "#{@fsp.fsp_number} was created."
       else
         render :new, status: :unprocessable_entity
       end
@@ -28,7 +32,7 @@ module Dashboard
       if @fsp.update(attrs)
         notice = "#{@fsp.fsp_number} was updated."
         notice += " Login password was changed — they can sign in at /fsp/sign_in." if password_changed
-        redirect_to dashboard_fsps_path, notice: notice
+        redirect_to dashboard_fsp_path(@fsp), notice: notice
       else
         render :edit, status: :unprocessable_entity
       end

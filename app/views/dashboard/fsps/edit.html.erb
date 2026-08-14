@@ -2,7 +2,7 @@
 
 <div class="space-y-6 max-w-xl">
   <div>
-    <%= link_to "← All FSPs", dashboard_fsps_path, class: "text-sm no-underline text-[--color-ink-muted] hover:text-[--color-ink]" %>
+    <%= link_to "← #{@fsp.fsp_number}", dashboard_fsp_path(@fsp), class: "text-sm no-underline text-ink-muted hover:text-ink" %>
     <h1 class="page-title mt-3">Edit <%= @fsp.fsp_number %></h1>
     <p class="page-lede"><%= @fsp.full_name %></p>
   </div>
