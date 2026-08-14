@@ -39,14 +39,28 @@
     <div class="card dash-stat-card dash-stat-card--scheduled">
       <div class="card-section dash-stat-card__inner">
         <p class="section-label">Scheduled</p>
-        <p class="dash-stat-card__count"><%= @counts[:scheduled] %></p>
+        <div class="dash-stat-card__row">
+          <p class="dash-stat-card__count"><%= @counts[:scheduled] %></p>
+          <%= link_to dashboard_inspection_requests_path(status: "scheduled"),
+                      class: "dash-link-arrow",
+                      aria: { label: "See scheduled jobs" } do %>
+            See jobs <span aria-hidden="true">→</span>
+          <% end %>
+        </div>
       </div>
     </div>
 
     <div class="card dash-stat-card dash-stat-card--completed">
       <div class="card-section dash-stat-card__inner">
         <p class="section-label">Completed</p>
-        <p class="dash-stat-card__count"><%= @counts[:completed] %></p>
+        <div class="dash-stat-card__row">
+          <p class="dash-stat-card__count"><%= @counts[:completed] %></p>
+          <%= link_to dashboard_inspection_requests_path(status: "completed"),
+                      class: "dash-link-arrow",
+                      aria: { label: "See completed jobs" } do %>
+            See jobs <span aria-hidden="true">→</span>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
