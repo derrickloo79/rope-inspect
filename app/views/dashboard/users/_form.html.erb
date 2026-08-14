@@ -35,7 +35,13 @@
                               required: true,
                               placeholder: "91234567",
                               autocomplete: "tel-national",
-                              inputmode: "tel" %>
+                              inputmode: "numeric",
+                              pattern: "[0-9]+",
+                              title: "Digits only",
+                              data: {
+                                controller: "digits-only",
+                                action: "input->digits-only#filter"
+                              } %>
       </div>
     </div>
     <p class="field-hint">Country code is required for WhatsApp. Enter the local number without the country code.</p>
