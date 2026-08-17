@@ -25,18 +25,18 @@
     <%= render "layouts/header" %>
 
     <% if notice.present? || alert.present? %>
-      <div class="mx-auto max-w-3xl w-full px-5 pt-6 space-y-2">
+      <div class="mx-auto max-w-5xl w-full px-5 pt-6 space-y-2">
         <% if notice.present? %><div class="flash-notice" role="status"><%= notice %></div><% end %>
         <% if alert.present? %><div class="flash-alert" role="alert"><%= alert %></div><% end %>
       </div>
     <% end %>
 
-    <main class="flex-1 mx-auto w-full max-w-4xl px-5 py-10">
+    <main class="flex-1 mx-auto w-full max-w-5xl px-5 py-10">
       <%= yield %>
     </main>
 
     <footer class="border-t border-line py-8">
-      <div class="mx-auto max-w-3xl px-5 text-sm" style="color: var(--color-ink-faint);">
+      <div class="mx-auto max-w-5xl px-5 text-sm" style="color: var(--color-ink-faint);">
         Hey Tec Inspect — construction wire rope inspections, kept simple.
       </div>
     </footer>

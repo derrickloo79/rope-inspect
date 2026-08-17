@@ -6,7 +6,8 @@
 
   <%# Step 1: crane details %>
   <div data-request-form-steps-target="craneDetails">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-3">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-3"
+         data-controller="crane-type-other">
       <div class="min-w-0 w-full sm:flex-1">
         <%= f.label :crane_type, "Crane type", class: "field-label" %>
         <%= f.select :crane_type,
@@ -14,7 +15,25 @@
                      { prompt: "Select type" },
                      class: "field-select",
                      required: true,
-                     data: { request_form_steps_target: "craneType" } %>
+                     data: {
+                       crane_type_other_target: "select",
+                       request_form_steps_target: "craneType",
+                       action: "change->crane-type-other#toggle"
+                     } %>
+      </div>
+
+      <div class="min-w-0 w-full sm:flex-1"
+           <% unless f.object.others? %>hidden<% end %>
+           data-crane-type-other-target="other">
+        <label class="field-label hidden sm:block invisible" aria-hidden="true">Specify type</label>
+        <%= f.text_field :crane_type_other,
+                         class: "field-input",
+                         placeholder: "e.g. cable car",
+                         maxlength: 80,
+                         autocomplete: "off",
+                         aria: { label: "Specify crane type" },
+                         required: f.object.others?,
+                         data: { request_form_steps_target: "craneTypeOther" } %>
       </div>
 
       <div class="min-w-0 w-full sm:flex-1">

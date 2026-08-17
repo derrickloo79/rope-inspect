@@ -128,14 +128,15 @@ export default class extends Controller {
       if (item.classList.contains("hidden")) return
 
       const typeSelect = item.querySelector("[data-request-form-steps-target='craneType']")
+      const typeOther = item.querySelector("[data-request-form-steps-target='craneTypeOther']")
       const lmInput = item.querySelector("[data-request-form-steps-target='craneLm']")
       const summary = item.querySelector("[data-request-form-steps-target='craneSummary']")
       if (!summary) return
 
       const typeLabel =
-        typeSelect?.selectedOptions?.[0]?.text?.trim() ||
-        typeSelect?.value ||
-        "Crane"
+        typeSelect?.value === "others"
+          ? ((typeOther?.value || "").trim() || "Others")
+          : (typeSelect?.selectedOptions?.[0]?.text?.trim() || typeSelect?.value || "Crane")
       const lm = (lmInput?.value || "").trim() || "No LM number"
       summary.textContent = `Crane ${index + 1} · ${typeLabel} · ${lm}`
     })

@@ -36,6 +36,7 @@ class InspectionRequestsController < ApplicationController
       cranes_attributes: [
         :id,
         :crane_type,
+        :crane_type_other,
         :lm_number,
         :rope_diameter_mm,
         :position,

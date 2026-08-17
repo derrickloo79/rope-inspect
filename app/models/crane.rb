@@ -22,12 +22,22 @@ class Crane < ApplicationRecord
   has_many_attached :mill_certificates
 
   validates :crane_type, presence: true, inclusion: { in: CRANE_TYPES.keys }
+  validates :crane_type_other, presence: true, if: :others?
+  validates :crane_type_other, length: { maximum: 80 }, allow_blank: true
   validates :lm_number, presence: true
   validates :rope_diameter_mm, presence: true
   validate :lm_certificate_must_be_acceptable
   validate :mill_certificates_must_be_acceptable
 
+  before_validation :normalize_crane_type_other
+
+  def others?
+    crane_type == "others"
+  end
+
   def crane_type_label
+    return crane_type_other if others? && crane_type_other.present?
+
     CRANE_TYPES[crane_type] || crane_type.to_s.humanize
   end
 
@@ -36,6 +46,11 @@ class Crane < ApplicationRecord
   end
 
   private
+
+  def normalize_crane_type_other
+    self.crane_type_other = crane_type_other.to_s.strip.presence
+    self.crane_type_other = nil unless others?
+  end
 
   def lm_certificate_must_be_acceptable
     return unless lm_certificate.attached?

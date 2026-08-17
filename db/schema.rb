@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_08_06_034756) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_17_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -50,6 +50,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_08_06_034756) do
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "crane_type_other"
     t.index ["inspection_request_id", "position"], name: "index_cranes_on_inspection_request_id_and_position"
     t.index ["inspection_request_id"], name: "index_cranes_on_inspection_request_id"
   end
