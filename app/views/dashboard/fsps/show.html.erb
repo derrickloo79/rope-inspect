@@ -39,14 +39,17 @@
     <h2 class="section-label mb-4">Assigned jobs</h2>
 
     <% if @jobs.any? %>
-      <div class="card overflow-hidden">
-        <ul class="divide-y divide-[--color-line]">
-          <% @jobs.each do |request| %>
-            <%= render "shared/job_list_item",
-                       request: request,
-                       url: dashboard_inspection_request_path(request) %>
-          <% end %>
-        </ul>
+      <div class="space-y-2">
+        <%= render "shared/job_docs_legend" %>
+        <div class="card overflow-hidden">
+          <ul class="divide-y divide-[--color-line]">
+            <% @jobs.each do |request| %>
+              <%= render "shared/job_list_item",
+                         request: request,
+                         url: dashboard_inspection_request_path(request) %>
+            <% end %>
+          </ul>
+        </div>
       </div>
     <% else %>
       <div class="text-center py-12 text-ink-muted">

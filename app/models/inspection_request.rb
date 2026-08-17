@@ -226,6 +226,11 @@ class InspectionRequest < ApplicationRecord
     map_url.present? || site_note.present?
   end
 
+  # True only when every crane has both an LM certificate and at least one mill certificate.
+  def certificates_complete?
+    cranes.any? && cranes.all?(&:certificates_complete?)
+  end
+
   def point_of_contact?
     poc_name.present? && poc_contact_number.present?
   end

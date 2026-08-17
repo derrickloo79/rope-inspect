@@ -6,7 +6,9 @@ module Dashboard
 
     def index
       @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
-      scope = InspectionRequest.includes(:cranes, :fsp).recent_first
+      scope = InspectionRequest
+        .includes(:fsp, cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
+        .recent_first
       scope = scope.where(status: @status_filter) if @status_filter
       @inspection_requests = scope
       @counts = InspectionRequest.group(:status).count

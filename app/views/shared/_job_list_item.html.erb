@@ -4,6 +4,7 @@
     <div class="job-list-row">
       <div class="job-list-details min-w-0">
         <div class="job-list-title-row">
+          <%= render "shared/job_docs_icon", complete: request.certificates_complete? %>
           <span class="job-list-title truncate"><%= request.site_name %></span>
         </div>
         <p class="job-list-meta mt-0.5 truncate">

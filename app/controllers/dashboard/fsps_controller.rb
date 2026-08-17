@@ -7,7 +7,10 @@ module Dashboard
     end
 
     def show
-      @jobs = @fsp.assigned_jobs.includes(:fsp)
+      @jobs = @fsp.assigned_jobs.includes(
+        :fsp,
+        cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob }
+      )
     end
 
     def new
