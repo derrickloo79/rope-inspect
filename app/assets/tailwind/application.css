@@ -973,6 +973,48 @@
     color: var(--color-ink);
   }
 
+  /* FSP details identity (name + contact line + color badge) */
+  .fsp-identity {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .fsp-identity__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 9999px;
+  }
+
+  .fsp-identity__number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--color-ink);
+  }
+
+  .fsp-identity__body {
+    min-width: 0;
+  }
+
+  .fsp-identity__meta {
+    margin-top: 0.25rem;
+    color: var(--color-ink-muted);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .fsp-identity__sep {
+    margin: 0 0.35rem;
+    color: var(--color-ink-faint);
+  }
+
   /* FSP list color swatch */
   .fsp-color-swatch {
     display: block;
