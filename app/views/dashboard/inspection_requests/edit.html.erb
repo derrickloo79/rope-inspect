@@ -1,0 +1,73 @@
+<% content_for :title, "Edit #{@inspection_request.reference_code} — RopeInspect" %>
+
+<div class="space-y-6">
+  <div>
+    <%= link_to "← #{@inspection_request.reference_code}",
+                dashboard_inspection_request_path(@inspection_request),
+                class: "text-sm no-underline text-ink-muted hover:text-ink" %>
+    <h1 class="page-title mt-3">Edit inspection details</h1>
+    <p class="page-lede">
+      <%= @inspection_request.site_name %> · <%= @inspection_request.reference_code %>
+    </p>
+  </div>
+
+  <% if @inspection_request.errors.any? %>
+    <div class="error-list" role="alert">
+      <p class="font-medium">Please fix the following:</p>
+      <ul class="list-disc list-inside mt-1">
+        <% @inspection_request.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: [:dashboard, @inspection_request],
+                class: "space-y-6",
+                data: { controller: "nested-form" } do |f| %>
+
+    <section class="card">
+      <div class="card-section">
+        <h2 class="section-label mb-4">Requestor details</h2>
+        <%= render "shared/requestor_fields", f: f, requestor_name_label: "Requestor name" %>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-section">
+        <div class="mb-4">
+          <h2 class="section-label">Cranes to inspect</h2>
+          <p class="text-sm text-ink-muted mt-1">
+            Add rope diameter in this order: Single / Main / Boom.
+            Certificates are unchanged here — update them on the job page.
+          </p>
+        </div>
+
+        <div class="space-y-4" data-nested-form-target="container">
+          <%= f.fields_for :cranes do |crane_form| %>
+            <%= render "inspection_requests/crane_fields", f: crane_form, skip_certificates: true %>
+          <% end %>
+        </div>
+
+        <div class="mt-4">
+          <button type="button" class="btn-secondary !py-1.5 !px-3 text-sm" data-action="nested-form#add">
+            + Add crane
+          </button>
+        </div>
+
+        <template data-nested-form-target="template">
+          <%= f.fields_for :cranes, Crane.new, child_index: "NEW_RECORD" do |crane_form| %>
+            <%= render "inspection_requests/crane_fields", f: crane_form, skip_certificates: true %>
+          <% end %>
+        </template>
+      </div>
+    </section>
+
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+      <%= f.submit "Save changes", class: "btn-primary cursor-pointer" %>
+      <%= link_to "Cancel",
+                  dashboard_inspection_request_path(@inspection_request),
+                  class: "btn-secondary no-underline text-center" %>
+    </div>
+  <% end %>
+</div>

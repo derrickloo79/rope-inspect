@@ -25,7 +25,7 @@ Rails.application.routes.draw do
     resource :profile, only: [ :edit, :update ]
     resources :users, path: "admins", except: [ :show ]
     resources :fsps, path: "fsps"
-    resources :inspection_requests, only: [ :index, :show ], path: "jobs" do
+    resources :inspection_requests, only: [ :index, :show, :edit, :update ], path: "jobs" do
       member do
         patch :accept
         patch :reject

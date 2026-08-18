@@ -27,6 +27,9 @@
         <p class="page-lede"><%= @inspection_request.company_name %> · <%= @inspection_request.reference_code %></p>
         <div class="mt-2"><%= status_badge(@inspection_request.status) %></div>
       </div>
+      <%= link_to "Edit",
+                  edit_dashboard_inspection_request_path(@inspection_request),
+                  class: "btn-secondary no-underline shrink-0" %>
     </div>
   </div>
 

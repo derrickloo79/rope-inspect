@@ -1,7 +1,7 @@
 module Dashboard
   class InspectionRequestsController < BaseController
     before_action :set_inspection_request, only: [
-      :show, :accept, :reject, :reopen, :schedule, :complete, :site_access, :point_of_contact
+      :show, :edit, :update, :accept, :reject, :reopen, :schedule, :complete, :site_access, :point_of_contact
     ]
 
     def index
@@ -15,6 +15,18 @@ module Dashboard
     end
 
     def show
+    end
+
+    def edit
+    end
+
+    def update
+      if @inspection_request.update(job_details_params)
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    notice: "Inspection details updated."
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
 
     def accept
@@ -113,6 +125,25 @@ module Dashboard
       @inspection_request = InspectionRequest
         .includes(:fsp, cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
         .find(params[:id])
+    end
+
+    def job_details_params
+      params.require(:inspection_request).permit(
+        :company_name,
+        :requestor_name,
+        :country_code,
+        :contact_number,
+        :site_name,
+        cranes_attributes: [
+          :id,
+          :crane_type,
+          :crane_type_other,
+          :lm_number,
+          :rope_diameter_mm,
+          :position,
+          :_destroy
+        ]
+      )
     end
 
     def site_access_params

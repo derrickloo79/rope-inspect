@@ -1,3 +1,4 @@
+<% skip_certificates = local_assigns.fetch(:skip_certificates, false) %>
 <div class="rounded-md border border-stone-200 bg-stone-50/60 p-4 space-y-4"
      data-nested-form-target="item"
      data-request-form-steps-target="craneItem">
@@ -73,7 +74,8 @@
     </div>
   </div>
 
-  <%# Step 2: optional certificates for this crane %>
+  <%# Step 2: optional certificates for this crane (public request form only) %>
+  <% unless skip_certificates %>
   <div data-request-form-steps-target="craneDocs" hidden>
     <p class="text-sm font-medium text-ink mb-3" data-request-form-steps-target="craneSummary">
       Crane
@@ -100,4 +102,5 @@
       </div>
     </div>
   </div>
+  <% end %>
 </div>
