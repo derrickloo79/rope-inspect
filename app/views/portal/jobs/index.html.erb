@@ -30,7 +30,7 @@
 
   <% if @jobs.any? %>
     <div class="card overflow-hidden">
-      <ul class="divide-y divide-[--color-line]">
+      <ul class="divide-y divide-line-soft">
         <% @jobs.each do |request| %>
           <li>
             <%= link_to portal_job_path(request), class: "no-underline block px-5 py-4 hover:bg-stone-50 transition-colors" do %>

@@ -29,7 +29,7 @@
       <div class="space-y-2">
         <%= render "shared/job_docs_legend" %>
         <div class="card overflow-hidden">
-          <ul class="divide-y divide-[--color-line]">
+          <ul class="divide-y divide-line-soft">
             <% @jobs.each do |request| %>
               <%= render "shared/job_list_item",
                          request: request,
