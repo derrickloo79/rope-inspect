@@ -24,7 +24,7 @@
                     edit_dashboard_profile_path,
                     class: "site-header-email no-underline #{'is-active' if nav_link_active?(:profile)}",
                     title: current_user.email %>
-        <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn-ghost !py-1.5 !px-2 text-sm" %>
+        <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn-ghost" %>
       </div>
 
       <button type="button"
@@ -59,7 +59,7 @@
           <span class="fsp-color-swatch" style="background-color: <%= current_fsp.color %>;" title="<%= current_fsp.fsp_number %>"></span>
           <%= current_fsp.full_name %>
         <% end %>
-        <%= button_to "Sign out", destroy_fsp_session_path, method: :delete, class: "btn-ghost !py-1.5 !px-2 text-sm" %>
+        <%= button_to "Sign out", destroy_fsp_session_path, method: :delete, class: "btn-ghost" %>
       </div>
 
       <button type="button"
@@ -82,8 +82,8 @@
       </button>
     <% else %>
       <nav class="site-header-nav" aria-label="Account">
-        <%= link_to "FSP sign in", new_fsp_session_path, class: "btn-ghost !py-1.5 !px-3 text-sm no-underline" %>
-        <%= link_to "Staff sign in", new_user_session_path, class: "btn-primary !py-1.5 !px-3 text-sm no-underline" %>
+        <%= link_to "FSP sign in", new_fsp_session_path, class: "btn-ghost no-underline" %>
+        <%= link_to "Staff sign in", new_user_session_path, class: "btn-primary no-underline" %>
       </nav>
     <% end %>
   </div>
@@ -141,7 +141,7 @@
           <%= button_to "Sign out",
                         destroy_user_session_path,
                         method: :delete,
-                        class: "btn-ghost !py-1.5 !px-2 text-sm w-full justify-start",
+                        class: "btn-ghost w-full justify-start",
                         form: { data: { action: "menu#navigate" } } %>
         </div>
       </div>
@@ -187,7 +187,7 @@
           <%= button_to "Sign out",
                         destroy_fsp_session_path,
                         method: :delete,
-                        class: "btn-ghost !py-1.5 !px-2 text-sm w-full justify-start",
+                        class: "btn-ghost w-full justify-start",
                         form: { data: { action: "menu#navigate" } } %>
         </div>
       </div>
