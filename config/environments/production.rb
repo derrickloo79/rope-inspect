@@ -53,6 +53,7 @@ Rails.application.configure do
 
   # Allow Render hostnames (and optional custom domain via APP_HOST).
   config.hosts << /.*\.onrender\.com/
+  config.hosts << /.*\.heytec.com.sg/
   config.hosts << ENV["APP_HOST"] if ENV["APP_HOST"].present?
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
