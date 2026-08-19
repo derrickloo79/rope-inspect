@@ -953,6 +953,13 @@
     box-shadow: inset 0 0 0 1px #e7e5e4;
   }
 
+  /* Listing table header cells (FSP / admin) */
+  .table-th {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
   /* FSP list: clickable row (opens details; Edit/Delete stay their own targets) */
   .fsp-list-row {
     cursor: pointer;
