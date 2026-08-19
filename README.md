@@ -64,7 +64,9 @@ Crane
 
 ## Deploy (Render)
 
-Production and staging are defined in `render.yaml` as two isolated stacks (`main` → production, `staging` → staging). See [docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md).
+Day-to-day edits: work on `dev` → push to Render **dev** → merge to `main` for production. See [docs/DEV_WORKFLOW.md](docs/DEV_WORKFLOW.md).
+
+First-time Render setup (project environments, env vars, seed): [docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md).
 
 ## Next iterations
 
