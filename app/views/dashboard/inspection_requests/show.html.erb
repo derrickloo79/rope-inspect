@@ -147,7 +147,13 @@
                                           class: "field-input",
                                           placeholder: "e.g. 91234567",
                                           autocomplete: "tel-national",
-                                          inputmode: "tel" %>
+                                          inputmode: "numeric",
+                                          pattern: "[0-9]*",
+                                          title: "Digits only",
+                                          data: {
+                                            controller: "digits-only",
+                                            action: "input->digits-only#filter"
+                                          } %>
                   </div>
                 </div>
                 <p class="field-hint">Country code for WhatsApp. Local number only in the right field.</p>

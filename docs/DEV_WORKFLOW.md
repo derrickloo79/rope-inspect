@@ -41,6 +41,38 @@ git push origin dev
 
 Render **rope-inspect-dev** auto-deploys from `dev`. Wait until the deploy is **Live**, then check the **dev** URL (not production).
 
+## Feature branch (child of `dev`)
+
+For a chunk of work you don’t want on `dev` until it’s ready, branch off `dev`:
+
+```bash
+git checkout dev
+git pull
+git checkout -b your-branch-name
+```
+
+Example: `git checkout -b icon-for-fsp-metadata`
+
+Commit on that branch (uncommitted files follow you if you switch back to `dev`):
+
+```bash
+git add -A
+git status
+git commit -m "short description of the change"
+git push -u origin your-branch-name
+```
+
+When you’re ready to put it on Render **dev**:
+
+```bash
+git checkout dev
+git pull
+git merge your-branch-name
+git push origin dev
+```
+
+`dev` only shows the child branch’s work **after** that merge. Production stays unchanged until you merge `dev` → `main`.
+
 ## When you’re happy → production
 
 ```bash
