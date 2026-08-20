@@ -1,68 +1,68 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Map location field: Google Places address autocomplete (when API key set),
-// free-text / pasted Maps links, and an in-field clear control.
-let mapsLoaderPromise = null
+// Map location: Places Autocomplete (New) when a key is set, plus free-text / pasted links.
 
-function loadGoogleMapsPlaces(apiKey) {
-  if (window.google?.maps?.places) return Promise.resolve()
-  if (mapsLoaderPromise) return mapsLoaderPromise
+// Official Maps JS bootstrap — defines google.maps.importLibrary, then loads the API.
+function installMapsBootstrap(apiKey) {
+  const googleNs = (window.google = window.google || {})
+  const maps = (googleNs.maps = googleNs.maps || {})
+  if (typeof maps.importLibrary === "function") return
 
-  mapsLoaderPromise = new Promise((resolve, reject) => {
-    const existing = document.querySelector("script[data-google-maps-places]")
-    if (existing) {
-      if (window.google?.maps?.places) {
-        resolve()
-        return
-      }
-      existing.addEventListener("load", () => resolve(), { once: true })
-      existing.addEventListener("error", () => reject(new Error("Google Maps failed to load")), { once: true })
-      return
-    }
+  const pending = new Set()
+  let loading = null
 
-    const callbackName = `__initGoogleMapsPlaces_${Date.now()}`
-    window[callbackName] = () => {
-      delete window[callbackName]
-      resolve()
-    }
+  const startLoad = () => {
+    loading ||= new Promise((resolve, reject) => {
+      const params = new URLSearchParams()
+      params.set("key", apiKey)
+      params.set("v", "weekly")
+      params.set("libraries", Array.from(pending).join(","))
+      params.set("callback", "google.maps.__ib__")
+      maps.__ib__ = resolve
 
-    const script = document.createElement("script")
-    script.src =
-      `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}` +
-      `&libraries=places&callback=${callbackName}`
-    script.async = true
-    script.defer = true
-    script.dataset.googleMapsPlaces = "true"
-    script.onerror = () => {
-      delete window[callbackName]
-      mapsLoaderPromise = null
-      reject(new Error("Google Maps failed to load"))
-    }
-    document.head.appendChild(script)
-  })
+      const script = document.createElement("script")
+      script.src = `https://maps.googleapis.com/maps/api/js?${params}`
+      script.async = true
+      script.onerror = () => reject(new Error("Google Maps failed to load"))
+      document.head.appendChild(script)
+    })
+    return loading
+  }
 
-  return mapsLoaderPromise
+  maps.importLibrary = (name, ...args) => {
+    pending.add(name)
+    return startLoad().then(() => maps.importLibrary(name, ...args))
+  }
+}
+
+function loadPlacesLibrary(apiKey) {
+  installMapsBootstrap(apiKey)
+  return google.maps.importLibrary("places")
 }
 
 export default class extends Controller {
-  static targets = [ "input", "clear" ]
+  static targets = [ "input", "clear", "list" ]
   static values = {
     apiKey: { type: String, default: "" }
   }
 
   connect() {
-    this.autocomplete = null
+    this.places = null
+    this.sessionToken = null
+    this.suggestions = []
+    this.activeIndex = -1
+    this.debounceTimer = null
+    this.legacyAutocomplete = null
+    this.boundClose = this.closeOnOutside.bind(this)
+    document.addEventListener("mousedown", this.boundClose)
     this.refresh()
-    if (this.apiKeyValue) {
-      this.ensureAutocomplete()
-    }
   }
 
   disconnect() {
-    if (this.autocomplete && window.google?.maps?.event) {
-      google.maps.event.clearInstanceListeners(this.autocomplete)
-    }
-    this.autocomplete = null
+    this.clearTimer()
+    this.teardownLegacy()
+    this.hideList()
+    if (this.boundClose) document.removeEventListener("mousedown", this.boundClose)
   }
 
   refresh() {
@@ -75,81 +75,227 @@ export default class extends Controller {
   clear(event) {
     event.preventDefault()
     this.inputTarget.value = ""
+    this.hideList()
     this.refresh()
     this.inputTarget.focus()
     this.inputTarget.dispatchEvent(new Event("input", { bubbles: true }))
   }
 
-  async ensureAutocomplete() {
-    if (this.autocomplete || !this.apiKeyValue) return
+  async prepare() {
+    if (!this.apiKeyValue) return
 
     try {
-      await loadGoogleMapsPlaces(this.apiKeyValue)
-    } catch (_error) {
+      this.places = await loadPlacesLibrary(this.apiKeyValue)
+    } catch (error) {
+      console.warn("Google Places failed to load.", error)
       return
     }
 
-    if (this.autocomplete || !this.hasInputTarget) return
-    if (!window.google?.maps?.places) return
+    if (this.places?.AutocompleteSuggestion) return
 
-    // No `types` restriction so both addresses and businesses are suggested.
-    this.autocomplete = new google.maps.places.Autocomplete(this.inputTarget, {
-      fields: [ "formatted_address", "name", "url", "place_id", "geometry" ]
-    })
-
-    this.autocomplete.addListener("place_changed", () => this.onPlaceChanged())
-
-    // Keep pac-container above cards / sticky chrome.
-    this.inputTarget.addEventListener("focus", () => this.bumpPacZIndex())
+    // Older keys: fall back to the legacy widget once the field is visible.
+    this.bindLegacyAutocomplete()
   }
 
-  onPlaceChanged() {
-    const place = this.autocomplete?.getPlace()
-    if (!place) return
+  suggest() {
+    this.refresh()
+    if (!this.apiKeyValue) return
 
-    // Use the place *name* when present. Relying only on formatted_address often
-    // collapses a specific site (e.g. "Woh Hup WCP Site 2") to a nearby street
-    // ("Woodlands Centre Rd"). Prefer "Name, Address" for establishments.
-    const value = this.displayValueForPlace(place)
-    if (value) {
-      this.inputTarget.value = value
+    this.clearTimer()
+    const query = this.inputTarget.value.trim()
+    if (query.length < 2) {
+      this.hideList()
+      return
     }
 
-    this.closeSuggestions()
+    this.debounceTimer = setTimeout(() => this.fetchSuggestions(query), 220)
+  }
+
+  keydown(event) {
+    if (!this.hasListTarget || this.listTarget.hidden) return
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault()
+      this.moveActive(1)
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault()
+      this.moveActive(-1)
+    } else if (event.key === "Enter" && this.activeIndex >= 0) {
+      event.preventDefault()
+      this.pick(this.activeIndex)
+    } else if (event.key === "Escape") {
+      this.hideList()
+    }
+  }
+
+  closeOnOutside(event) {
+    if (!this.element.contains(event.target)) this.hideList()
+  }
+
+  async fetchSuggestions(query) {
+    if (!this.places?.AutocompleteSuggestion) {
+      await this.prepare()
+    }
+    if (!this.places?.AutocompleteSuggestion) return
+
+    try {
+      if (!this.sessionToken && this.places.AutocompleteSessionToken) {
+        this.sessionToken = new this.places.AutocompleteSessionToken()
+      }
+
+      const { suggestions } = await this.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input: query,
+        sessionToken: this.sessionToken
+      })
+
+      this.suggestions = suggestions || []
+      this.renderList()
+    } catch (error) {
+      console.warn("Places autocomplete request failed.", error)
+      this.hideList()
+    }
+  }
+
+  renderList() {
+    if (!this.hasListTarget) return
+
+    this.listTarget.innerHTML = ""
+    this.activeIndex = -1
+
+    if (this.suggestions.length === 0) {
+      this.hideList()
+      return
+    }
+
+    this.suggestions.forEach((suggestion, index) => {
+      const label = this.predictionLabel(suggestion)
+      if (!label) return
+
+      const item = document.createElement("li")
+      item.className = "map-suggest__item"
+      item.setAttribute("role", "option")
+      item.dataset.index = String(index)
+      item.textContent = label
+      item.addEventListener("mousedown", (event) => {
+        event.preventDefault()
+        this.pick(index)
+      })
+      this.listTarget.appendChild(item)
+    })
+
+    if (this.listTarget.children.length === 0) {
+      this.hideList()
+      return
+    }
+
+    this.listTarget.hidden = false
+  }
+
+  async pick(index) {
+    const suggestion = this.suggestions[index]
+    if (!suggestion) return
+
+    const value = await this.displayValueForSuggestion(suggestion)
+    if (value) this.inputTarget.value = value
+
+    this.sessionToken = null
+    this.hideList()
     this.refresh()
   }
 
-  displayValueForPlace(place) {
-    const name = (place.name || "").trim()
-    const formatted = (place.formatted_address || "").trim()
+  async displayValueForSuggestion(suggestion) {
+    const prediction = suggestion.placePrediction
+    if (!prediction) return this.predictionLabel(suggestion)
 
-    if (name && formatted) {
-      if (formatted.toLowerCase().includes(name.toLowerCase())) {
-        return formatted
+    try {
+      const place = prediction.toPlace()
+      await place.fetchFields({ fields: [ "displayName", "formattedAddress" ] })
+      const name = this.asText(place.displayName)
+      const formatted = this.asText(place.formattedAddress)
+      if (name && formatted) {
+        if (formatted.toLowerCase().includes(name.toLowerCase())) return formatted
+        return `${name}, ${formatted}`
       }
-      return `${name}, ${formatted}`
+      return name || formatted || this.predictionLabel(suggestion)
+    } catch (_error) {
+      return this.predictionLabel(suggestion)
     }
-
-    return name || formatted || place.url || ""
   }
 
-  closeSuggestions() {
-    // Google's .pac-container can linger after a click selection (esp. when we
-    // rewrite the input value). Hide it and blur so it doesn't stay open.
-    document.querySelectorAll(".pac-container").forEach((el) => {
-      el.style.display = "none"
-    })
-    this.inputTarget.blur()
+  predictionLabel(suggestion) {
+    const prediction = suggestion.placePrediction
+    if (!prediction) return ""
+    return this.asText(prediction.text)
   }
 
-  bumpPacZIndex() {
-    // Google injects .pac-container on the body; ensure it stacks above UI chrome
-    // and re-show if it was hidden after a previous selection.
-    requestAnimationFrame(() => {
-      document.querySelectorAll(".pac-container").forEach((el) => {
-        el.style.zIndex = "10000"
-        el.style.display = ""
-      })
+  asText(value) {
+    if (!value) return ""
+    if (typeof value === "string") return value.trim()
+    if (typeof value.text === "string") return value.text.trim()
+    if (typeof value.toString === "function") {
+      const text = value.toString()
+      if (text && text !== "[object Object]") return text.trim()
+    }
+    return ""
+  }
+
+  moveActive(delta) {
+    const items = Array.from(this.listTarget.querySelectorAll(".map-suggest__item"))
+    if (items.length === 0) return
+
+    this.activeIndex = (this.activeIndex + delta + items.length) % items.length
+    items.forEach((item, i) => {
+      item.classList.toggle("is-active", i === this.activeIndex)
     })
+    items[this.activeIndex].scrollIntoView({ block: "nearest" })
+  }
+
+  hideList() {
+    this.suggestions = []
+    this.activeIndex = -1
+    if (this.hasListTarget) {
+      this.listTarget.innerHTML = ""
+      this.listTarget.hidden = true
+    }
+  }
+
+  bindLegacyAutocomplete() {
+    if (this.legacyAutocomplete || !this.hasInputTarget) return
+    if (!this.inputVisible()) return
+    if (!window.google?.maps?.places?.Autocomplete) return
+
+    this.legacyAutocomplete = new google.maps.places.Autocomplete(this.inputTarget, {
+      fields: [ "formatted_address", "name", "url", "place_id", "geometry" ]
+    })
+    this.legacyAutocomplete.addListener("place_changed", () => {
+      const place = this.legacyAutocomplete.getPlace()
+      if (!place) return
+      const name = (place.name || "").trim()
+      const formatted = (place.formatted_address || "").trim()
+      if (name && formatted && !formatted.toLowerCase().includes(name.toLowerCase())) {
+        this.inputTarget.value = `${name}, ${formatted}`
+      } else {
+        this.inputTarget.value = formatted || name || place.url || this.inputTarget.value
+      }
+      this.refresh()
+    })
+  }
+
+  teardownLegacy() {
+    if (this.legacyAutocomplete && window.google?.maps?.event) {
+      google.maps.event.clearInstanceListeners(this.legacyAutocomplete)
+    }
+    this.legacyAutocomplete = null
+  }
+
+  inputVisible() {
+    return Boolean(this.hasInputTarget && this.inputTarget.offsetParent)
+  }
+
+  clearTimer() {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer)
+      this.debounceTimer = null
+    }
   }
 }

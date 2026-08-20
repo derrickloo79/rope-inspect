@@ -256,9 +256,11 @@
                                   class: "field-input field-input--clearable",
                                   placeholder: "Search address or paste a Google Maps link",
                                   autocomplete: "off",
+                                  role: "combobox",
+                                  aria: { autocomplete: "list", expanded: "false" },
                                   data: {
                                     map_location_target: "input",
-                                    action: "input->map-location#refresh"
+                                    action: "focus->map-location#prepare input->map-location#suggest keydown->map-location#keydown"
                                   } %>
                   <button type="button"
                           class="field-clear-btn"
@@ -270,6 +272,10 @@
                       <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                   </button>
+                  <ul class="map-suggest"
+                      data-map-location-target="list"
+                      role="listbox"
+                      hidden></ul>
                 </div>
                 <p class="field-hint">
                   <% if google_maps_api_key.present? %>

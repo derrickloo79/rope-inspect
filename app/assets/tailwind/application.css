@@ -2174,7 +2174,42 @@
     display: none !important;
   }
 
-  /* Google Places Autocomplete dropdown */
+  /* Places Autocomplete (New) suggestions */
+  .map-suggest {
+    position: absolute;
+    z-index: 10000;
+    left: 0;
+    right: 0;
+    top: calc(100% + 0.25rem);
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 0.375rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    max-height: 16rem;
+    overflow-y: auto;
+  }
+
+  .map-suggest[hidden] {
+    display: none !important;
+  }
+
+  .map-suggest__item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+
+  .map-suggest__item:hover,
+  .map-suggest__item.is-active {
+    background-color: #f5f5f4;
+  }
+
+  /* Google Places Autocomplete dropdown (legacy fallback) */
   .pac-container {
     z-index: 10000 !important;
     border: 1px solid var(--color-line-strong);
