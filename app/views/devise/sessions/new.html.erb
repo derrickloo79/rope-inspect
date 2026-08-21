@@ -30,7 +30,11 @@
 
         <div>
           <%= f.label :password, class: "field-label" %>
-          <%= f.password_field :password, autocomplete: "current-password", class: "field-input", required: true %>
+          <%= render "shared/password_field",
+                     f: f,
+                     method: :password,
+                     required: true,
+                     autocomplete: "current-password" %>
         </div>
 
         <% if devise_mapping.rememberable? %>
