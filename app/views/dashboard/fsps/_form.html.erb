@@ -63,12 +63,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
     <div>
       <%= f.label :password, fsp.persisted? ? "New password" : "Password", class: "field-label" %>
-      <%= f.password_field :password,
-                          class: "field-input",
-                          required: !fsp.persisted?,
-                          autocomplete: "new-password",
-                          minlength: Devise.password_length.min,
-                          value: nil %>
+      <%= render "shared/password_field", f: f, method: :password, required: !fsp.persisted? %>
       <% if fsp.persisted? %>
         <p class="field-hint">Leave blank to keep the current password. Min <%= Devise.password_length.min %> characters.</p>
       <% else %>
@@ -77,12 +72,7 @@
     </div>
     <div>
       <%= f.label :password_confirmation, "Confirm password", class: "field-label" %>
-      <%= f.password_field :password_confirmation,
-                          class: "field-input",
-                          required: !fsp.persisted?,
-                          autocomplete: "new-password",
-                          minlength: Devise.password_length.min,
-                          value: nil %>
+      <%= render "shared/password_field", f: f, method: :password_confirmation, required: !fsp.persisted? %>
     </div>
   </div>
 

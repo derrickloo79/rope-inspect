@@ -2192,7 +2192,8 @@
     background-color: rgba(231, 229, 228, 0.7);
   }
 
-  .field-clear-btn[hidden] {
+  .field-clear-btn[hidden],
+  .field-clear-btn [hidden] {
     display: none !important;
   }
 
