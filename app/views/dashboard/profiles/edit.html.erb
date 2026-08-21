@@ -55,20 +55,12 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <%= f.label :password, "New password", class: "field-label" %>
-            <%= f.password_field :password,
-                                class: "field-input",
-                                autocomplete: "new-password",
-                                minlength: Devise.password_length.min,
-                                value: nil %>
+            <%= render "shared/password_field", f: f, method: :password, required: false %>
             <p class="field-hint">Leave blank to keep your current password. Min <%= Devise.password_length.min %> characters.</p>
           </div>
           <div>
             <%= f.label :password_confirmation, "Confirm password", class: "field-label" %>
-            <%= f.password_field :password_confirmation,
-                                class: "field-input",
-                                autocomplete: "new-password",
-                                minlength: Devise.password_length.min,
-                                value: nil %>
+            <%= render "shared/password_field", f: f, method: :password_confirmation, required: false %>
           </div>
         </div>
 
