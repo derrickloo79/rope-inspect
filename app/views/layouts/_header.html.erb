@@ -4,8 +4,8 @@
         data-action="keydown@window->menu#keydown">
   <div class="site-header-inner">
     <%= link_to(fsp_signed_in? ? portal_root_path : root_path, class: "site-logo") do %>
-      <span class="site-logo-mark">HT</span>
-      <span class="site-logo-text">Hey Tec</span>
+      <%= image_tag "inspect-logo-white-bbg.png", class: "site-logo-mark", alt: "" %>
+      <span class="site-logo-text">Inspect</span>
     <% end %>
 
     <% if user_signed_in? %>
