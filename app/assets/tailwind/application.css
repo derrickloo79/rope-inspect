@@ -93,9 +93,23 @@
     flex-shrink: 0;
   }
 
+  .site-logo-mark--footer {
+    width: 32px;
+    height: 32px;
+  }
+
+  .site-footer-brand {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+    line-height: 1.2;
+  }
+
   .site-logo-text {
     font-size: 1.25rem;
     font-weight: 600;
+    letter-spacing: -0.025em;
     color: inherit;
   }
 
