@@ -68,7 +68,7 @@
             <span class="requestor-identity__body">
               <span class="block text-base font-medium break-words"><%= @job.requestor_name %></span>
               <% if (wa_href = whatsapp_href(@job.whatsapp_number)) %>
-                <a class="requestor-identity__phone break-words inline-flex items-center gap-1 underline underline-offset-2"
+                <a class="requestor-identity__phone break-words inline-flex items-center gap-1 no-underline"
                    href="<%= wa_href %>"
                    target="_blank"
                    rel="noopener noreferrer"
@@ -92,7 +92,7 @@
               <span class="requestor-identity__body">
                 <span class="block text-base font-medium break-words"><%= @job.poc_name %></span>
                 <% if (poc_wa_href = whatsapp_href(@job.poc_whatsapp_number)) %>
-                  <a class="requestor-identity__phone break-words inline-flex items-center gap-1 underline underline-offset-2"
+                  <a class="requestor-identity__phone break-words inline-flex items-center gap-1 no-underline"
                      href="<%= poc_wa_href %>"
                      target="_blank"
                      rel="noopener noreferrer"

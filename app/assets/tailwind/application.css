@@ -1097,10 +1097,10 @@
     color: var(--color-ink-muted);
   }
 
-  /* Phone as a wa.me link: same accent blue + underline as the admin view */
+  /* Phone as a wa.me link: same accent blue as the admin view, no underline (matches Google Maps link) */
   a.requestor-identity__phone {
     color: var(--color-accent);
-    text-decoration: underline;
+    text-decoration: none;
   }
 
   a.requestor-identity__phone:hover,

@@ -46,7 +46,7 @@
             <dt class="text-sm text-[--color-ink-muted]">Phone</dt>
             <dd class="text-base font-medium mt-0.5 break-words">
               <% if (wa_href = whatsapp_href(@inspection_request.whatsapp_number)) %>
-                <a class="inline-flex items-center gap-1 underline underline-offset-2"
+                <a class="inline-flex items-center gap-1 no-underline"
                    href="<%= wa_href %>"
                    target="_blank"
                    rel="noopener noreferrer"
@@ -118,7 +118,7 @@
                   <dt class="text-sm text-ink-muted">Contact number</dt>
                   <dd class="text-base font-medium mt-0.5 break-words">
                     <% if (poc_wa_href = whatsapp_href(@inspection_request.poc_whatsapp_number)) %>
-                      <a class="inline-flex items-center gap-1 underline underline-offset-2"
+                      <a class="inline-flex items-center gap-1 no-underline"
                          href="<%= poc_wa_href %>"
                          target="_blank"
                          rel="noopener noreferrer"
