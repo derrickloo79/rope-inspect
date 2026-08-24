@@ -67,9 +67,18 @@
             </span>
             <span class="requestor-identity__body">
               <span class="block text-base font-medium break-words"><%= @job.requestor_name %></span>
-              <span class="block requestor-identity__phone break-words" title="WhatsApp: <%= @job.whatsapp_number %>">
-                <%= @job.full_contact_number %>
-              </span>
+              <% if (wa_href = whatsapp_href(@job.whatsapp_number)) %>
+                <a class="requestor-identity__phone break-words inline-flex items-center gap-1 underline underline-offset-2"
+                   href="<%= wa_href %>"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   title="Message <%= @job.requestor_name %> on WhatsApp">
+                  <%= @job.full_contact_number %>
+                  <%= whatsapp_icon %>
+                </a>
+              <% else %>
+                <span class="block requestor-identity__phone break-words"><%= @job.full_contact_number %></span>
+              <% end %>
             </span>
           </dd>
         </div>
@@ -82,9 +91,18 @@
               </span>
               <span class="requestor-identity__body">
                 <span class="block text-base font-medium break-words"><%= @job.poc_name %></span>
-                <span class="block requestor-identity__phone break-words" title="WhatsApp: <%= @job.poc_whatsapp_number %>">
-                  <%= @job.full_poc_contact_number %>
-                </span>
+                <% if (poc_wa_href = whatsapp_href(@job.poc_whatsapp_number)) %>
+                  <a class="requestor-identity__phone break-words inline-flex items-center gap-1 underline underline-offset-2"
+                     href="<%= poc_wa_href %>"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     title="Message <%= @job.poc_name %> on WhatsApp">
+                    <%= @job.full_poc_contact_number %>
+                    <%= whatsapp_icon %>
+                  </a>
+                <% else %>
+                  <span class="block requestor-identity__phone break-words"><%= @job.full_poc_contact_number %></span>
+                <% end %>
               </span>
             </dd>
           <% else %>

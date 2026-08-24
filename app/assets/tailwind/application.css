@@ -1092,9 +1092,28 @@
 
   .requestor-identity__phone {
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1.4;
     color: var(--color-ink-muted);
+  }
+
+  /* Phone as a wa.me link: same accent blue + underline as the admin view */
+  a.requestor-identity__phone {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  a.requestor-identity__phone:hover,
+  a.requestor-identity__phone:focus-visible {
+    color: var(--color-accent-hover);
+  }
+
+  /* WhatsApp glyph shown after a chat-capable phone number */
+  .whatsapp-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+    flex-shrink: 0;
+    color: #25d366;
   }
 
   /* FSP list color swatch */

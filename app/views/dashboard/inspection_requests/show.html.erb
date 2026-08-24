@@ -44,8 +44,19 @@
           </div>
           <div class="min-w-0">
             <dt class="text-sm text-[--color-ink-muted]">Phone</dt>
-            <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.whatsapp_number %>">
-              <%= @inspection_request.full_contact_number %>
+            <dd class="text-base font-medium mt-0.5 break-words">
+              <% if (wa_href = whatsapp_href(@inspection_request.whatsapp_number)) %>
+                <a class="inline-flex items-center gap-1 underline underline-offset-2"
+                   href="<%= wa_href %>"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   title="Message <%= @inspection_request.requestor_name %> on WhatsApp">
+                  <%= @inspection_request.full_contact_number %>
+                  <%= whatsapp_icon %>
+                </a>
+              <% else %>
+                <%= @inspection_request.full_contact_number %>
+              <% end %>
             </dd>
           </div>
           <div class="min-w-0">
@@ -105,8 +116,19 @@
                 </div>
                 <div class="min-w-0">
                   <dt class="text-sm text-ink-muted">Contact number</dt>
-                  <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.poc_whatsapp_number %>">
-                    <%= @inspection_request.full_poc_contact_number %>
+                  <dd class="text-base font-medium mt-0.5 break-words">
+                    <% if (poc_wa_href = whatsapp_href(@inspection_request.poc_whatsapp_number)) %>
+                      <a class="inline-flex items-center gap-1 underline underline-offset-2"
+                         href="<%= poc_wa_href %>"
+                         target="_blank"
+                         rel="noopener noreferrer"
+                         title="Message <%= @inspection_request.poc_name %> on WhatsApp">
+                        <%= @inspection_request.full_poc_contact_number %>
+                        <%= whatsapp_icon %>
+                      </a>
+                    <% else %>
+                      <%= @inspection_request.full_poc_contact_number %>
+                    <% end %>
                   </dd>
                 </div>
               </dl>
