@@ -61,25 +61,35 @@
         </div>
         <div class="min-w-0">
           <dt class="text-sm text-ink-muted">Requestor</dt>
-          <dd class="text-base font-medium mt-0.5 break-words"><%= @job.requestor_name %></dd>
-        </div>
-        <div class="min-w-0">
-          <dt class="text-sm text-ink-muted">Phone</dt>
-          <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @job.whatsapp_number %>">
-            <%= @job.full_contact_number %>
+          <dd class="mt-0.5 requestor-identity">
+            <span class="requestor-identity__avatar" aria-hidden="true">
+              <span class="requestor-identity__initials"><%= initials_for(@job.requestor_name) %></span>
+            </span>
+            <span class="requestor-identity__body">
+              <span class="block text-base font-medium break-words"><%= @job.requestor_name %></span>
+              <span class="block requestor-identity__phone break-words" title="WhatsApp: <%= @job.whatsapp_number %>">
+                <%= @job.full_contact_number %>
+              </span>
+            </span>
           </dd>
         </div>
         <div class="min-w-0">
           <dt class="text-sm text-ink-muted">Point of contact</dt>
-          <dd class="text-base font-medium mt-0.5 break-words">
-            <%= @job.point_of_contact? ? @job.poc_name : "—" %>
-          </dd>
-        </div>
-        <div class="min-w-0">
-          <dt class="text-sm text-ink-muted">POC phone</dt>
-          <dd class="text-base font-medium mt-0.5 break-words"<% if @job.point_of_contact? %> title="WhatsApp: <%= @job.poc_whatsapp_number %>"<% end %>>
-            <%= @job.point_of_contact? ? @job.full_poc_contact_number : "—" %>
-          </dd>
+          <% if @job.point_of_contact? %>
+            <dd class="mt-0.5 requestor-identity">
+              <span class="requestor-identity__avatar" aria-hidden="true">
+                <span class="requestor-identity__initials"><%= initials_for(@job.poc_name) %></span>
+              </span>
+              <span class="requestor-identity__body">
+                <span class="block text-base font-medium break-words"><%= @job.poc_name %></span>
+                <span class="block requestor-identity__phone break-words" title="WhatsApp: <%= @job.poc_whatsapp_number %>">
+                  <%= @job.full_poc_contact_number %>
+                </span>
+              </span>
+            </dd>
+          <% else %>
+            <dd class="text-base font-medium mt-0.5 break-words">—</dd>
+          <% end %>
         </div>
         <div class="min-w-0">
           <dt class="text-sm text-ink-muted">Google Maps</dt>

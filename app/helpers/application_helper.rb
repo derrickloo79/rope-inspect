@@ -90,6 +90,14 @@ module ApplicationHelper
   end
 
 
+  # Avatar initials from a person's name: "Frederick Francis" → "FF".
+  def initials_for(name)
+    words = name.to_s.split(/[\s.\-]+/).reject(&:blank?)
+    return "—" if words.empty?
+
+    (words.first(2).map { |word| word[0] }.join).upcase
+  end
+
   def status_badge(status)
     css = case status.to_s
     when "pending" then "badge-pending"

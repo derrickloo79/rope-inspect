@@ -1058,6 +1058,45 @@
     color: var(--color-ink-faint);
   }
 
+  /* Job detail: requestor identity (neutral avatar + name + phone) */
+  .requestor-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .requestor-identity__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    background-color: var(--color-line);
+  }
+
+  .requestor-identity__initials {
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    color: var(--color-ink-muted);
+  }
+
+  .requestor-identity__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .requestor-identity__phone {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--color-ink-muted);
+  }
+
   /* FSP list color swatch */
   .fsp-color-swatch {
     display: block;
