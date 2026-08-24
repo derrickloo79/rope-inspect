@@ -14,6 +14,7 @@ class Crane < ApplicationRecord
   CERT_CONTENT_TYPES = %w[application/pdf image/jpeg image/png].freeze
   CERT_EXTENSIONS = %w[pdf jpg jpeg png].freeze
   CERT_MAX_BYTES = 15.megabytes
+  REMARKS_MAX_LENGTH = 2000
 
   belongs_to :inspection_request, inverse_of: :cranes
 
@@ -28,8 +29,10 @@ class Crane < ApplicationRecord
   validates :rope_diameter_mm, presence: true
   validate :lm_certificate_must_be_acceptable
   validate :mill_certificates_must_be_acceptable
+  validates :remarks, length: { maximum: REMARKS_MAX_LENGTH }, allow_blank: true
 
   before_validation :normalize_crane_type_other
+  before_validation :normalize_remarks
 
   def others?
     crane_type == "others"
@@ -50,6 +53,10 @@ class Crane < ApplicationRecord
   def normalize_crane_type_other
     self.crane_type_other = crane_type_other.to_s.strip.presence
     self.crane_type_other = nil unless others?
+  end
+
+  def normalize_remarks
+    self.remarks = remarks.to_s.strip.presence
   end
 
   def lm_certificate_must_be_acceptable

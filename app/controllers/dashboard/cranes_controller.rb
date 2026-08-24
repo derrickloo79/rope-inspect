@@ -3,6 +3,30 @@ module Dashboard
     before_action :set_crane
 
     def update
+      if params[:crane]&.key?(:remarks)
+        update_remarks
+      else
+        update_certificates_action
+      end
+    end
+
+    private
+
+    def set_crane
+      @crane = Crane.find(params[:id])
+    end
+
+    def update_remarks
+      if @crane.update(params.require(:crane).permit(:remarks))
+        redirect_to dashboard_inspection_request_path(@crane.inspection_request),
+                    notice: "Remarks saved for #{@crane.crane_type_label} (#{@crane.lm_number})."
+      else
+        redirect_to dashboard_inspection_request_path(@crane.inspection_request),
+                    alert: @crane.errors.full_messages.to_sentence.presence || "Could not save remarks."
+      end
+    end
+
+    def update_certificates_action
       # Optional attachments — admin can add/replace LM, append mills, remove by id.
       if update_certificates
         redirect_to dashboard_inspection_request_path(@crane.inspection_request),
@@ -11,12 +35,6 @@ module Dashboard
         redirect_to dashboard_inspection_request_path(@crane.inspection_request),
                     alert: @crane.errors.full_messages.to_sentence.presence || "Could not update certificates."
       end
-    end
-
-    private
-
-    def set_crane
-      @crane = Crane.find(params[:id])
     end
 
     def update_certificates

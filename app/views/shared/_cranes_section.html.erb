@@ -41,6 +41,51 @@
             </div>
           </dl>
 
+          <% if editable %>
+            <div class="mt-4"
+                 data-controller="site-access"
+                 data-site-access-editing-value="<%= crane.remarks.blank? %>">
+              <%# View mode %>
+              <div data-site-access-target="view" class="space-y-3">
+                <div class="min-w-0">
+                  <dt class="text-sm text-ink-muted">Remarks</dt>
+                  <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= crane.remarks.presence || "No remarks yet." %></dd>
+                </div>
+                <button type="button"
+                        class="btn-secondary cursor-pointer"
+                        data-action="site-access#edit">
+                  <%= crane.remarks.present? ? "Edit" : "Add remarks" %>
+                </button>
+              </div>
+
+              <%# Edit mode %>
+              <div data-site-access-target="form" hidden>
+                <%= form_with model: crane,
+                              url: dashboard_crane_path(crane),
+                              method: :patch,
+                              html: { class: "flex flex-col gap-3" } do |f| %>
+                  <div>
+                    <%= f.label :remarks, "Remarks", class: "field-label" %>
+                    <%= f.text_area :remarks,
+                                    class: "field-input h-[4.5rem] min-h-[4.5rem]",
+                                    placeholder: "e.g. prefer AM, needs clearance, etc." %>
+                  </div>
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <%= f.submit "Save remarks", class: "btn-primary cursor-pointer" %>
+                    <button type="button" class="btn-secondary cursor-pointer" data-action="site-access#cancel">
+                      Cancel
+                    </button>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% elsif crane.remarks.present? %>
+            <div class="mt-4 min-w-0">
+              <dt class="text-sm text-ink-muted">Remarks</dt>
+              <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= crane.remarks %></dd>
+            </div>
+          <% end %>
+
           <div class="mt-4 border-t border-line pt-4">
             <% if editable %>
               <%= form_with model: crane,
