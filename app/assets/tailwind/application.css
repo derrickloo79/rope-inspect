@@ -1409,6 +1409,82 @@
     min-width: 0;
   }
 
+  /* Job detail "..." actions dropdown (replaces the old Edit button) */
+  .job-detail-menu {
+    position: relative;
+  }
+
+  .job-detail-menu__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-line-strong);
+    background-color: #fff;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+
+  .job-detail-menu__button:hover {
+    background-color: #fafaf9;
+    color: var(--color-ink);
+  }
+
+  .job-detail-menu__button:focus-visible {
+    outline: 2px solid #a8a29e;
+    outline-offset: 2px;
+  }
+
+  .job-detail-menu.is-open .job-detail-menu__button {
+    background-color: #fafaf9;
+    color: var(--color-ink);
+  }
+
+  .job-detail-menu__panel {
+    position: absolute;
+    z-index: 20;
+    right: 0;
+    top: calc(100% + 0.375rem);
+    min-width: 15rem;
+    padding: 0.25rem;
+    background: #fff;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .job-detail-menu__panel[hidden] {
+    display: none !important;
+  }
+
+  .job-detail-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.375rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .job-detail-menu__item:hover,
+  .job-detail-menu__item:focus-visible {
+    background-color: #f5f5f4;
+    text-decoration: none;
+  }
+
+  .job-detail-menu__item svg {
+    flex-shrink: 0;
+    color: var(--color-ink-faint);
+  }
+
   .job-cal {
     flex-shrink: 0;
     width: 3.85rem;

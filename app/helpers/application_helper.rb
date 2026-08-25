@@ -100,11 +100,48 @@ module ApplicationHelper
 
   # wa.me deep link — opens the WhatsApp app on mobile, WhatsApp Web on desktop.
   # Expects a digits-only number with country code (e.g. InspectionRequest#whatsapp_number).
-  def whatsapp_href(number)
+  # Pass `text:` to pre-fill the message body (e.g. job details to send the requestor).
+  def whatsapp_href(number, text: nil)
     digits = number.to_s.gsub(/\D/, "")
     return nil if digits.blank?
 
-    "https://wa.me/#{digits}"
+    href = "https://wa.me/#{digits}"
+    href += "?text=#{ERB::Util.url_encode(text)}" if text.present?
+    href
+  end
+
+  # Pre-filled WhatsApp message for the "Send job details" menu action.
+  def job_details_whatsapp_message(inspection_request)
+    lines = [
+      "Hi #{inspection_request.requestor_name},",
+      "Here are your inspection job details:",
+      "Site: *#{inspection_request.site_name}*",
+      "No of cranes: *#{inspection_request.cranes.size}*",
+      "Company: *#{inspection_request.company_name}*",
+      "Reference: *#{inspection_request.reference_code}*"
+    ]
+
+    lines << "-----------------"
+    lines << "Status: *#{inspection_request.status.to_s.humanize}*"
+
+    if inspection_request.scheduled_on.present?
+      schedule = format_date(inspection_request.scheduled_on)
+      schedule += " (#{inspection_request.scheduled_period})" if inspection_request.scheduled_period.present?
+      lines << "Schedule: *#{schedule}*"
+    end
+
+    if inspection_request.fsp.present?
+      lines << "Inspector: *#{inspection_request.inspector_label}*"
+      lines << "Contact Number: *#{inspection_request.fsp.full_contact_number}*"
+    end
+
+    if inspection_request.share_token.present?
+      lines << "-----------------"
+      lines << "You may track the job status at this public link:"
+      lines << public_status_url(inspection_request.share_token)
+    end
+
+    lines.join("\n")
   end
 
   # Small inline WhatsApp glyph to mark a phone number as chat-capable.

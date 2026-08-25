@@ -27,9 +27,50 @@
         <p class="page-lede"><%= @inspection_request.company_name %> · <%= @inspection_request.reference_code %></p>
         <div class="mt-2"><%= status_badge(@inspection_request.status) %></div>
       </div>
-      <%= link_to "Edit",
-                  edit_dashboard_inspection_request_path(@inspection_request),
-                  class: "btn-secondary no-underline shrink-0" %>
+      <div class="job-detail-menu shrink-0"
+           data-controller="dropdown"
+           data-dropdown-open-class="is-open"
+           data-action="click@window->dropdown#hide keydown@window->dropdown#keydown">
+        <button type="button"
+                class="job-detail-menu__button"
+                data-dropdown-target="button"
+                data-action="dropdown#toggle"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-label="Job actions">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="12" cy="5" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="12" cy="19" r="2" />
+          </svg>
+        </button>
+
+        <div class="job-detail-menu__panel" data-dropdown-target="menu" role="menu" hidden>
+          <%= link_to edit_dashboard_inspection_request_path(@inspection_request),
+                      class: "job-detail-menu__item",
+                      role: "menuitem" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+              <path d="m15 5 4 4" />
+            </svg>
+            <span>Edit</span>
+          <% end %>
+
+          <% if (send_href = whatsapp_href(@inspection_request.whatsapp_number, text: job_details_whatsapp_message(@inspection_request))) %>
+            <%= link_to send_href,
+                        class: "job-detail-menu__item",
+                        target: "_blank",
+                        rel: "noopener noreferrer",
+                        role: "menuitem" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m22 2-7 20-4-9-9-4Z" />
+                <path d="M22 2 11 13" />
+              </svg>
+              <span>Whatsapp job updates</span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
     </div>
   </div>
 
