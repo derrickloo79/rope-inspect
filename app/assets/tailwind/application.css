@@ -1485,6 +1485,12 @@
     color: var(--color-ink-faint);
   }
 
+  /* Empty-value dash placeholders (e.g. "—" for missing POC / map / site note) */
+  .value-dash {
+    color: var(--color-ink-faint);
+    font-weight: 400;
+  }
+
   .job-cal {
     flex-shrink: 0;
     width: 3.85rem;

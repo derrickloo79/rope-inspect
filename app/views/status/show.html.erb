@@ -41,37 +41,80 @@
         </div>
         <div class="min-w-0">
           <dt class="text-sm text-ink-muted">Requestor</dt>
-          <dd class="text-base font-medium mt-0.5 break-words"><%= @inspection_request.requestor_name %></dd>
-        </div>
-        <div class="min-w-0">
-          <dt class="text-sm text-ink-muted">Phone</dt>
-          <dd class="text-base font-medium mt-0.5 break-words" title="WhatsApp: <%= @inspection_request.whatsapp_number %>">
-            <%= @inspection_request.full_contact_number %>
+          <dd class="mt-0.5 requestor-identity">
+            <span class="requestor-identity__avatar" aria-hidden="true">
+              <span class="requestor-identity__initials"><%= initials_for(@inspection_request.requestor_name) %></span>
+            </span>
+            <span class="requestor-identity__body">
+              <span class="block text-base font-medium break-words"><%= @inspection_request.requestor_name %></span>
+              <% if (wa_href = whatsapp_href(@inspection_request.whatsapp_number)) %>
+                <a class="requestor-identity__phone break-words inline-flex items-center gap-1 no-underline"
+                   href="<%= wa_href %>"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   title="Message <%= @inspection_request.requestor_name %> on WhatsApp">
+                  <%= @inspection_request.full_contact_number %>
+                  <%= whatsapp_icon %>
+                </a>
+              <% else %>
+                <span class="block requestor-identity__phone break-words"><%= @inspection_request.full_contact_number %></span>
+              <% end %>
+            </span>
           </dd>
         </div>
         <div class="min-w-0">
           <dt class="text-sm text-ink-muted">Point of contact</dt>
-          <dd class="text-base font-medium mt-0.5 break-words">
-            <%= @inspection_request.point_of_contact? ? @inspection_request.poc_name : "—" %>
-          </dd>
+          <% if @inspection_request.point_of_contact? %>
+            <dd class="mt-0.5 requestor-identity">
+              <span class="requestor-identity__avatar" aria-hidden="true">
+                <span class="requestor-identity__initials"><%= initials_for(@inspection_request.poc_name) %></span>
+              </span>
+              <span class="requestor-identity__body">
+                <span class="block text-base font-medium break-words"><%= @inspection_request.poc_name %></span>
+                <% if (poc_wa_href = whatsapp_href(@inspection_request.poc_whatsapp_number)) %>
+                  <a class="requestor-identity__phone break-words inline-flex items-center gap-1 no-underline"
+                     href="<%= poc_wa_href %>"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     title="Message <%= @inspection_request.poc_name %> on WhatsApp">
+                    <%= @inspection_request.full_poc_contact_number %>
+                    <%= whatsapp_icon %>
+                  </a>
+                <% else %>
+                  <span class="block requestor-identity__phone break-words"><%= @inspection_request.full_poc_contact_number %></span>
+                <% end %>
+              </span>
+            </dd>
+          <% else %>
+            <dd class="text-base mt-0.5 break-words value-dash">—</dd>
+          <% end %>
         </div>
-        <div class="min-w-0">
-          <dt class="text-sm text-ink-muted">POC phone</dt>
-          <dd class="text-base font-medium mt-0.5 break-words"<% if @inspection_request.point_of_contact? %> title="WhatsApp: <%= @inspection_request.poc_whatsapp_number %>"<% end %>>
-            <%= @inspection_request.point_of_contact? ? @inspection_request.full_poc_contact_number : "—" %>
-          </dd>
-        </div>
-        <div class="min-w-0">
+        <div class="min-w-0 sm:col-span-2">
           <dt class="text-sm text-ink-muted">Inspector (FSP)</dt>
-          <dd class="text-base font-medium mt-0.5 break-words">
-            <%= @inspection_request.fsp&.full_name.presence || @inspection_request.inspector_label.presence || "—" %>
-          </dd>
-        </div>
-        <div class="min-w-0">
-          <dt class="text-sm text-ink-muted">FSP phone</dt>
-          <dd class="text-base font-medium mt-0.5 break-words"<% if @inspection_request.fsp.present? %> title="WhatsApp: <%= @inspection_request.fsp.whatsapp_number %>"<% end %>>
-            <%= @inspection_request.fsp&.full_contact_number.presence || "—" %>
-          </dd>
+          <% if @inspection_request.fsp.present? %>
+            <dd class="mt-0.5 requestor-identity">
+              <span class="requestor-identity__avatar" aria-hidden="true">
+                <span class="requestor-identity__initials"><%= initials_for(@inspection_request.fsp.full_name) %></span>
+              </span>
+              <span class="requestor-identity__body">
+                <span class="block text-base font-medium break-words"><%= @inspection_request.fsp.full_name %></span>
+                <% if (fsp_wa_href = whatsapp_href(@inspection_request.fsp.whatsapp_number)) %>
+                  <a class="requestor-identity__phone break-words inline-flex items-center gap-1 no-underline"
+                     href="<%= fsp_wa_href %>"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     title="Message <%= @inspection_request.fsp.full_name %> on WhatsApp">
+                    <%= @inspection_request.fsp.full_contact_number %>
+                    <%= whatsapp_icon %>
+                  </a>
+                <% else %>
+                  <span class="block requestor-identity__phone break-words"><%= @inspection_request.fsp.full_contact_number %></span>
+                <% end %>
+              </span>
+            </dd>
+          <% else %>
+            <dd class="text-base font-medium mt-0.5 break-words"><%= @inspection_request.inspector_label.presence || content_tag(:span, "—", class: "value-dash") %></dd>
+          <% end %>
         </div>
         <div class="min-w-0">
           <dt class="text-sm text-ink-muted">Google Maps</dt>
@@ -92,13 +135,13 @@
                         aria-label="Copy Google Maps link">Copy</button>)
               </span>
             <% else %>
-              <span class="text-ink-muted">—</span>
+              <span class="value-dash">—</span>
             <% end %>
           </dd>
         </div>
         <div class="min-w-0">
           <dt class="text-sm text-ink-muted">Site note</dt>
-          <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @inspection_request.site_note.to_s.strip.presence || "—" %></dd>
+          <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @inspection_request.site_note.to_s.strip.presence || content_tag(:span, "—", class: "value-dash") %></dd>
         </div>
       </dl>
     </div>
