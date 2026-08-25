@@ -36,11 +36,11 @@
           </div>
           <div>
             <dt class="text-sm text-[--color-ink-muted]">Time</dt>
-            <dd class="text-base font-medium mt-0.5"><%= @job.scheduled_period.presence || "—" %></dd>
+            <dd class="text-base font-medium mt-0.5"><%= @job.scheduled_period.presence || content_tag(:span, "—", class: "value-dash") %></dd>
           </div>
           <div>
             <dt class="text-sm text-[--color-ink-muted]">Assigned to</dt>
-            <dd class="text-base font-medium mt-0.5"><%= @job.inspector_label.presence || "—" %></dd>
+            <dd class="text-base font-medium mt-0.5"><%= @job.inspector_label.presence || content_tag(:span, "—", class: "value-dash") %></dd>
           </div>
         </dl>
       </div>
@@ -106,7 +106,7 @@
               </span>
             </dd>
           <% else %>
-            <dd class="text-base font-medium mt-0.5 break-words">—</dd>
+            <dd class="text-base mt-0.5 break-words value-dash">—</dd>
           <% end %>
         </div>
         <div class="min-w-0">
@@ -128,13 +128,13 @@
                         aria-label="Copy Google Maps link">Copy</button>)
               </span>
             <% else %>
-              <span class="text-ink-muted">—</span>
+              <span class="value-dash">—</span>
             <% end %>
           </dd>
         </div>
         <div class="min-w-0">
           <dt class="text-sm text-ink-muted">Site note</dt>
-          <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @job.site_note.to_s.strip.presence || "—" %></dd>
+          <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= @job.site_note.to_s.strip.presence || content_tag(:span, "—", class: "value-dash") %></dd>
         </div>
       </dl>
     </div>
