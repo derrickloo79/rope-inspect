@@ -56,7 +56,7 @@
             <span>Edit</span>
           <% end %>
 
-          <% if (send_href = whatsapp_href(@inspection_request.whatsapp_number, text: job_details_whatsapp_message(@inspection_request))) %>
+          <% if !@inspection_request.pending? && (send_href = whatsapp_href(@inspection_request.whatsapp_number, text: job_details_whatsapp_message(@inspection_request))) %>
             <%= link_to send_href,
                         class: "job-detail-menu__item",
                         target: "_blank",
