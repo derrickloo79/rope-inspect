@@ -117,9 +117,7 @@
              for="crane_<%= crane.id %>_mill_certificates"
              data-file-dropzone-target="prompt">
         <span>
-          <span class="file-dropzone__action">
-            <%= crane.mill_certificates.attached? ? "Upload files" : "Upload a file" %>
-          </span><span class="file-dropzone__or"> or drag and drop</span>
+          <span class="file-dropzone__action">Upload files</span><span class="file-dropzone__or"> or drag and drop</span>
         </span>
         <span class="file-dropzone__hint">PDF, JPG, or PNG · up to 15 MB each</span>
       </label>
