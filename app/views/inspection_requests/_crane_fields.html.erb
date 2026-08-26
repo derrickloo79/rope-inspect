@@ -85,21 +85,57 @@
     <div class="space-y-4">
       <div>
         <%= f.label :lm_certificate, "LM certificate", class: "field-label" %>
-        <%= f.file_field :lm_certificate,
-                         class: "field-file",
-                         accept: "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png",
-                         data: { action: "change->request-form-steps#filePicked" } %>
-        <p class="field-hint">Optional · one PDF, JPG, or PNG · max 15 MB</p>
+        <div class="file-dropzone"
+             data-controller="file-dropzone"
+             data-action="dragover->file-dropzone#dragover dragleave->file-dropzone#dragleave drop->file-dropzone#drop">
+          <%= f.file_field :lm_certificate,
+                           id: f.field_id(:lm_certificate),
+                           class: "sr-only",
+                           accept: "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png",
+                           data: {
+                             file_dropzone_target: "input",
+                             action: "change->file-dropzone#changed"
+                           } %>
+          <div class="file-dropzone__pending" data-file-dropzone-target="pending" hidden>
+            <div class="file-dropzone__pending-list" data-file-dropzone-target="list"></div>
+          </div>
+          <label class="file-dropzone__label"
+                 for="<%= f.field_id(:lm_certificate) %>"
+                 data-file-dropzone-target="prompt">
+            <span>
+              <span class="file-dropzone__action">Upload a file</span><span class="file-dropzone__or"> or drag and drop</span>
+            </span>
+            <span class="file-dropzone__hint">Optional · PDF, JPG, or PNG · up to 15 MB</span>
+          </label>
+        </div>
       </div>
 
       <div>
         <%= f.label :mill_certificates, "Mill certificate(s)", class: "field-label" %>
-        <%= f.file_field :mill_certificates,
-                         multiple: true,
-                         class: "field-file",
-                         accept: "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png",
-                         data: { action: "change->request-form-steps#filePicked" } %>
-        <p class="field-hint">Optional · one or more PDF, JPG, or PNG · max 15 MB each</p>
+        <div class="file-dropzone"
+             data-controller="file-dropzone"
+             data-action="dragover->file-dropzone#dragover dragleave->file-dropzone#dragleave drop->file-dropzone#drop">
+          <%= f.file_field :mill_certificates,
+                           id: f.field_id(:mill_certificates),
+                           multiple: true,
+                           class: "sr-only",
+                           accept: "application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png",
+                           data: {
+                             file_dropzone_target: "input",
+                             action: "change->file-dropzone#changed"
+                           } %>
+          <div class="file-dropzone__pending" data-file-dropzone-target="pending" hidden>
+            <div class="file-dropzone__pending-list" data-file-dropzone-target="list"></div>
+          </div>
+          <label class="file-dropzone__label"
+                 for="<%= f.field_id(:mill_certificates) %>"
+                 data-file-dropzone-target="prompt">
+            <span>
+              <span class="file-dropzone__action">Upload files</span><span class="file-dropzone__or"> or drag and drop</span>
+            </span>
+            <span class="file-dropzone__hint">Optional · one or more PDF, JPG, or PNG · up to 15 MB each</span>
+          </label>
+        </div>
       </div>
     </div>
   </div>
