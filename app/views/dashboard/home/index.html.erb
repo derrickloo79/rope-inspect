@@ -65,7 +65,11 @@
     </div>
   </div>
 
-  <%= render "shared/upcoming_schedule",
-             upcoming_by_day: @upcoming_by_day,
-             job_path: :dashboard_inspection_request_path %>
+  <%= turbo_frame_tag "dashboard_upcoming", class: "block" do %>
+    <%= render "shared/upcoming_schedule",
+               upcoming_by_day: @upcoming_by_day,
+               job_path: :dashboard_inspection_request_path,
+               fsps: @fsps,
+               fsp_filter: @fsp_filter %>
+  <% end %>
 </div>

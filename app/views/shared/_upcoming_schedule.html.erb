@@ -2,11 +2,34 @@
   locals:
     upcoming_by_day: Hash[Date => Array<InspectionRequest>]
     job_path: :dashboard_inspection_request_path | :portal_job_path
+    fsps: optional Array<Fsp> — when present, shows the dashboard FSP filter
+    fsp_filter: optional selected FSP id
 %>
 <% job_path = local_assigns.fetch(:job_path, :dashboard_inspection_request_path) %>
+<% fsps = local_assigns[:fsps] %>
+<% fsp_filter = local_assigns[:fsp_filter] %>
 
 <section class="space-y-4" aria-labelledby="upcoming-heading">
   <h2 id="upcoming-heading" class="section-label">Upcoming · next 7 days</h2>
+
+  <% if fsps %>
+    <div class="planner-week-filter">
+      <%= form_with url: dashboard_root_path,
+                    method: :get,
+                    class: "planner-week-filter__form",
+                    data: { turbo_frame: "dashboard_upcoming", turbo_action: "advance" } do %>
+        <label for="dashboard-fsp-filter" class="sr-only">Filter by FSP</label>
+        <%= select_tag :fsp_id,
+                       options_for_select(
+                         [[ "All FSPs", "" ]] + fsps.map { |fsp| [ "#{fsp.fsp_number} · #{fsp.full_name}", fsp.id ] },
+                         fsp_filter
+                       ),
+                       id: "dashboard-fsp-filter",
+                       class: "planner-week-filter__select field-select",
+                       onchange: "this.form.requestSubmit()" %>
+      <% end %>
+    </div>
+  <% end %>
 
   <% if upcoming_by_day.any? %>
     <div class="space-y-6">
@@ -38,7 +61,8 @@
                     <% period_jobs.each do |job| %>
                       <li>
                         <%= link_to send(job_path, job),
-                                    class: "dash-upcoming-item no-underline block" do %>
+                                    class: "dash-upcoming-item no-underline block",
+                                    data: { turbo_frame: "_top" } do %>
                           <span class="dash-upcoming-item__title truncate"><%= job.site_name %></span>
                           <p class="dash-upcoming-item__meta mt-0.5 truncate">
                             <%= job.company_name %>
