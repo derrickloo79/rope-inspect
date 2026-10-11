@@ -16,9 +16,9 @@
         <div class="dash-day-block">
           <h3 class="dash-day-heading">
             <% if date == Date.current %>
-              Today · <%= date.strftime("%-d %b") %>
+              Today (<%= date.strftime("%A") %>) · <%= date.strftime("%-d %b") %>
             <% elsif date == Date.current + 1 %>
-              Tomorrow · <%= date.strftime("%-d %b") %>
+              Tomorrow (<%= date.strftime("%A") %>) · <%= date.strftime("%-d %b") %>
             <% else %>
               <%= date.strftime("%A, %-d %b") %>
             <% end %>
