@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Public request form: step 1 (details + cranes) → step 2 (optional certificates).
+// "Submit without certificates" posts step 1 and skips step 2.
 export default class extends Controller {
   static targets = [
     "step1Panel",
@@ -36,6 +37,13 @@ export default class extends Controller {
     this.refreshSummaries()
     this.render()
     this.scrollToTop()
+  }
+
+  // Posts the request from step 1. Certificates stay optional and are not shown.
+  submitWithoutCertificates(event) {
+    if (!this.validateStep1()) {
+      event.preventDefault()
+    }
   }
 
   back(event) {
