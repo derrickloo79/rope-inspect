@@ -552,6 +552,20 @@
     padding-right: 1.25rem;
   }
 
+  .planner-queues {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .planner-queues {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1.5rem 2rem;
+    }
+  }
+
   .planner-accepted-header__title {
     font-size: .9375rem;
     font-weight: 600;
@@ -570,13 +584,6 @@
   @media (min-width: 640px) {
     .planner-accepted-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .planner-accepted-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 1rem;
     }
   }
 
@@ -601,6 +608,21 @@
     text-decoration: none;
     border-color: #93c5fd;
     box-shadow: 0 2px 8px rgba(29, 78, 216, 0.1);
+  }
+
+  .planner-accepted-card--on-hold {
+    border-color: #fca5a5;
+    background-color: #fef2f2;
+  }
+
+  .planner-accepted-card--on-hold:hover {
+    border-color: #f87171;
+    box-shadow: 0 2px 8px rgba(185, 28, 28, 0.1);
+  }
+
+  .planner-accepted-card--on-hold .planner-accepted-card__title,
+  .planner-accepted-card--on-hold .planner-accepted-card__cta {
+    color: #b91c1c;
   }
 
   .planner-accepted-card__title {

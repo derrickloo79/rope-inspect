@@ -7,39 +7,74 @@
     <p class="page-lede">Schedule accepted jobs and scan the week ahead. Click a card to set date, time, and inspector.</p>
   </div>
 
-  <%# Section A: Accepted jobs ready to schedule %>
-  <section class="space-y-4" aria-labelledby="planner-accepted-heading">
-    <div class="flex gap-2">
-      <span class="planner-accepted-header__title">Accepted</span>
-      <span class="planner-accepted-header__counter">(<%= @accepted_jobs.size %>)</span>
-    </div>
-
-    <% if @accepted_jobs.any? %>
-      <div class="planner-accepted-grid">
-        <% @accepted_jobs.each do |job| %>
-          <button type="button"
-                  class="planner-accepted-card text-left"
-                  data-action="planner-schedule#open"
-                  data-planner-schedule-job-id-param="<%= job.id %>"
-                  data-planner-schedule-title-param="<%= job.site_name %>"
-                  data-planner-schedule-subtitle-param="<%= job.company_name %> · <%= job.reference_code %>"
-                  data-planner-schedule-date-param="<%= job.scheduled_on %>"
-                  data-planner-schedule-period-param="<%= job.scheduled_period %>"
-                  data-planner-schedule-fsp-id-param="<%= job.fsp_id %>">
-            <p class="planner-accepted-card__title"><%= job.site_name %></p>
-            <p class="planner-accepted-card__meta">
-              <%= job.company_name %>
-              · <%= pluralize(job.cranes.size, "crane") %>
-              · <%= job.reference_code %>
-            </p>
-            <span class="planner-accepted-card__cta">Schedule →</span>
-          </button>
-        <% end %>
+  <%# Accepted jobs, with on-hold jobs in the column to the right %>
+  <div class="planner-queues">
+    <section class="space-y-4" aria-labelledby="planner-accepted-heading">
+      <div class="flex gap-2">
+        <span id="planner-accepted-heading" class="planner-accepted-header__title">Accepted</span>
+        <span class="planner-accepted-header__counter">(<%= @accepted_jobs.size %>)</span>
       </div>
-    <% else %>
-      <p class="text-sm text-ink-muted py-4">No accepted jobs waiting to schedule.</p>
-    <% end %>
-  </section>
+
+      <% if @accepted_jobs.any? %>
+        <div class="planner-accepted-grid">
+          <% @accepted_jobs.each do |job| %>
+            <button type="button"
+                    class="planner-accepted-card text-left"
+                    data-action="planner-schedule#open"
+                    data-planner-schedule-job-id-param="<%= job.id %>"
+                    data-planner-schedule-title-param="<%= job.site_name %>"
+                    data-planner-schedule-subtitle-param="<%= job.company_name %> · <%= job.reference_code %>"
+                    data-planner-schedule-date-param="<%= job.scheduled_on %>"
+                    data-planner-schedule-period-param="<%= job.scheduled_period %>"
+                    data-planner-schedule-fsp-id-param="<%= job.fsp_id %>">
+              <p class="planner-accepted-card__title"><%= job.site_name %></p>
+              <p class="planner-accepted-card__meta">
+                <%= job.company_name %>
+                · <%= pluralize(job.cranes.size, "crane") %>
+                · <%= job.reference_code %>
+              </p>
+              <span class="planner-accepted-card__cta">Schedule →</span>
+            </button>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-ink-muted py-4">No accepted jobs waiting to schedule.</p>
+      <% end %>
+    </section>
+
+    <section class="space-y-4" aria-labelledby="planner-on-hold-heading">
+      <div class="flex gap-2">
+        <span id="planner-on-hold-heading" class="planner-accepted-header__title">On Hold</span>
+        <span class="planner-accepted-header__counter">(<%= @on_hold_jobs.size %>)</span>
+      </div>
+
+      <% if @on_hold_jobs.any? %>
+        <div class="planner-accepted-grid">
+          <% @on_hold_jobs.each do |job| %>
+            <button type="button"
+                    class="planner-accepted-card planner-accepted-card--on-hold text-left"
+                    data-action="planner-schedule#open"
+                    data-planner-schedule-job-id-param="<%= job.id %>"
+                    data-planner-schedule-title-param="<%= job.site_name %>"
+                    data-planner-schedule-subtitle-param="<%= job.company_name %> · <%= job.reference_code %>"
+                    data-planner-schedule-date-param="<%= job.scheduled_on %>"
+                    data-planner-schedule-period-param="<%= job.scheduled_period %>"
+                    data-planner-schedule-fsp-id-param="<%= job.fsp_id %>">
+              <p class="planner-accepted-card__title"><%= job.site_name %></p>
+              <p class="planner-accepted-card__meta">
+                <%= job.company_name %>
+                · <%= pluralize(job.cranes.size, "crane") %>
+                · <%= job.reference_code %>
+              </p>
+              <span class="planner-accepted-card__cta">Re-schedule →</span>
+            </button>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-ink-muted py-4">No jobs on hold.</p>
+      <% end %>
+    </section>
+  </div>
 
   <%# Section B: Weekly calendar (Turbo Frame — filter/week nav refresh only this block) %>
   <% planner_query = { week: @week_start.iso8601 } %>

@@ -45,6 +45,7 @@ class InspectionRequest < ApplicationRecord
   scope :pending, -> { where(status: "pending") }
   scope :accepted, -> { where(status: "accepted") }
   scope :scheduled, -> { where(status: "scheduled") }
+  scope :on_hold, -> { where(status: "on_hold") }
   scope :completed, -> { where(status: "completed") }
   scope :rejected, -> { where(status: "rejected") }
   scope :recent_first, -> { order(created_at: :desc) }

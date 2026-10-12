@@ -12,6 +12,10 @@ module Dashboard
         .includes(:cranes, :fsp)
         .order(Arel.sql("accepted_at DESC NULLS LAST"), created_at: :desc)
 
+      @on_hold_jobs = InspectionRequest.on_hold
+        .includes(:cranes, :fsp)
+        .order(Arel.sql("on_hold_at DESC NULLS LAST"), created_at: :desc)
+
       scheduled = InspectionRequest.scheduled
         .includes(:cranes, :fsp)
         .where(scheduled_on: @week_start..@week_end)
