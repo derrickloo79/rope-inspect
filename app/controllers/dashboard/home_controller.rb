@@ -3,6 +3,7 @@ module Dashboard
     def index
       @counts = {
         pending: InspectionRequest.pending.count,
+        on_hold: InspectionRequest.on_hold.count,
         accepted: InspectionRequest.accepted.count,
         scheduled: InspectionRequest.scheduled.count,
         completed: InspectionRequest.completed.count

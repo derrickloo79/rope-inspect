@@ -335,8 +335,14 @@
 
   @media (min-width: 768px) {
     .dash-stat-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .dash-stat-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
     }
   }
 
@@ -377,6 +383,11 @@
   .card.dash-stat-card--pending {
     background-color: #fffbeb;
     border-color: #fde68a;
+  }
+
+  .card.dash-stat-card--on-hold {
+    background-color: #fef2f2;
+    border-color: #fecaca;
   }
 
   .card.dash-stat-card--accepted {

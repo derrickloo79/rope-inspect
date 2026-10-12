@@ -22,6 +22,20 @@
       </div>
     </div>
 
+    <div class="card dash-stat-card dash-stat-card--on-hold">
+      <div class="card-section dash-stat-card__inner">
+        <p class="section-label">On Hold</p>
+        <div class="dash-stat-card__row">
+          <p class="dash-stat-card__count"><%= @counts[:on_hold] %></p>
+          <%= link_to dashboard_inspection_requests_path(status: "on_hold"),
+                      class: "dash-link-arrow",
+                      aria: { label: "See on hold jobs" } do %>
+            See jobs <span aria-hidden="true">→</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
     <div class="card dash-stat-card dash-stat-card--accepted">
       <div class="card-section dash-stat-card__inner">
         <p class="section-label">Accepted</p>
