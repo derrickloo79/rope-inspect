@@ -13,20 +13,34 @@
   <h2 id="upcoming-heading" class="section-label">Upcoming · next 7 days</h2>
 
   <% if fsps %>
-    <div class="planner-week-filter">
-      <%= form_with url: dashboard_root_path,
-                    method: :get,
-                    class: "planner-week-filter__form",
-                    data: { turbo_frame: "dashboard_upcoming", turbo_action: "advance" } do %>
-        <label for="dashboard-fsp-filter" class="sr-only">Filter by FSP</label>
-        <%= select_tag :fsp_id,
-                       options_for_select(
-                         [[ "All FSPs", "" ]] + fsps.map { |fsp| [ "#{fsp.fsp_number} · #{fsp.full_name}", fsp.id ] },
-                         fsp_filter
-                       ),
-                       id: "dashboard-fsp-filter",
-                       class: "planner-week-filter__select field-select",
-                       onchange: "this.form.requestSubmit()" %>
+    <% selected_fsp = fsp_filter.present? ? fsps.find { |fsp| fsp.id.to_s == fsp_filter.to_s } : nil %>
+    <% schedule_jobs = upcoming_by_day.sort_by { |date, _jobs| date }.flat_map { |_date, day_jobs| day_jobs } %>
+    <% wa_href = selected_fsp && whatsapp_href(selected_fsp.whatsapp_number, text: fsp_schedule_whatsapp_message(schedule_jobs)) %>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="planner-week-filter">
+        <%= form_with url: dashboard_root_path,
+                      method: :get,
+                      class: "planner-week-filter__form",
+                      data: { turbo_frame: "dashboard_upcoming", turbo_action: "advance" } do %>
+          <label for="dashboard-fsp-filter" class="sr-only">Filter by FSP</label>
+          <%= select_tag :fsp_id,
+                         options_for_select(
+                           [[ "All FSPs", "" ]] + fsps.map { |fsp| [ "#{fsp.fsp_number} · #{fsp.full_name}", fsp.id ] },
+                           fsp_filter
+                         ),
+                         id: "dashboard-fsp-filter",
+                         class: "planner-week-filter__select field-select",
+                         onchange: "this.form.requestSubmit()" %>
+        <% end %>
+      </div>
+      <% if wa_href %>
+        <%= link_to "WA schedule to FSP",
+                    wa_href,
+                    class: "btn-secondary no-underline shrink-0",
+                    target: "_blank",
+                    rel: "noopener noreferrer" %>
+      <% else %>
+        <button type="button" class="btn-secondary shrink-0" disabled>WA schedule to FSP</button>
       <% end %>
     </div>
   <% end %>

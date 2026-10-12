@@ -144,6 +144,33 @@ module ApplicationHelper
     lines.join("\n")
   end
 
+  # Pre-filled WhatsApp schedule for one FSP's upcoming jobs.
+  # Header, one block per job, a blank line between jobs, then the footer.
+  def fsp_schedule_whatsapp_message(jobs)
+    blocks = jobs.map { |job| fsp_schedule_job_block(job) }
+    ([ "!-- Upcoming Jobs --!" ] + blocks + [ "!--- End ---!" ]).join("\n\n")
+  end
+
+  def fsp_schedule_job_block(job)
+    date = job.scheduled_on
+    when_line = "#{date.strftime("%-d %b %y")} | #{date.strftime("%a")}"
+    when_line += " | #{job.scheduled_period}" if job.scheduled_period.present?
+
+    lines = [ "*#{when_line}*", "#{job.company_name} | #{job.site_name}" ]
+    counts = job.cranes.each_with_object({}) do |crane, memo|
+      label = fsp_schedule_crane_label(crane)
+      memo[label] = memo.fetch(label, 0) + 1
+    end
+    counts.each { |label, count| lines << "#{count}x #{label}" }
+    lines.join("\n")
+  end
+
+  def fsp_schedule_crane_label(crane)
+    return crane.crane_type_other.to_s.strip if crane.others? && crane.crane_type_other.present?
+
+    crane.crane_type_label.to_s.titleize
+  end
+
   # Small inline WhatsApp glyph to mark a phone number as chat-capable.
   def whatsapp_icon(css_class: "whatsapp-icon")
     content_tag :svg, class: css_class, viewBox: "0 0 32 32", fill: "currentColor", aria: { hidden: "true" } do
