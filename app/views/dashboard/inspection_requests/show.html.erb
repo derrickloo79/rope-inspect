@@ -608,8 +608,8 @@
                   <p class="field-warning-callout__text" data-fsp-session-warning-target="warningText"></p>
                 </div>
               </div>
-              <button type="submit" class="btn-secondary w-full cursor-pointer">
-                Update schedule
+              <button type="submit" class="<%= @inspection_request.on_hold? ? "btn-primary" : "btn-secondary" %> w-full cursor-pointer">
+                <%= @inspection_request.on_hold? ? "Update & remove on hold" : "Update schedule" %>
               </button>
             <% end %>
 
@@ -619,12 +619,6 @@
                       data-action="on-hold-modal#show">
                 Mark On Hold
               </button>
-            <% elsif @inspection_request.on_hold? %>
-              <%= button_to "Remove On Hold",
-                            release_hold_dashboard_inspection_request_path(@inspection_request),
-                            method: :patch,
-                            class: "btn-primary w-full cursor-pointer",
-                            form: { class: "w-full" } %>
             <% end %>
           </div>
         </section>

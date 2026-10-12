@@ -32,7 +32,6 @@ Rails.application.routes.draw do
         patch :reopen
         patch :schedule
         patch :hold
-        patch :release_hold
         patch :complete
         patch :site_access
         patch :point_of_contact

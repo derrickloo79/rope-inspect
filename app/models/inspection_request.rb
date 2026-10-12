@@ -128,21 +128,20 @@ class InspectionRequest < ApplicationRecord
   end
 
   # fsp: Fsp record, or nil to leave unassigned.
+  # Saving the schedule while on hold returns the job to scheduled.
   def schedule!(on:, at: nil, fsp: nil)
     return false unless accepted? || scheduled? || on_hold?
 
-    # Updating the date while on hold keeps the hold. Only "Remove On Hold" clears it.
-    attrs = {
+    update!(
+      status: "scheduled",
       scheduled_on: on,
       scheduled_time: at,
+      scheduled_at: Time.current,
+      on_hold_reason: nil,
+      on_hold_at: nil,
       fsp: fsp,
       assigned_inspector: fsp&.display_name
-    }
-    unless on_hold?
-      attrs[:status] = "scheduled"
-      attrs[:scheduled_at] = Time.current
-    end
-    update!(attrs)
+    )
   end
 
   def hold!(reason)
@@ -159,12 +158,6 @@ class InspectionRequest < ApplicationRecord
     end
 
     update!(status: "on_hold", on_hold_reason: reason, on_hold_at: Time.current)
-  end
-
-  def release_hold!
-    return false unless on_hold?
-
-    update!(status: "scheduled", on_hold_reason: nil, on_hold_at: nil)
   end
 
   def inspector_label

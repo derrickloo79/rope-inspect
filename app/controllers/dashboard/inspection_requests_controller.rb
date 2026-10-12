@@ -1,7 +1,7 @@
 module Dashboard
   class InspectionRequestsController < BaseController
     before_action :set_inspection_request, only: [
-      :show, :edit, :update, :accept, :reject, :reopen, :schedule, :hold, :release_hold, :complete, :site_access, :point_of_contact
+      :show, :edit, :update, :accept, :reject, :reopen, :schedule, :hold, :complete, :site_access, :point_of_contact
     ]
 
     def index
@@ -81,8 +81,10 @@ module Dashboard
         return
       end
 
+      was_on_hold = @inspection_request.on_hold?
       if @inspection_request.schedule!(on: on, at: at, fsp: fsp)
-        redirect_to after_schedule_path, notice: "Inspection scheduled."
+        notice = was_on_hold ? "On hold removed. This job is scheduled again." : "Inspection scheduled."
+        redirect_to after_schedule_path, notice: notice
       else
         redirect_to after_schedule_path,
                     alert: "Could not schedule from the current state. Accept the request first."
@@ -101,16 +103,6 @@ module Dashboard
       else
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     alert: "Only a scheduled job can be marked on hold."
-      end
-    end
-
-    def release_hold
-      if @inspection_request.release_hold!
-        redirect_to dashboard_inspection_request_path(@inspection_request),
-                    notice: "On hold removed. This job is scheduled again."
-      else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
-                    alert: "This job is not on hold."
       end
     end
 
