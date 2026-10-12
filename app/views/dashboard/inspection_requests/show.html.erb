@@ -27,7 +27,12 @@
       <div class="job-detail-heading__body min-w-0">
         <h1 class="page-title"><%= @inspection_request.site_name %></h1>
         <p class="page-lede"><%= @inspection_request.company_name %> · <%= @inspection_request.reference_code %></p>
-        <div class="mt-2"><%= status_badge(@inspection_request.status) %></div>
+        <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <%= status_badge(@inspection_request.status) %>
+          <% if @inspection_request.on_hold? && @inspection_request.on_hold_reason.present? %>
+            <p class="min-w-0 text-base font-bold text-red-700"><%= @inspection_request.on_hold_reason %></p>
+          <% end %>
+        </div>
       </div>
       <div class="job-detail-menu shrink-0"
            data-controller="dropdown"
@@ -534,12 +539,6 @@
         <section class="card">
           <div class="card-section space-y-3">
             <h2 class="section-label">Schedule</h2>
-            <% if @inspection_request.on_hold? && @inspection_request.on_hold_reason.present? %>
-              <div>
-                <p class="text-sm text-ink-muted">Reason for On-Hold</p>
-                <p class="text-base mt-0.5"><%= @inspection_request.on_hold_reason %></p>
-              </div>
-            <% end %>
             <%= form_with url: schedule_dashboard_inspection_request_path(@inspection_request),
                           method: :patch,
                           html: {
@@ -624,7 +623,7 @@
               <%= button_to "Remove On Hold",
                             release_hold_dashboard_inspection_request_path(@inspection_request),
                             method: :patch,
-                            class: "btn-secondary w-full cursor-pointer",
+                            class: "btn-primary w-full cursor-pointer",
                             form: { class: "w-full" } %>
             <% end %>
           </div>
