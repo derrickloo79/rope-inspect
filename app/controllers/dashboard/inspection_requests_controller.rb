@@ -1,7 +1,7 @@
 module Dashboard
   class InspectionRequestsController < BaseController
     before_action :set_inspection_request, only: [
-      :show, :edit, :update, :accept, :reject, :reopen, :schedule, :complete, :site_access, :point_of_contact
+      :show, :edit, :update, :accept, :reject, :reopen, :schedule, :hold, :release_hold, :complete, :site_access, :point_of_contact
     ]
 
     def index
@@ -86,6 +86,31 @@ module Dashboard
       else
         redirect_to after_schedule_path,
                     alert: "Could not schedule from the current state. Accept the request first."
+      end
+    end
+
+    def hold
+      reason = params.dig(:inspection_request, :on_hold_reason)
+      if @inspection_request.hold!(reason)
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    notice: "Job marked on hold."
+      elsif @inspection_request.errors[:on_hold_reason].any?
+        @open_on_hold_modal = true
+        @on_hold_reason_input = reason
+        render :show, status: :unprocessable_entity
+      else
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "Only a scheduled job can be marked on hold."
+      end
+    end
+
+    def release_hold
+      if @inspection_request.release_hold!
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    notice: "On hold removed. This job is scheduled again."
+      else
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "This job is not on hold."
       end
     end
 

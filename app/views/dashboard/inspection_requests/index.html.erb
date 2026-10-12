@@ -22,7 +22,7 @@
                   class: "job-filter-pill no-underline #{@status_filter == status ? "is-active" : ""}",
                   role: "tab",
                   "aria-selected": @status_filter == status do %>
-        <%= status.humanize %>
+        <%= status_label(status) %>
         <span class="job-filter-pill__count"><%= @counts[status] || 0 %></span>
       <% end %>
     <% end %>

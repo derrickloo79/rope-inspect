@@ -122,7 +122,7 @@ module ApplicationHelper
     ]
 
     lines << "-----------------"
-    lines << "Status: *#{inspection_request.status.to_s.humanize}*"
+    lines << "Status: *#{status_label(inspection_request.status)}*"
 
     if inspection_request.scheduled_on.present?
       schedule = format_date(inspection_request.scheduled_on)
@@ -177,17 +177,22 @@ module ApplicationHelper
       content_tag :path, "", d: "M16.004 3C9.377 3 4 8.373 4 15c0 2.34.67 4.523 1.83 6.37L4 29l7.86-1.79A11.94 11.94 0 0 0 16.004 27C22.63 27 28 21.627 28 15S22.63 3 16.004 3Zm6.98 16.86c-.297.836-1.47 1.53-2.41 1.73-.64.135-1.475.244-4.287-.92-3.598-1.49-5.914-5.14-6.096-5.38-.176-.24-1.464-1.95-1.464-3.72 0-1.77.93-2.64 1.26-3 .33-.36.72-.45.96-.45.24 0 .48.003.69.014.222.012.52-.084.812.62.297.72 1.01 2.49 1.098 2.67.088.18.147.39.03.63-.117.24-.176.39-.35.6-.176.21-.37.47-.53.63-.176.176-.36.367-.155.72.207.354.918 1.51 1.97 2.446 1.353 1.207 2.494 1.582 2.848 1.758.354.176.56.147.766-.088.207-.234.882-1.03 1.118-1.383.235-.354.47-.294.793-.176.324.117 2.06.97 2.414 1.146.354.176.588.264.676.412.088.147.088.85-.21 1.686Z" end
   end
 
+  def status_label(status)
+    status.to_s == "on_hold" ? "On Hold" : status.to_s.humanize
+  end
+
   def status_badge(status)
     css = case status.to_s
     when "pending" then "badge-pending"
     when "accepted" then "badge-accepted"
     when "scheduled" then "badge-scheduled"
+    when "on_hold" then "badge-on-hold"
     when "completed" then "badge-completed"
     when "rejected" then "badge-rejected"
     else "badge bg-stone-100 text-stone-700"
     end
 
-    content_tag(:span, status.to_s.humanize, class: css)
+    content_tag(:span, status_label(status), class: css)
   end
 
   def timeline_marker_classes(event)

@@ -1,5 +1,6 @@
 class InspectionRequest < ApplicationRecord
-  STATUSES = %w[pending accepted scheduled completed rejected].freeze
+  STATUSES = %w[pending accepted scheduled on_hold completed rejected].freeze
+  ON_HOLD_REASON_MAX = 1000
 
   belongs_to :fsp, optional: true, inverse_of: :inspection_requests
   has_many :cranes, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :inspection_request
@@ -16,6 +17,7 @@ class InspectionRequest < ApplicationRecord
     message: "should be digits only (spaces or dashes allowed)"
   }
   validates :status, inclusion: { in: STATUSES }
+  validates :on_hold_reason, presence: true, length: { maximum: ON_HOLD_REASON_MAX }, if: :on_hold?
   validates :share_token, uniqueness: true, allow_nil: true
   MAP_URL_FORMAT = %r{\Ahttps?://[^\s]+\z}i
   MAP_URL_MAX_LENGTH = 2000
@@ -67,7 +69,7 @@ class InspectionRequest < ApplicationRecord
     period = period.to_s.upcase
     return nil unless fsp_id.present? && date.present? && %w[AM PM].include?(period)
 
-    scope = scheduled.where(fsp_id: fsp_id, scheduled_on: date)
+    scope = where(status: %w[scheduled on_hold], fsp_id: fsp_id, scheduled_on: date)
     scope = scope.where.not(id: exclude_id) if exclude_id.present?
     scope.includes(:fsp).find { |job| job.scheduled_period == period }
   end
@@ -82,6 +84,10 @@ class InspectionRequest < ApplicationRecord
 
   def scheduled?
     status == "scheduled"
+  end
+
+  def on_hold?
+    status == "on_hold"
   end
 
   def completed?
@@ -123,16 +129,42 @@ class InspectionRequest < ApplicationRecord
 
   # fsp: Fsp record, or nil to leave unassigned.
   def schedule!(on:, at: nil, fsp: nil)
-    return false unless accepted? || scheduled?
+    return false unless accepted? || scheduled? || on_hold?
 
-    update!(
-      status: "scheduled",
+    # Updating the date while on hold keeps the hold. Only "Remove On Hold" clears it.
+    attrs = {
       scheduled_on: on,
       scheduled_time: at,
-      scheduled_at: Time.current,
       fsp: fsp,
       assigned_inspector: fsp&.display_name
-    )
+    }
+    unless on_hold?
+      attrs[:status] = "scheduled"
+      attrs[:scheduled_at] = Time.current
+    end
+    update!(attrs)
+  end
+
+  def hold!(reason)
+    return false unless scheduled?
+
+    reason = reason.to_s.strip
+    if reason.blank?
+      errors.add(:on_hold_reason, "Please enter a reason for putting this job on hold.")
+      return false
+    end
+    if reason.length > ON_HOLD_REASON_MAX
+      errors.add(:on_hold_reason, "Please keep the reason under #{ON_HOLD_REASON_MAX} characters.")
+      return false
+    end
+
+    update!(status: "on_hold", on_hold_reason: reason, on_hold_at: Time.current)
+  end
+
+  def release_hold!
+    return false unless on_hold?
+
+    update!(status: "scheduled", on_hold_reason: nil, on_hold_at: nil)
   end
 
   def inspector_label
@@ -193,6 +225,19 @@ class InspectionRequest < ApplicationRecord
         done: scheduled_at.present?,
         detail: schedule_detail
       },
+      *(
+        if on_hold?
+          [ {
+            key: "on_hold",
+            label: "On Hold",
+            at: on_hold_at,
+            done: true,
+            detail: on_hold_reason
+          } ]
+        else
+          []
+        end
+      ),
       {
         key: "completed",
         label: "Completed",
