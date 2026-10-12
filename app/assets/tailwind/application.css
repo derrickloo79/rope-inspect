@@ -1316,9 +1316,27 @@
 
   .job-list-status {
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+    gap: 0.5rem;
     min-width: 0;
+  }
+
+  .job-list-status > :first-child {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .job-list-status__reason {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #b91c1c;
+    overflow-wrap: anywhere;
   }
 
   .job-list-timestamp {

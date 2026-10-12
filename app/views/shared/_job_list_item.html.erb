@@ -35,6 +35,9 @@
       </div>
       <div class="job-list-status">
         <%= status_badge(request.status) %>
+        <% if request.on_hold? && request.on_hold_reason.present? %>
+          <p class="job-list-status__reason"><%= request.on_hold_reason %></p>
+        <% end %>
       </div>
       <div class="job-list-timestamp whitespace-nowrap">
         <%= format_list_timestamp(request.created_at) %>
