@@ -22,7 +22,12 @@
         <p class="page-lede">
           <%= @inspection_request.company_name %> · <%= @inspection_request.reference_code %>
         </p>
-        <div class="mt-2"><%= status_badge(@inspection_request.status) %></div>
+        <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <%= status_badge(@inspection_request.status) %>
+          <% if @inspection_request.on_hold? && @inspection_request.on_hold_reason.present? %>
+            <p class="min-w-0 text-base font-bold text-red-700"><%= @inspection_request.on_hold_reason %></p>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
