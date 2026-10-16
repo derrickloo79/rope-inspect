@@ -55,6 +55,21 @@ class InspectionRequest < ApplicationRecord
   scope :cancelled, -> { where(status: "cancelled") }
   scope :aborted, -> { where(status: "aborted") }
   scope :recent_first, -> { order(created_at: :desc) }
+
+  # Site, company, requestor, or a job number such as "36" or "RI-00036".
+  def self.matching_query(raw)
+    term = raw.to_s.strip
+    return all if term.blank?
+
+    like = "%#{sanitize_sql_like(term)}%"
+    sql = "site_name ILIKE :like OR company_name ILIKE :like OR requestor_name ILIKE :like"
+    binds = { like: like }
+    if term.match?(/\A\s*(?:RI[-\s]?)?\d+\s*\z/i)
+      sql += " OR id = :job_id"
+      binds[:job_id] = term.gsub(/\D/, "").to_i
+    end
+    where(sql, binds)
+  end
   scope :for_fsp, ->(fsp) { where(fsp_id: fsp.id) }
   scope :upcoming_within, ->(days = 7) {
     scheduled

@@ -8,24 +8,61 @@
     </div>
   </div>
 
-  <%# Status filter pills %>
-  <div class="job-filter-pills" role="tablist" aria-label="Filter jobs by status">
-    <%= link_to dashboard_inspection_requests_path,
-                class: "job-filter-pill no-underline #{@status_filter.nil? ? "is-active" : ""}",
-                role: "tab",
-                "aria-selected": @status_filter.nil? do %>
-      All
-      <span class="job-filter-pill__count"><%= @counts.values.sum %></span>
-    <% end %>
-    <% InspectionRequest::STATUSES.each do |status| %>
-      <%= link_to dashboard_inspection_requests_path(status: status),
-                  class: "job-filter-pill no-underline #{@status_filter == status ? "is-active" : ""}",
-                  role: "tab",
-                  "aria-selected": @status_filter == status do %>
-        <%= status_label(status) %>
-        <span class="job-filter-pill__count"><%= @counts[status] || 0 %></span>
+  <div class="job-list-toolbar">
+    <%= form_with url: dashboard_inspection_requests_path, method: :get, class: "job-list-search" do %>
+      <% if @status_filter %>
+        <%= hidden_field_tag :status, @status_filter %>
       <% end %>
+      <label class="sr-only" for="job-search">Search jobs</label>
+      <svg class="job-list-search__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+      <input type="search"
+             name="q"
+             id="job-search"
+             value="<%= @query %>"
+             placeholder="Search site, company, or job number"
+             class="field-input job-list-search__input"
+             autocomplete="off">
     <% end %>
+
+    <div class="job-list-filter"
+         data-controller="dropdown"
+         data-dropdown-open-class="is-open"
+         data-action="click@window->dropdown#hide keydown@window->dropdown#keydown">
+      <button type="button"
+              class="job-list-filter__button<%= " is-active" if @status_filter %>"
+              data-dropdown-target="button"
+              data-action="dropdown#toggle"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-label="Filter by status">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+        </svg>
+      </button>
+      <div class="job-list-filter__menu" data-dropdown-target="menu" role="menu" hidden>
+        <% filter_options = [[ "All", nil ]] + InspectionRequest::STATUSES.map { |status| [ status_label(status), status ] } %>
+        <% filter_options.each do |label, status| %>
+          <% selected = @status_filter == status %>
+          <%= link_to dashboard_inspection_requests_path(status: status, q: @query),
+                      class: "job-list-filter__option no-underline",
+                      role: "menuitemradio",
+                      aria: { checked: selected } do %>
+            <span class="job-list-filter__mark" aria-hidden="true">
+              <% if selected %>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              <% end %>
+            </span>
+            <span><%= label %></span>
+            <span class="job-list-filter__count"><%= status.nil? ? @all_count : (@status_counts[status] || 0) %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <% if @inspection_requests.any? %>
@@ -45,8 +82,14 @@
     <div class="text-center py-12 text-[--color-ink-muted]">
       <p class="font-medium text-[--color-ink]">No jobs here yet</p>
       <p class="text-sm mt-1">
-        <% if @status_filter %>
-          Nothing in <strong><%= @status_filter %></strong>.
+        <% if @query.present? && @status_filter %>
+          No <%= status_label(@status_filter).downcase %> jobs match “<%= @query %>”.
+          <%= link_to "Clear search", dashboard_inspection_requests_path(status: @status_filter) %>
+        <% elsif @query.present? %>
+          No jobs match “<%= @query %>”.
+          <%= link_to "Clear search", dashboard_inspection_requests_path %>
+        <% elsif @status_filter %>
+          Nothing in <strong><%= status_label(@status_filter) %></strong>.
           <%= link_to "View all", dashboard_inspection_requests_path %>
         <% else %>
           Public requests will show up here when submitted.

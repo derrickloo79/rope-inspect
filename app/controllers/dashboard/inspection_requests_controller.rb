@@ -5,13 +5,17 @@ module Dashboard
     ]
 
     def index
+      @query = params[:q].to_s.strip.presence
       @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
-      scope = InspectionRequest
+      counted = InspectionRequest.all
+      counted = counted.matching_query(@query) if @query
+      @status_counts = counted.group(:status).count
+      @all_count = @status_counts.values.sum
+      scope = counted
         .includes(:fsp, cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
         .recent_first
       scope = scope.where(status: @status_filter) if @status_filter
       @inspection_requests = scope
-      @counts = InspectionRequest.group(:status).count
     end
 
     def show
