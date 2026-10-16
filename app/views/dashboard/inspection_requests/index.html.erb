@@ -27,6 +27,12 @@
              autocomplete="off">
     <% end %>
 
+    <% if @query.present? %>
+      <%= link_to "Clear search",
+                  (@status_filter ? dashboard_inspection_requests_path(status: @status_filter) : dashboard_inspection_requests_path),
+                  class: "job-list-search__clear text-sm" %>
+    <% end %>
+
     <div class="job-list-filter"
          data-controller="dropdown"
          data-dropdown-open-class="is-open"

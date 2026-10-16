@@ -1455,6 +1455,11 @@
     appearance: none;
   }
 
+  .job-list-search__clear {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
   .job-list-filter {
     position: relative;
     flex-shrink: 0;
