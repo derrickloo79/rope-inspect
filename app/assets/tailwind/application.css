@@ -2000,7 +2000,7 @@
     transition: color 0.15s, background-color 0.15s;
     cursor: pointer;
     background-color: #fff;
-    color: var(--color-ink);
+    color: var(--color-accent);
     border: 1px solid var(--color-line-strong);
     text-decoration: none;
   }
@@ -2008,7 +2008,7 @@
   .btn-secondary:hover {
     background-color: #fafaf9;
     text-decoration: none;
-    color: var(--color-ink);
+    color: var(--color-accent-hover);
   }
 
   .btn-secondary:focus-visible {
