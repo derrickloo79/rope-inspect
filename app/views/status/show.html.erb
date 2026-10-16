@@ -26,6 +26,8 @@
           <%= status_badge(@inspection_request.status) %>
           <% if @inspection_request.on_hold? && @inspection_request.on_hold_reason.present? %>
             <p class="min-w-0 text-base font-bold text-red-700"><%= @inspection_request.on_hold_reason %></p>
+          <% elsif @inspection_request.cancelled? && @inspection_request.cancellation_reason.present? %>
+            <p class="min-w-0 text-base font-bold text-red-700"><%= @inspection_request.cancellation_reason %></p>
           <% end %>
         </div>
       </div>

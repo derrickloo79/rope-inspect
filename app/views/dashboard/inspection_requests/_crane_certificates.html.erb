@@ -1,4 +1,5 @@
-<%# Admin: editable cranes + certificates. %>
+<%# Admin: editable cranes + certificates. Cancelled jobs stay read-only. %>
 <%= render "shared/cranes_section",
            cranes: @inspection_request.cranes,
-           editable: true %>
+           editable: !@inspection_request.cancelled?,
+           omit_empty_certificates: @inspection_request.cancelled? %>

@@ -1,6 +1,7 @@
 class InspectionRequest < ApplicationRecord
-  STATUSES = %w[pending accepted scheduled on_hold completed rejected].freeze
+  STATUSES = %w[pending accepted scheduled on_hold completed rejected cancelled].freeze
   ON_HOLD_REASON_MAX = 1000
+  CANCELLATION_REASON_MAX = 1000
 
   belongs_to :fsp, optional: true, inverse_of: :inspection_requests
   has_many :cranes, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :inspection_request
@@ -18,6 +19,7 @@ class InspectionRequest < ApplicationRecord
   }
   validates :status, inclusion: { in: STATUSES }
   validates :on_hold_reason, presence: true, length: { maximum: ON_HOLD_REASON_MAX }, if: :on_hold?
+  validates :cancellation_reason, presence: true, length: { maximum: CANCELLATION_REASON_MAX }, if: :cancelled?
   validates :share_token, uniqueness: true, allow_nil: true
   MAP_URL_FORMAT = %r{\Ahttps?://[^\s]+\z}i
   MAP_URL_MAX_LENGTH = 2000
@@ -48,6 +50,7 @@ class InspectionRequest < ApplicationRecord
   scope :on_hold, -> { where(status: "on_hold") }
   scope :completed, -> { where(status: "completed") }
   scope :rejected, -> { where(status: "rejected") }
+  scope :cancelled, -> { where(status: "cancelled") }
   scope :recent_first, -> { order(created_at: :desc) }
   scope :for_fsp, ->(fsp) { where(fsp_id: fsp.id) }
   scope :upcoming_within, ->(days = 7) {
@@ -99,6 +102,10 @@ class InspectionRequest < ApplicationRecord
     status == "rejected"
   end
 
+  def cancelled?
+    status == "cancelled"
+  end
+
   def public_status?
     share_token.present? && !pending? && !rejected?
   end
@@ -120,6 +127,26 @@ class InspectionRequest < ApplicationRecord
     return false unless pending?
 
     update!(status: "rejected", rejected_at: Time.current)
+  end
+
+  def cancel!(reason)
+    return false unless accepted? || scheduled? || on_hold?
+
+    reason = reason.to_s.strip
+    if reason.blank?
+      errors.add(:cancellation_reason, "Please enter a reason for cancelling this job.")
+      return false
+    end
+    if reason.length > CANCELLATION_REASON_MAX
+      errors.add(:cancellation_reason, "Please keep the reason under #{CANCELLATION_REASON_MAX} characters.")
+      return false
+    end
+
+    update!(
+      status: "cancelled",
+      cancellation_reason: reason,
+      cancelled_at: Time.current
+    )
   end
 
   def reopen!
@@ -201,6 +228,33 @@ class InspectionRequest < ApplicationRecord
         at: rejected_at,
         done: true,
         failed: true
+      }
+      return events
+    end
+
+    if cancelled?
+      events << {
+        key: "accepted",
+        label: "Accepted",
+        at: accepted_at,
+        done: accepted_at.present?
+      }
+      if scheduled_at.present?
+        events << {
+          key: "scheduled",
+          label: "Scheduled",
+          at: scheduled_at,
+          done: true,
+          detail: schedule_detail
+        }
+      end
+      events << {
+        key: "cancelled",
+        label: "Cancelled",
+        at: cancelled_at,
+        done: true,
+        failed: true,
+        detail: cancellation_reason
       }
       return events
     end

@@ -1,7 +1,7 @@
 module Dashboard
   class InspectionRequestsController < BaseController
     before_action :set_inspection_request, only: [
-      :show, :edit, :update, :accept, :reject, :reopen, :schedule, :hold, :complete, :site_access, :point_of_contact
+      :show, :edit, :update, :accept, :reject, :cancel, :reopen, :schedule, :hold, :complete, :site_access, :point_of_contact
     ]
 
     def index
@@ -46,6 +46,21 @@ module Dashboard
       else
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     alert: "Could not reject this request from its current state."
+      end
+    end
+
+    def cancel
+      reason = params.dig(:inspection_request, :cancellation_reason)
+      if @inspection_request.cancel!(reason)
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    notice: "Job cancelled."
+      elsif @inspection_request.errors[:cancellation_reason].any?
+        @open_cancel_modal = true
+        @cancellation_reason_input = reason
+        render :show, status: :unprocessable_entity
+      else
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "Could not cancel this job from its current state."
       end
     end
 

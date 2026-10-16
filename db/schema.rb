@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_10_12_120000) do
+ActiveRecord::Schema[7.2].define(version: 2026_10_16_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -105,6 +105,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_10_12_120000) do
     t.string "poc_contact_number"
     t.text "on_hold_reason"
     t.datetime "on_hold_at"
+    t.text "cancellation_reason"
+    t.datetime "cancelled_at"
     t.index ["fsp_id"], name: "index_inspection_requests_on_fsp_id"
     t.index ["share_token"], name: "index_inspection_requests_on_share_token", unique: true
     t.index ["status"], name: "index_inspection_requests_on_status"

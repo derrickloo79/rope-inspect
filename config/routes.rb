@@ -29,6 +29,7 @@ Rails.application.routes.draw do
       member do
         patch :accept
         patch :reject
+        patch :cancel
         patch :reopen
         patch :schedule
         patch :hold

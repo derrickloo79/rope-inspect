@@ -189,6 +189,7 @@ module ApplicationHelper
     when "on_hold" then "badge-on-hold"
     when "completed" then "badge-completed"
     when "rejected" then "badge-rejected"
+    when "cancelled" then "badge-cancelled"
     else "badge bg-stone-100 text-stone-700"
     end
 
