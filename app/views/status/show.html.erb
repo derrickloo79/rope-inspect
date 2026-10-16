@@ -28,6 +28,8 @@
             <p class="min-w-0 text-base font-bold text-red-700"><%= @inspection_request.on_hold_reason %></p>
           <% elsif @inspection_request.cancelled? && @inspection_request.cancellation_reason.present? %>
             <p class="min-w-0 text-base font-bold text-red-700"><%= @inspection_request.cancellation_reason %></p>
+          <% elsif @inspection_request.aborted? && @inspection_request.abort_reason.present? %>
+            <p class="min-w-0 text-base font-bold text-red-700"><%= @inspection_request.abort_reason %></p>
           <% end %>
         </div>
       </div>

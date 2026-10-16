@@ -481,11 +481,42 @@
     border-color: var(--color-line-strong);
   }
 
+  .dash-upcoming-item--aborted {
+    background-color: #f5f5f4;
+    border-color: #d6d3d1;
+  }
+
+  .dash-upcoming-item--aborted:hover {
+    background-color: #fafaf9;
+    border-color: #a8a29e;
+  }
+
+  .dash-upcoming-item__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .dash-upcoming-item__heading .badge-aborted {
+    flex-shrink: 0;
+  }
+
   .dash-upcoming-item__title {
     display: block;
+    min-width: 0;
     font-weight: 500;
     color: var(--color-ink);
     line-height: 1.3;
+  }
+
+  .dash-upcoming-item__reason {
+    margin: 0.375rem 0 0;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #b91c1c;
   }
 
   .dash-upcoming-item__meta {
@@ -1780,6 +1811,10 @@
       padding-bottom: 6.5rem;
     }
 
+    .job-detail-page--stacked-actions {
+      padding-bottom: 9.5rem;
+    }
+
     .job-detail-page--accepted-dock {
       padding-bottom: 7.5rem;
     }
@@ -2566,7 +2601,8 @@
     box-shadow: inset 0 0 0 1px #fca5a5;
   }
 
-  .badge-cancelled {
+  .badge-cancelled,
+  .badge-aborted {
     display: inline-flex;
     align-items: center;
     border-radius: 9999px;

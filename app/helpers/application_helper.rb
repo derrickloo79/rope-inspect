@@ -190,6 +190,7 @@ module ApplicationHelper
     when "completed" then "badge-completed"
     when "rejected" then "badge-rejected"
     when "cancelled" then "badge-cancelled"
+    when "aborted" then "badge-aborted"
     else "badge bg-stone-100 text-stone-700"
     end
 

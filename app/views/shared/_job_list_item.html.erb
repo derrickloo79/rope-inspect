@@ -39,6 +39,8 @@
           <p class="job-list-status__reason"><%= request.on_hold_reason %></p>
         <% elsif request.cancelled? && request.cancellation_reason.present? %>
           <p class="job-list-status__reason"><%= request.cancellation_reason %></p>
+        <% elsif request.aborted? && request.abort_reason.present? %>
+          <p class="job-list-status__reason"><%= request.abort_reason %></p>
         <% end %>
       </div>
       <div class="job-list-timestamp whitespace-nowrap">

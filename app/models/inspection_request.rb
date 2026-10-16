@@ -1,7 +1,8 @@
 class InspectionRequest < ApplicationRecord
-  STATUSES = %w[pending accepted scheduled on_hold completed rejected cancelled].freeze
+  STATUSES = %w[pending accepted scheduled on_hold completed rejected cancelled aborted].freeze
   ON_HOLD_REASON_MAX = 1000
   CANCELLATION_REASON_MAX = 1000
+  ABORT_REASON_MAX = 1000
 
   belongs_to :fsp, optional: true, inverse_of: :inspection_requests
   has_many :cranes, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :inspection_request
@@ -20,6 +21,7 @@ class InspectionRequest < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :on_hold_reason, presence: true, length: { maximum: ON_HOLD_REASON_MAX }, if: :on_hold?
   validates :cancellation_reason, presence: true, length: { maximum: CANCELLATION_REASON_MAX }, if: :cancelled?
+  validates :abort_reason, presence: true, length: { maximum: ABORT_REASON_MAX }, if: :aborted?
   validates :share_token, uniqueness: true, allow_nil: true
   MAP_URL_FORMAT = %r{\Ahttps?://[^\s]+\z}i
   MAP_URL_MAX_LENGTH = 2000
@@ -51,10 +53,20 @@ class InspectionRequest < ApplicationRecord
   scope :completed, -> { where(status: "completed") }
   scope :rejected, -> { where(status: "rejected") }
   scope :cancelled, -> { where(status: "cancelled") }
+  scope :aborted, -> { where(status: "aborted") }
   scope :recent_first, -> { order(created_at: :desc) }
   scope :for_fsp, ->(fsp) { where(fsp_id: fsp.id) }
   scope :upcoming_within, ->(days = 7) {
     scheduled
+      .where.not(scheduled_on: nil)
+      .where(scheduled_on: Date.current..(Date.current + (days - 1).days))
+      .order(:scheduled_on, :scheduled_time, :company_name)
+  }
+
+  # Staff dashboard schedule: open visits, plus aborted ones.
+  # An aborted visit stays visible because the inspector attended and the client is billed.
+  scope :dashboard_upcoming_within, ->(days = 7) {
+    where(status: %w[scheduled aborted])
       .where.not(scheduled_on: nil)
       .where(scheduled_on: Date.current..(Date.current + (days - 1).days))
       .order(:scheduled_on, :scheduled_time, :company_name)
@@ -73,7 +85,7 @@ class InspectionRequest < ApplicationRecord
     period = period.to_s.upcase
     return nil unless fsp_id.present? && date.present? && %w[AM PM].include?(period)
 
-    scope = where(status: %w[scheduled on_hold], fsp_id: fsp_id, scheduled_on: date)
+    scope = where(status: %w[scheduled on_hold aborted], fsp_id: fsp_id, scheduled_on: date)
     scope = scope.where.not(id: exclude_id) if exclude_id.present?
     scope.includes(:fsp).find { |job| job.scheduled_period == period }
   end
@@ -104,6 +116,15 @@ class InspectionRequest < ApplicationRecord
 
   def cancelled?
     status == "cancelled"
+  end
+
+  def aborted?
+    status == "aborted"
+  end
+
+  # Cancelled and aborted jobs keep the same read-only job details.
+  def details_locked?
+    cancelled? || aborted?
   end
 
   def public_status?
@@ -146,6 +167,26 @@ class InspectionRequest < ApplicationRecord
       status: "cancelled",
       cancellation_reason: reason,
       cancelled_at: Time.current
+    )
+  end
+
+  def abort!(reason)
+    return false unless scheduled?
+
+    reason = reason.to_s.strip
+    if reason.blank?
+      errors.add(:abort_reason, "Please enter a reason for aborting this job.")
+      return false
+    end
+    if reason.length > ABORT_REASON_MAX
+      errors.add(:abort_reason, "Please keep the reason under #{ABORT_REASON_MAX} characters.")
+      return false
+    end
+
+    update!(
+      status: "aborted",
+      abort_reason: reason,
+      aborted_at: Time.current
     )
   end
 
@@ -255,6 +296,33 @@ class InspectionRequest < ApplicationRecord
         done: true,
         failed: true,
         detail: cancellation_reason
+      }
+      return events
+    end
+
+    if aborted?
+      events << {
+        key: "accepted",
+        label: "Accepted",
+        at: accepted_at,
+        done: accepted_at.present?
+      }
+      if scheduled_at.present?
+        events << {
+          key: "scheduled",
+          label: "Scheduled",
+          at: scheduled_at,
+          done: true,
+          detail: schedule_detail
+        }
+      end
+      events << {
+        key: "aborted",
+        label: "Aborted",
+        at: aborted_at,
+        done: true,
+        failed: true,
+        detail: abort_reason
       }
       return events
     end

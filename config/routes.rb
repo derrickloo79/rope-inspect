@@ -30,6 +30,7 @@ Rails.application.routes.draw do
         patch :accept
         patch :reject
         patch :cancel
+        patch :abort
         patch :reopen
         patch :schedule
         patch :hold

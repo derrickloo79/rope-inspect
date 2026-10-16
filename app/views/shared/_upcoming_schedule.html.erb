@@ -14,7 +14,7 @@
 
   <% if fsps %>
     <% selected_fsp = fsp_filter.present? ? fsps.find { |fsp| fsp.id.to_s == fsp_filter.to_s } : nil %>
-    <% schedule_jobs = upcoming_by_day.sort_by { |date, _jobs| date }.flat_map { |_date, day_jobs| day_jobs } %>
+    <% schedule_jobs = upcoming_by_day.sort_by { |date, _jobs| date }.flat_map { |_date, day_jobs| day_jobs }.reject(&:aborted?) %>
     <% wa_href = selected_fsp && whatsapp_href(selected_fsp.whatsapp_number, text: fsp_schedule_whatsapp_message(schedule_jobs)) %>
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div class="planner-week-filter">
@@ -75,14 +75,22 @@
                     <% period_jobs.each do |job| %>
                       <li>
                         <%= link_to send(job_path, job),
-                                    class: "dash-upcoming-item no-underline block",
+                                    class: "dash-upcoming-item no-underline block#{ " dash-upcoming-item--aborted" if job.aborted? }",
                                     data: { turbo_frame: "_top" } do %>
-                          <span class="dash-upcoming-item__title truncate"><%= job.site_name %></span>
+                          <span class="dash-upcoming-item__heading">
+                            <span class="dash-upcoming-item__title truncate"><%= job.site_name %></span>
+                            <% if job.aborted? %>
+                              <%= status_badge(job.status) %>
+                            <% end %>
+                          </span>
                           <p class="dash-upcoming-item__meta mt-0.5 truncate">
                             <%= job.company_name %>
                             · <%= pluralize(job.cranes.size, "crane") %>
                             · <%= job.reference_code %>
                           </p>
+                          <% if job.aborted? && job.abort_reason.present? %>
+                            <p class="dash-upcoming-item__reason"><%= job.abort_reason %></p>
+                          <% end %>
                           <div class="dash-upcoming-item__fsp mt-1.5">
                             <% if job.fsp.present? %>
                               <span class="fsp-color-swatch dash-upcoming-item__swatch"
