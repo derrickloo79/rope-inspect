@@ -56,19 +56,28 @@ class InspectionRequest < ApplicationRecord
   scope :aborted, -> { where(status: "aborted") }
   scope :recent_first, -> { order(created_at: :desc) }
 
-  # Site, company, requestor, or a job number such as "36" or "RI-00036".
+  # Site, company, requestor, job number ("36" or "RI-00036"),
+  # or the assigned FSP's name or number ("Mina" or "FSP3").
   def self.matching_query(raw)
     term = raw.to_s.strip
     return all if term.blank?
 
     like = "%#{sanitize_sql_like(term)}%"
-    sql = "site_name ILIKE :like OR company_name ILIKE :like OR requestor_name ILIKE :like"
-    binds = { like: like }
+    # "FSP 3" matches the stored number "FSP3".
+    fsp_number_like = "%#{sanitize_sql_like(term.gsub(/\s+/, ""))}%"
+    sql = <<~SQL.squish
+      inspection_requests.site_name ILIKE :like
+      OR inspection_requests.company_name ILIKE :like
+      OR inspection_requests.requestor_name ILIKE :like
+      OR fsps.full_name ILIKE :like
+      OR fsps.fsp_number ILIKE :fsp_number_like
+    SQL
+    binds = { like: like, fsp_number_like: fsp_number_like }
     if term.match?(/\A\s*(?:RI[-\s]?)?\d+\s*\z/i)
-      sql += " OR id = :job_id"
+      sql += " OR inspection_requests.id = :job_id"
       binds[:job_id] = term.gsub(/\D/, "").to_i
     end
-    where(sql, binds)
+    where(id: left_joins(:fsp).where(sql, binds).select("inspection_requests.id"))
   end
   scope :for_fsp, ->(fsp) { where(fsp_id: fsp.id) }
   scope :upcoming_within, ->(days = 7) {
