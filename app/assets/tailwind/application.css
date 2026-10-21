@@ -1460,10 +1460,17 @@
     white-space: nowrap;
   }
 
+  .job-list-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
   .job-list-filter {
     position: relative;
     flex-shrink: 0;
-    margin-left: auto;
   }
 
   .job-list-filter__button {
