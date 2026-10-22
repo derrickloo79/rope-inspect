@@ -151,6 +151,18 @@ class InspectionRequest < ApplicationRecord
     cancelled? || aborted?
   end
 
+  # A completed job can still edit a point of contact that was saved earlier.
+  # It cannot add one that was left blank.
+  def point_of_contact_locked?
+    details_locked? || (completed? && !point_of_contact?)
+  end
+
+  # A completed job can still edit site access that was saved earlier.
+  # It cannot add a map link or site note that was left blank.
+  def site_access_locked?
+    details_locked? || (completed? && !site_access?)
+  end
+
   def public_status?
     share_token.present? && !pending? && !rejected?
   end

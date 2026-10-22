@@ -17,7 +17,10 @@ module Dashboard
     end
 
     def update_remarks
-      if @crane.update(params.require(:crane).permit(:remarks))
+      if @crane.inspection_request.completed? && @crane.remarks.blank?
+        redirect_to dashboard_inspection_request_path(@crane.inspection_request),
+                    alert: "Crane remarks cannot be added after a job is completed."
+      elsif @crane.update(params.require(:crane).permit(:remarks))
         redirect_to dashboard_inspection_request_path(@crane.inspection_request),
                     notice: "Remarks saved for #{@crane.crane_type_label} (#{@crane.lm_number})."
       else

@@ -2,4 +2,5 @@
 <%= render "shared/cranes_section",
            cranes: @inspection_request.cranes,
            editable: !@inspection_request.details_locked?,
+           lock_blank_remarks: @inspection_request.completed?,
            omit_empty_certificates: @inspection_request.details_locked? %>

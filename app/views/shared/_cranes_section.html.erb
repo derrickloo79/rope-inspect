@@ -3,9 +3,11 @@
   locals:
     cranes:   (required) collection of Crane
     editable: (optional) true = upload/remove/save (admin). false = view only (FSP).
+    lock_blank_remarks: (optional) hide Add remarks when a crane has no remarks yet.
     omit_empty_certificates: (optional) hide the certificate block when nothing is on file.
 %>
 <% editable = local_assigns.fetch(:editable, false) %>
+<% lock_blank_remarks = local_assigns.fetch(:lock_blank_remarks, false) %>
 <% omit_empty_certificates = local_assigns.fetch(:omit_empty_certificates, false) %>
 
 <section class="card" data-controller="doc-viewer">
@@ -43,7 +45,8 @@
             </div>
           </dl>
 
-          <% if editable %>
+          <% remarks_locked = lock_blank_remarks && crane.remarks.blank? %>
+          <% if editable && !remarks_locked %>
             <div class="mt-4"
                  data-controller="site-access"
                  data-site-access-editing-value="<%= crane.remarks.blank? %>">
@@ -85,6 +88,11 @@
             <div class="mt-4 min-w-0">
               <dt class="text-sm text-ink-muted">Remarks</dt>
               <dd class="text-base font-medium mt-0.5 text-ink whitespace-pre-wrap break-words"><%= crane.remarks %></dd>
+            </div>
+          <% elsif remarks_locked %>
+            <div class="mt-4 min-w-0">
+              <dt class="text-sm text-ink-muted">Remarks</dt>
+              <dd class="text-base font-medium mt-0.5 text-ink-muted">No remarks yet.</dd>
             </div>
           <% end %>
 

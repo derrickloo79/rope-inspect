@@ -154,7 +154,10 @@ module Dashboard
     end
 
     def site_access
-      if @inspection_request.update(site_access_params)
+      if @inspection_request.completed? && !@inspection_request.site_access?
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "Site access cannot be added after a job is completed."
+      elsif @inspection_request.update(site_access_params)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Site access details saved."
       else
@@ -164,7 +167,10 @@ module Dashboard
     end
 
     def point_of_contact
-      if @inspection_request.update(point_of_contact_params)
+      if @inspection_request.completed? && !@inspection_request.point_of_contact?
+        redirect_to dashboard_inspection_request_path(@inspection_request),
+                    alert: "A point of contact cannot be added after a job is completed."
+      elsif @inspection_request.update(point_of_contact_params)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Point of contact saved."
       else

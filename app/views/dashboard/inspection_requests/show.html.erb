@@ -132,7 +132,7 @@
     </section>
 
     <% unless @inspection_request.pending? %>
-      <% poc_locked = @inspection_request.details_locked? %>
+      <% poc_locked = @inspection_request.point_of_contact_locked? %>
       <% poc_field_errors = @inspection_request.errors[:poc_name].any? || @inspection_request.errors[:poc_contact_number].any? || @inspection_request.errors[:poc_country_code].any? %>
       <% poc_editing = poc_field_errors || !@inspection_request.point_of_contact? %>
       <section class="card"
@@ -266,7 +266,7 @@
     <%= render "crane_certificates" %>
 
     <% unless @inspection_request.pending? %>
-      <% site_locked = @inspection_request.details_locked? %>
+      <% site_locked = @inspection_request.site_access_locked? %>
       <% site_access_errors = @inspection_request.errors[:map_url].any? || @inspection_request.errors[:site_note].any? %>
       <% site_access_editing = site_access_errors || !@inspection_request.site_access? %>
       <section class="card"
