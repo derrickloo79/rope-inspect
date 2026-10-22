@@ -28,7 +28,17 @@
       <% end %>
       <div class="job-detail-heading__body min-w-0">
         <h1 class="page-title"><%= @inspection_request.site_name %></h1>
-        <p class="page-lede"><%= @inspection_request.company_name %> · <%= @inspection_request.reference_code %></p>
+        <p class="page-lede">
+          <%= @inspection_request.company_name %> · <%= @inspection_request.reference_code %>
+          <% if @inspection_request.scheduled? || @inspection_request.completed? %>
+            ·
+            <% if @inspection_request.fsp.present? %>
+              <%= @inspection_request.fsp.fsp_number %>
+            <% else %>
+              <span class="text-ink-faint">Unassigned</span>
+            <% end %>
+          <% end %>
+        </p>
         <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
           <%= status_badge(@inspection_request.status) %>
           <% if @inspection_request.on_hold? && @inspection_request.on_hold_reason.present? %>
