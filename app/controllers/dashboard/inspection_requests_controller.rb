@@ -4,21 +4,31 @@ module Dashboard
       :show, :edit, :update, :accept, :reject, :cancel, :abort, :reopen, :schedule, :hold, :complete, :site_access, :point_of_contact
     ]
 
+    # Ref-no descending is the default and is omitted from the URL.
+    # Assigned-date sorts stay off for All, Accepted, On Hold, and Rejected.
+    SORT_VALUES = %w[asc date_asc date_desc].freeze
+    DATE_SORTS = %w[date_asc date_desc].freeze
+    DATE_SORT_STATUSES = %w[pending scheduled completed cancelled aborted].freeze
+
+    helper_method :jobs_index_path
+
     def index
       @query = params[:q].to_s.strip.presence
       @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
-      # Reference codes are RI- plus the id, so id order is reference-number order.
-      # Descending is the default and is omitted from the URL.
-      @sort = params[:sort] == "asc" ? "asc" : "desc"
+      @sort = SORT_VALUES.include?(params[:sort]) ? params[:sort] : "desc"
+      @date_sort_allowed = DATE_SORT_STATUSES.include?(@status_filter)
+      if DATE_SORTS.include?(@sort) && !@date_sort_allowed
+        redirect_to jobs_index_path(sort: "desc")
+        return
+      end
       counted = InspectionRequest.all
       counted = counted.matching_query(@query) if @query
       @status_counts = counted.group(:status).count
       @all_count = @status_counts.values.sum
       scope = counted
         .includes(:fsp, cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
-        .order(id: @sort == "asc" ? :asc : :desc)
       scope = scope.where(status: @status_filter) if @status_filter
-      @inspection_requests = scope
+      @inspection_requests = apply_job_sort(scope)
     end
 
     def show
@@ -208,6 +218,26 @@ module Dashboard
 
     def site_access_params
       params.require(:inspection_request).permit(:map_url, :site_note)
+    end
+
+    # Keeps the current search and drops a sort the destination filter cannot use.
+    def jobs_index_path(status: @status_filter, q: @query, sort: @sort)
+      sort = nil if sort.blank? || sort == "desc"
+      sort = nil if DATE_SORTS.include?(sort) && !DATE_SORT_STATUSES.include?(status)
+      dashboard_inspection_requests_path(status: status, q: q.presence, sort: sort)
+    end
+
+    def apply_job_sort(scope)
+      case @sort
+      when "asc"
+        scope.order(id: :asc)
+      when "date_asc"
+        scope.order(Arel.sql("scheduled_on ASC NULLS LAST, scheduled_time ASC NULLS LAST, id ASC"))
+      when "date_desc"
+        scope.order(Arel.sql("scheduled_on DESC NULLS LAST, scheduled_time DESC NULLS LAST, id DESC"))
+      else
+        scope.order(id: :desc)
+      end
     end
 
     def point_of_contact_params

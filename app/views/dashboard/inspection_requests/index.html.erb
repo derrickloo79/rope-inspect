@@ -13,8 +13,8 @@
       <% if @status_filter %>
         <%= hidden_field_tag :status, @status_filter %>
       <% end %>
-      <% if @sort == "asc" %>
-        <%= hidden_field_tag :sort, "asc" %>
+      <% if @sort != "desc" %>
+        <%= hidden_field_tag :sort, @sort %>
       <% end %>
       <label class="sr-only" for="job-search">Search jobs</label>
       <svg class="job-list-search__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -32,7 +32,7 @@
 
     <% if @query.present? %>
       <%= link_to "Clear search",
-                  dashboard_inspection_requests_path(status: @status_filter, sort: (@sort == "asc" ? "asc" : nil)),
+                  jobs_index_path(q: nil),
                   class: "job-list-search__clear text-sm" %>
     <% end %>
 
@@ -56,7 +56,7 @@
           <% filter_options = [[ "All", nil ]] + InspectionRequest::STATUSES.map { |status| [ status_label(status), status ] } %>
           <% filter_options.each do |label, status| %>
             <% selected = @status_filter == status %>
-            <%= link_to dashboard_inspection_requests_path(status: status, q: @query, sort: (@sort == "asc" ? "asc" : nil)),
+            <%= link_to jobs_index_path(status: status),
                         class: "job-list-filter__option no-underline",
                         role: "menuitemradio",
                         aria: { checked: selected } do %>
@@ -79,12 +79,12 @@
            data-dropdown-open-class="is-open"
            data-action="click@window->dropdown#hide keydown@window->dropdown#keydown">
         <button type="button"
-                class="job-list-filter__button<%= " is-active" if @sort == "asc" %>"
+                class="job-list-filter__button<%= " is-active" if @sort != "desc" %>"
                 data-dropdown-target="button"
                 data-action="dropdown#toggle"
                 aria-haspopup="menu"
                 aria-expanded="false"
-                aria-label="Sort by reference number">
+                aria-label="Sort jobs">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="m3 8 4-4 4 4" />
             <path d="M7 4v16" />
@@ -92,21 +92,36 @@
             <path d="M17 20V4" />
           </svg>
         </button>
-        <div class="job-list-filter__menu" data-dropdown-target="menu" role="menu" hidden>
-          <% [["Ref no ascending", "asc"], ["Ref no descending", "desc"]].each do |label, value| %>
+        <div class="job-list-filter__menu job-list-filter__menu--sort" data-dropdown-target="menu" role="menu" hidden>
+          <% [
+            ["Ref no ascending", "asc", false],
+            ["Ref no descending", "desc", false],
+            ["Assigned date ascending", "date_asc", !@date_sort_allowed],
+            ["Assigned date descending", "date_desc", !@date_sort_allowed]
+          ].each do |label, value, disabled| %>
             <% selected = @sort == value %>
-            <%= link_to dashboard_inspection_requests_path(status: @status_filter, q: @query, sort: (value == "desc" ? nil : value)),
-                        class: "job-list-filter__option no-underline",
-                        role: "menuitemradio",
-                        aria: { checked: selected } do %>
-              <span class="job-list-filter__mark" aria-hidden="true">
-                <% if selected %>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                <% end %>
+            <% if disabled %>
+              <span class="job-list-filter__option is-disabled"
+                    role="menuitemradio"
+                    aria-disabled="true"
+                    aria-checked="false">
+                <span class="job-list-filter__mark" aria-hidden="true"></span>
+                <span><%= label %></span>
               </span>
-              <span><%= label %></span>
+            <% else %>
+              <%= link_to jobs_index_path(sort: value),
+                          class: "job-list-filter__option no-underline",
+                          role: "menuitemradio",
+                          aria: { checked: selected } do %>
+                <span class="job-list-filter__mark" aria-hidden="true">
+                  <% if selected %>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  <% end %>
+                </span>
+                <span><%= label %></span>
+              <% end %>
             <% end %>
           <% end %>
         </div>
@@ -133,13 +148,13 @@
       <p class="text-sm mt-1">
         <% if @query.present? && @status_filter %>
           No <%= status_label(@status_filter).downcase %> jobs match “<%= @query %>”.
-          <%= link_to "Clear search", dashboard_inspection_requests_path(status: @status_filter, sort: (@sort == "asc" ? "asc" : nil)) %>
+          <%= link_to "Clear search", jobs_index_path(q: nil) %>
         <% elsif @query.present? %>
           No jobs match “<%= @query %>”.
-          <%= link_to "Clear search", dashboard_inspection_requests_path(sort: (@sort == "asc" ? "asc" : nil)) %>
+          <%= link_to "Clear search", jobs_index_path(q: nil) %>
         <% elsif @status_filter %>
           Nothing in <strong><%= status_label(@status_filter) %></strong>.
-          <%= link_to "View all", dashboard_inspection_requests_path(sort: (@sort == "asc" ? "asc" : nil)) %>
+          <%= link_to "View all", jobs_index_path(status: nil, q: nil) %>
         <% else %>
           Public requests will show up here when submitted.
         <% end %>

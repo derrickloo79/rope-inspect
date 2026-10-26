@@ -1542,6 +1542,19 @@
     text-decoration: none;
   }
 
+  .job-list-filter__option.is-disabled,
+  .job-list-filter__option.is-disabled:hover,
+  .job-list-filter__option.is-disabled:focus-visible {
+    color: var(--color-ink-faint);
+    background-color: transparent;
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+
+  .job-list-filter__menu--sort {
+    min-width: 16.5rem;
+  }
+
   .job-list-filter__mark {
     display: inline-flex;
     align-items: center;
