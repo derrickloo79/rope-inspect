@@ -245,11 +245,12 @@ class InspectionRequest < ApplicationRecord
 
   # fsp: Fsp record, or nil to leave unassigned.
   # Saving the schedule while on hold returns the job to scheduled.
-  # A job that was already scheduled, or on hold, is logged as a reschedule.
+  # That return is logged as a move to Scheduled. Only a change while
+  # the job is already scheduled is logged as a reschedule.
   def schedule!(on:, at: nil, fsp: nil, actor: nil)
     return false unless accepted? || scheduled? || on_hold?
 
-    rescheduling = scheduled? || on_hold?
+    rescheduling = scheduled?
     previous = {
       "previous_scheduled_on" => scheduled_on&.iso8601,
       "previous_period" => scheduled_period,

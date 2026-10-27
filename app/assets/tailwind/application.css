@@ -2793,6 +2793,15 @@
     box-shadow: inset 0 0 0 1px #fecaca;
   }
 
+  .status-text-pending { color: #92400e; }
+  .status-text-accepted { color: #1e40af; }
+  .status-text-scheduled { color: #5b21b6; }
+  .status-text-on-hold { color: #b91c1c; }
+  .status-text-completed { color: #166534; }
+  .status-text-rejected { color: #991b1b; }
+  .status-text-cancelled,
+  .status-text-aborted { color: #44403c; }
+
   .page-title {
     font-size: 1.5rem;
     font-weight: 600;

@@ -463,12 +463,19 @@
                     <span class="text-ink-muted"><%= format_datetime(event.occurred_at) %></span>
                   </p>
                   <div class="mt-0.5 text-sm text-ink">
-                    <p><%= event.label %></p>
+                    <% if event.action == "rescheduled" %>
+                      <p><%= event.label %></p>
+                    <% else %>
+                      <p>
+                        Move job to
+                        <span class="font-bold <%= status_text_class(event.action) %>"><%= status_label(event.action) %></span>
+                      </p>
+                    <% end %>
                     <% if event.detail.present? %>
                       <p class="whitespace-pre-wrap break-words"><%= event.detail %></p>
                     <% end %>
                     <% if event.reason.present? %>
-                      <p class="whitespace-pre-wrap break-words"><span class="font-bold">Reason:</span> <%= event.reason %></p>
+                      <p class="whitespace-pre-wrap break-words text-ink-muted"><span class="font-bold">Reason:</span> <%= event.reason %></p>
                     <% end %>
                   </div>
                 </div>

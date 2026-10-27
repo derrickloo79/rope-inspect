@@ -181,6 +181,19 @@ module ApplicationHelper
     status.to_s == "on_hold" ? "On Hold" : status.to_s.humanize
   end
 
+  def status_text_class(status)
+    {
+      "pending" => "status-text-pending",
+      "accepted" => "status-text-accepted",
+      "scheduled" => "status-text-scheduled",
+      "on_hold" => "status-text-on-hold",
+      "completed" => "status-text-completed",
+      "rejected" => "status-text-rejected",
+      "cancelled" => "status-text-cancelled",
+      "aborted" => "status-text-aborted"
+    }.fetch(status.to_s, "text-ink")
+  end
+
   def status_badge(status)
     css = case status.to_s
     when "pending" then "badge-pending"
