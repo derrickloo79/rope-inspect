@@ -449,15 +449,18 @@
         <% if @inspection_request.job_events.any? %>
           <ol class="flex flex-col gap-5">
             <% @inspection_request.job_events.each do |event| %>
-              <% actor_name = event.actor_name(current_user) %>
+              <% actor_name = event.actor_name %>
               <li class="audit-entry">
                 <span class="requestor-identity__avatar" aria-hidden="true">
                   <span class="requestor-identity__initials"><%= initials_for(actor_name) %></span>
                 </span>
                 <div class="min-w-0">
                   <p class="text-sm leading-5">
-                    <span class="font-semibold text-ink"><%= actor_name %></span>
-                    <span class="text-ink-muted"> · <%= format_datetime(event.occurred_at) %></span>
+                    <% if actor_name %>
+                      <span class="font-semibold text-ink"><%= actor_name %></span>
+                      <span class="text-ink-muted"> · </span>
+                    <% end %>
+                    <span class="text-ink-muted"><%= format_datetime(event.occurred_at) %></span>
                   </p>
                   <div class="mt-0.5 text-sm text-ink">
                     <p><%= event.label %></p>

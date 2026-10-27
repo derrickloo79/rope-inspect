@@ -9,8 +9,8 @@ class JobEvent < ApplicationRecord
 
   scope :chronological, -> { order(:occurred_at, :id) }
 
-  def actor_name(viewer = nil)
-    user&.display_name.presence || viewer&.display_name
+  def actor_name
+    user&.display_name.presence
   end
 
   def label
