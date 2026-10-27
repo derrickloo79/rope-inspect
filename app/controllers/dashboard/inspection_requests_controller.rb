@@ -173,9 +173,9 @@ module Dashboard
     end
 
     def site_access
-      if @inspection_request.completed? && !@inspection_request.site_access?
+      if @inspection_request.site_access_locked?
         redirect_to job_show_path,
-                    alert: "Site access cannot be added after a job is completed."
+                    alert: (@inspection_request.completed? ? "Site access cannot be changed after a job is completed." : "Site access cannot be changed.")
       elsif @inspection_request.update(site_access_params)
         log_detail_update!("site_access_updated", %w[map_url site_note]) do
           @inspection_request.site_access_audit_summary
@@ -189,9 +189,9 @@ module Dashboard
     end
 
     def point_of_contact
-      if @inspection_request.completed? && !@inspection_request.point_of_contact?
+      if @inspection_request.point_of_contact_locked?
         redirect_to job_show_path,
-                    alert: "A point of contact cannot be added after a job is completed."
+                    alert: (@inspection_request.completed? ? "Point of contact cannot be changed after a job is completed." : "Point of contact cannot be changed.")
       elsif @inspection_request.update(point_of_contact_params)
         log_detail_update!("poc_updated", %w[poc_name poc_country_code poc_contact_number]) do
           @inspection_request.poc_audit_summary
