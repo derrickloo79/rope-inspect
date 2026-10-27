@@ -479,6 +479,27 @@ class InspectionRequest < ApplicationRecord
     "#{code}#{national}"
   end
 
+  # Job-detail saves (point of contact, site access, cranes) call this.
+  # Status transitions keep their own calls to record_job_event!.
+  def log_job_event!(action, actor:, details: {})
+    record_job_event!(action, actor: actor, at: Time.current, details: details)
+  end
+
+  def poc_audit_summary
+    return "Cleared" unless point_of_contact?
+
+    "#{poc_name} · #{full_poc_contact_number}"
+  end
+
+  def site_access_audit_summary
+    return "Cleared" unless site_access?
+
+    lines = []
+    lines << "Map: #{map_url.strip}" if map_url.present?
+    lines << "Note: #{site_note.strip}" if site_note.present?
+    lines.join("\n")
+  end
+
   # Safe http(s) href for "Open in Google Maps".
   # - Stored share/search links are returned as-is when valid.
   # - Free-text addresses become a Google Maps search URL.

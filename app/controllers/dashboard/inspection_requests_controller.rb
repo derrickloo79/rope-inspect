@@ -38,7 +38,16 @@ module Dashboard
     end
 
     def update
+      before = crane_audit_rows(@inspection_request.cranes)
       if @inspection_request.update(job_details_params)
+        summary = crane_details_change_summary(before, crane_audit_rows(@inspection_request.cranes.reload))
+        if summary.present?
+          @inspection_request.log_job_event!(
+            "crane_details_updated",
+            actor: current_user,
+            details: { "summary" => summary }
+          )
+        end
         redirect_to job_show_path,
                     notice: "Inspection details updated."
       else
@@ -168,6 +177,9 @@ module Dashboard
         redirect_to job_show_path,
                     alert: "Site access cannot be added after a job is completed."
       elsif @inspection_request.update(site_access_params)
+        log_detail_update!("site_access_updated", %w[map_url site_note]) do
+          @inspection_request.site_access_audit_summary
+        end
         redirect_to job_show_path,
                     notice: "Site access details saved."
       else
@@ -181,6 +193,9 @@ module Dashboard
         redirect_to job_show_path,
                     alert: "A point of contact cannot be added after a job is completed."
       elsif @inspection_request.update(point_of_contact_params)
+        log_detail_update!("poc_updated", %w[poc_name poc_country_code poc_contact_number]) do
+          @inspection_request.poc_audit_summary
+        end
         redirect_to job_show_path,
                     notice: "Point of contact saved."
       else
@@ -264,6 +279,55 @@ module Dashboard
 
     def point_of_contact_params
       params.require(:inspection_request).permit(:poc_name, :poc_country_code, :poc_contact_number)
+    end
+
+    def log_detail_update!(action, attributes)
+      return unless (attributes & @inspection_request.saved_changes.keys).any?
+
+      @inspection_request.log_job_event!(action, actor: current_user, details: { "summary" => yield })
+    end
+
+    def crane_audit_rows(cranes)
+      cranes.map do |crane|
+        {
+          id: crane.id,
+          type: crane.crane_type_label,
+          lm: crane.lm_number,
+          diameter: crane.rope_diameter_mm.to_s
+        }
+      end
+    end
+
+    # One group per added, removed, or changed crane. Unchanged cranes are skipped.
+    def crane_details_change_summary(before, after)
+      before_by_id = before.index_by { |row| row[:id] }
+      groups = []
+
+      before.each do |old|
+        next if after.any? { |row| row[:id] == old[:id] }
+
+        groups << [ "Removed #{old[:type]} · #{old[:lm]}" ]
+      end
+
+      after.each do |current|
+        old = before_by_id[current[:id]]
+        if old.nil?
+          groups << [ "Added #{current[:type]} · #{current[:lm]} · #{current[:diameter]} mm" ]
+          next
+        end
+
+        diffs = []
+        diffs << "Type #{old[:type]} → #{current[:type]}" if old[:type] != current[:type]
+        diffs << "LM number #{old[:lm]} → #{current[:lm]}" if old[:lm] != current[:lm]
+        if old[:diameter] != current[:diameter]
+          diffs << "Rope diameter #{old[:diameter]} mm → #{current[:diameter]} mm"
+        end
+        next if diffs.empty?
+
+        groups << [ "#{current[:type]} · #{current[:lm]}", *diffs ]
+      end
+
+      groups.map { |lines| lines.join("\n") }.join("\n\n").presence
     end
 
     # Map AM/PM radio values to a time-of-day stored on scheduled_time.
