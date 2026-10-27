@@ -1,5 +1,12 @@
 class JobEvent < ApplicationRecord
-  ACTIONS = %w[accepted rejected scheduled rescheduled completed aborted on_hold cancelled].freeze
+  ACTIONS = %w[
+    accepted rejected scheduled rescheduled completed aborted on_hold cancelled
+    poc_updated site_access_updated crane_remarks_updated crane_certificates_updated crane_details_updated
+  ].freeze
+  STATUS_MOVES = %w[accepted rejected scheduled completed aborted on_hold cancelled].freeze
+  DETAIL_UPDATES = %w[
+    poc_updated site_access_updated crane_remarks_updated crane_certificates_updated crane_details_updated
+  ].freeze
 
   belongs_to :inspection_request
   belongs_to :user, optional: true
@@ -13,6 +20,10 @@ class JobEvent < ApplicationRecord
     user&.display_name.presence
   end
 
+  def status_move?
+    STATUS_MOVES.include?(action)
+  end
+
   def label
     {
       "accepted" => "Accepted",
@@ -22,7 +33,12 @@ class JobEvent < ApplicationRecord
       "completed" => "Completed",
       "aborted" => "Aborted",
       "on_hold" => "Put on hold",
-      "cancelled" => "Cancelled"
+      "cancelled" => "Cancelled",
+      "poc_updated" => "Updated point of contact",
+      "site_access_updated" => "Updated site access",
+      "crane_remarks_updated" => "Updated crane remarks",
+      "crane_certificates_updated" => "Updated crane certificates",
+      "crane_details_updated" => "Updated crane details"
     }.fetch(action)
   end
 
@@ -32,6 +48,8 @@ class JobEvent < ApplicationRecord
       visit_phrase
     when "rescheduled"
       [ visit_phrase("previous_"), visit_phrase ].compact.join(" → ").presence
+    when *DETAIL_UPDATES
+      details["summary"].presence
     end
   end
 

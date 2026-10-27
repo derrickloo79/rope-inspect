@@ -441,13 +441,13 @@
                     <span class="text-ink-muted"><%= format_datetime(event.occurred_at) %></span>
                   </p>
                   <div class="mt-0.5 text-sm text-ink">
-                    <% if event.action == "rescheduled" %>
-                      <p><%= event.label %></p>
-                    <% else %>
+                    <% if event.status_move? %>
                       <p>
                         Move job to
                         <span class="font-bold <%= status_text_class(event.action) %>"><%= status_label(event.action) %></span>
                       </p>
+                    <% else %>
+                      <p><%= event.label %></p>
                     <% end %>
                     <% if event.detail.present? %>
                       <p class="whitespace-pre-wrap break-words"><%= event.detail %></p>

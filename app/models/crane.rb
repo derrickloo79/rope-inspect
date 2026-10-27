@@ -48,6 +48,14 @@ class Crane < ApplicationRecord
     lm_certificate.attached? && mill_certificates.attached?
   end
 
+  def audit_heading
+    "#{crane_type_label} · #{lm_number}"
+  end
+
+  def remarks_audit_summary
+    "#{audit_heading}\n#{remarks.presence || "Cleared"}"
+  end
+
   private
 
   def normalize_crane_type_other
