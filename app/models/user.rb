@@ -20,6 +20,8 @@ class User < ApplicationRecord
   before_validation :normalize_contact_number
   before_validation :default_country_code
 
+  has_many :job_events, dependent: :nullify
+
   scope :ordered, -> { order(:name, :email) }
 
   def display_name

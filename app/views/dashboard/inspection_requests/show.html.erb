@@ -442,6 +442,41 @@
         </ol>
       </div>
     </section>
+
+    <section class="card">
+      <div class="card-section">
+        <h2 class="section-label mb-5">Timeline (new)</h2>
+        <% if @inspection_request.job_events.any? %>
+          <ol class="flex flex-col gap-5">
+            <% @inspection_request.job_events.each do |event| %>
+              <% actor_name = event.actor_name(current_user) %>
+              <li class="audit-entry">
+                <span class="requestor-identity__avatar" aria-hidden="true">
+                  <span class="requestor-identity__initials"><%= initials_for(actor_name) %></span>
+                </span>
+                <div class="min-w-0">
+                  <p class="text-sm leading-5">
+                    <span class="font-semibold text-ink"><%= actor_name %></span>
+                    <span class="text-ink-muted"> · <%= format_datetime(event.occurred_at) %></span>
+                  </p>
+                  <div class="mt-0.5 text-sm text-ink">
+                    <p><%= event.label %></p>
+                    <% if event.detail.present? %>
+                      <p class="whitespace-pre-wrap break-words"><%= event.detail %></p>
+                    <% end %>
+                    <% if event.reason.present? %>
+                      <p class="whitespace-pre-wrap break-words"><span class="font-bold">Reason:</span> <%= event.reason %></p>
+                    <% end %>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ol>
+        <% else %>
+          <p class="text-sm text-ink-muted">No updates yet.</p>
+        <% end %>
+      </div>
+    </section>
   </div>
 
   <aside class="job-detail-side space-y-6">

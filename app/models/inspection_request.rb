@@ -6,6 +6,7 @@ class InspectionRequest < ApplicationRecord
 
   belongs_to :fsp, optional: true, inverse_of: :inspection_requests
   has_many :cranes, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :inspection_request
+  has_many :job_events, -> { chronological }, dependent: :destroy
   accepts_nested_attributes_for :cranes, allow_destroy: true, reject_if: :all_blank
 
   # Same dial codes as FSP / admin (WhatsApp-ready).
@@ -168,7 +169,7 @@ class InspectionRequest < ApplicationRecord
   end
 
   # Simple state machine transitions
-  def accept!
+  def accept!(actor: nil)
     return false unless pending?
 
     transaction do
@@ -177,16 +178,20 @@ class InspectionRequest < ApplicationRecord
         accepted_at: Time.current,
         share_token: share_token.presence || generate_share_token
       )
+      record_job_event!("accepted", actor: actor, at: accepted_at)
     end
   end
 
-  def reject!
+  def reject!(actor: nil)
     return false unless pending?
 
-    update!(status: "rejected", rejected_at: Time.current)
+    transaction do
+      update!(status: "rejected", rejected_at: Time.current)
+      record_job_event!("rejected", actor: actor, at: rejected_at)
+    end
   end
 
-  def cancel!(reason)
+  def cancel!(reason, actor: nil)
     return false unless accepted? || scheduled? || on_hold?
 
     reason = reason.to_s.strip
@@ -199,14 +204,17 @@ class InspectionRequest < ApplicationRecord
       return false
     end
 
-    update!(
-      status: "cancelled",
-      cancellation_reason: reason,
-      cancelled_at: Time.current
-    )
+    transaction do
+      update!(
+        status: "cancelled",
+        cancellation_reason: reason,
+        cancelled_at: Time.current
+      )
+      record_job_event!("cancelled", actor: actor, at: cancelled_at, details: { "reason" => reason })
+    end
   end
 
-  def abort!(reason)
+  def abort!(reason, actor: nil)
     return false unless scheduled?
 
     reason = reason.to_s.strip
@@ -219,11 +227,14 @@ class InspectionRequest < ApplicationRecord
       return false
     end
 
-    update!(
-      status: "aborted",
-      abort_reason: reason,
-      aborted_at: Time.current
-    )
+    transaction do
+      update!(
+        status: "aborted",
+        abort_reason: reason,
+        aborted_at: Time.current
+      )
+      record_job_event!("aborted", actor: actor, at: aborted_at, details: { "reason" => reason })
+    end
   end
 
   def reopen!
@@ -234,22 +245,39 @@ class InspectionRequest < ApplicationRecord
 
   # fsp: Fsp record, or nil to leave unassigned.
   # Saving the schedule while on hold returns the job to scheduled.
-  def schedule!(on:, at: nil, fsp: nil)
+  # A job that was already scheduled, or on hold, is logged as a reschedule.
+  def schedule!(on:, at: nil, fsp: nil, actor: nil)
     return false unless accepted? || scheduled? || on_hold?
 
-    update!(
-      status: "scheduled",
-      scheduled_on: on,
-      scheduled_time: at,
-      scheduled_at: Time.current,
-      on_hold_reason: nil,
-      on_hold_at: nil,
-      fsp: fsp,
-      assigned_inspector: fsp&.display_name
-    )
+    rescheduling = scheduled? || on_hold?
+    previous = {
+      "previous_scheduled_on" => scheduled_on&.iso8601,
+      "previous_period" => scheduled_period,
+      "previous_fsp_number" => Fsp.where(id: fsp_id).pick(:fsp_number)
+    }
+
+    transaction do
+      update!(
+        status: "scheduled",
+        scheduled_on: on,
+        scheduled_time: at,
+        scheduled_at: Time.current,
+        on_hold_reason: nil,
+        on_hold_at: nil,
+        fsp: fsp,
+        assigned_inspector: fsp&.display_name
+      )
+      details = {
+        "scheduled_on" => scheduled_on&.iso8601,
+        "period" => scheduled_period,
+        "fsp_number" => fsp&.fsp_number
+      }
+      details.merge!(previous) if rescheduling
+      record_job_event!(rescheduling ? "rescheduled" : "scheduled", actor: actor, at: scheduled_at, details: details)
+    end
   end
 
-  def hold!(reason)
+  def hold!(reason, actor: nil)
     return false unless scheduled?
 
     reason = reason.to_s.strip
@@ -262,7 +290,10 @@ class InspectionRequest < ApplicationRecord
       return false
     end
 
-    update!(status: "on_hold", on_hold_reason: reason, on_hold_at: Time.current)
+    transaction do
+      update!(status: "on_hold", on_hold_reason: reason, on_hold_at: Time.current)
+      record_job_event!("on_hold", actor: actor, at: on_hold_at, details: { "reason" => reason })
+    end
   end
 
   def inspector_label
@@ -282,10 +313,13 @@ class InspectionRequest < ApplicationRecord
     [ period_rank, fsp_rank, company_name.to_s.downcase ]
   end
 
-  def complete!
+  def complete!(actor: nil)
     return false unless scheduled?
 
-    update!(status: "completed", completed_at: Time.current)
+    transaction do
+      update!(status: "completed", completed_at: Time.current)
+      record_job_event!("completed", actor: actor, at: completed_at)
+    end
   end
 
   def status_timeline
@@ -526,6 +560,15 @@ class InspectionRequest < ApplicationRecord
   def must_have_at_least_one_crane
     active = cranes.reject(&:marked_for_destruction?)
     errors.add(:base, "Add at least one crane to inspect.") if active.empty?
+  end
+
+  def record_job_event!(action, actor:, at:, details: {})
+    job_events.create!(
+      action: action,
+      user: actor,
+      occurred_at: at || Time.current,
+      details: details.compact
+    )
   end
 
   def generate_share_token

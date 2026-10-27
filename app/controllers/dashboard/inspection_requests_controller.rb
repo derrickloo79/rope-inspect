@@ -47,7 +47,7 @@ module Dashboard
     end
 
     def accept
-      if @inspection_request.accept!
+      if @inspection_request.accept!(actor: current_user)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Request accepted. A public status link is ready."
       else
@@ -57,7 +57,7 @@ module Dashboard
     end
 
     def reject
-      if @inspection_request.reject!
+      if @inspection_request.reject!(actor: current_user)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Request rejected."
       else
@@ -68,7 +68,7 @@ module Dashboard
 
     def cancel
       reason = params.dig(:inspection_request, :cancellation_reason)
-      if @inspection_request.cancel!(reason)
+      if @inspection_request.cancel!(reason, actor: current_user)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Job cancelled."
       elsif @inspection_request.errors[:cancellation_reason].any?
@@ -83,7 +83,7 @@ module Dashboard
 
     def abort
       reason = params.dig(:inspection_request, :abort_reason)
-      if @inspection_request.abort!(reason)
+      if @inspection_request.abort!(reason, actor: current_user)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Job aborted."
       elsif @inspection_request.errors[:abort_reason].any?
@@ -129,7 +129,7 @@ module Dashboard
       end
 
       was_on_hold = @inspection_request.on_hold?
-      if @inspection_request.schedule!(on: on, at: at, fsp: fsp)
+      if @inspection_request.schedule!(on: on, at: at, fsp: fsp, actor: current_user)
         notice = was_on_hold ? "On hold removed. This job is scheduled again." : "Inspection scheduled."
         redirect_to after_schedule_path, notice: notice
       else
@@ -140,7 +140,7 @@ module Dashboard
 
     def hold
       reason = params.dig(:inspection_request, :on_hold_reason)
-      if @inspection_request.hold!(reason)
+      if @inspection_request.hold!(reason, actor: current_user)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Job marked on hold."
       elsif @inspection_request.errors[:on_hold_reason].any?
@@ -154,7 +154,7 @@ module Dashboard
     end
 
     def complete
-      if @inspection_request.complete!
+      if @inspection_request.complete!(actor: current_user)
         redirect_to dashboard_inspection_request_path(@inspection_request),
                     notice: "Marked as completed."
       else
@@ -193,7 +193,7 @@ module Dashboard
 
     def set_inspection_request
       @inspection_request = InspectionRequest
-        .includes(:fsp, cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
+        .includes(:fsp, { job_events: :user }, cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
         .find(params[:id])
     end
 

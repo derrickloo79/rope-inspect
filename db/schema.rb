@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_10_16_143000) do
+ActiveRecord::Schema[7.2].define(version: 2026_10_27_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -114,6 +114,19 @@ ActiveRecord::Schema[7.2].define(version: 2026_10_16_143000) do
     t.index ["status"], name: "index_inspection_requests_on_status"
   end
 
+  create_table "job_events", force: :cascade do |t|
+    t.bigint "inspection_request_id", null: false
+    t.bigint "user_id"
+    t.string "action", null: false
+    t.jsonb "details", default: {}, null: false
+    t.datetime "occurred_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["inspection_request_id", "occurred_at"], name: "index_job_events_on_inspection_request_id_and_occurred_at"
+    t.index ["inspection_request_id"], name: "index_job_events_on_inspection_request_id"
+    t.index ["user_id"], name: "index_job_events_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -133,4 +146,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_10_16_143000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "cranes", "inspection_requests"
   add_foreign_key "inspection_requests", "fsps"
+  add_foreign_key "job_events", "inspection_requests"
+  add_foreign_key "job_events", "users", on_delete: :nullify
 end
