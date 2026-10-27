@@ -10,7 +10,7 @@ module Dashboard
     DATE_SORTS = %w[date_asc date_desc].freeze
     DATE_SORT_STATUSES = %w[pending scheduled completed cancelled aborted].freeze
 
-    helper_method :jobs_index_path
+    helper_method :jobs_index_path, :jobs_list_params, :job_return_params
 
     def index
       @query = params[:q].to_s.strip.presence
@@ -39,7 +39,7 @@ module Dashboard
 
     def update
       if @inspection_request.update(job_details_params)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Inspection details updated."
       else
         render :edit, status: :unprocessable_entity
@@ -48,20 +48,20 @@ module Dashboard
 
     def accept
       if @inspection_request.accept!(actor: current_user)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Request accepted. A public status link is ready."
       else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "Could not accept this request from its current state."
       end
     end
 
     def reject
       if @inspection_request.reject!(actor: current_user)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Request rejected."
       else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "Could not reject this request from its current state."
       end
     end
@@ -69,14 +69,14 @@ module Dashboard
     def cancel
       reason = params.dig(:inspection_request, :cancellation_reason)
       if @inspection_request.cancel!(reason, actor: current_user)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Job cancelled."
       elsif @inspection_request.errors[:cancellation_reason].any?
         @open_cancel_modal = true
         @cancellation_reason_input = reason
         render :show, status: :unprocessable_entity
       else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "Could not cancel this job from its current state."
       end
     end
@@ -84,24 +84,24 @@ module Dashboard
     def abort
       reason = params.dig(:inspection_request, :abort_reason)
       if @inspection_request.abort!(reason, actor: current_user)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Job aborted."
       elsif @inspection_request.errors[:abort_reason].any?
         @open_abort_modal = true
         @abort_reason_input = reason
         render :show, status: :unprocessable_entity
       else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "Could not abort this job from its current state."
       end
     end
 
     def reopen
       if @inspection_request.reopen!
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Request re-opened and moved back to pending."
       else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "Could not re-open this request from its current state."
       end
     end
@@ -141,34 +141,34 @@ module Dashboard
     def hold
       reason = params.dig(:inspection_request, :on_hold_reason)
       if @inspection_request.hold!(reason, actor: current_user)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Job marked on hold."
       elsif @inspection_request.errors[:on_hold_reason].any?
         @open_on_hold_modal = true
         @on_hold_reason_input = reason
         render :show, status: :unprocessable_entity
       else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "Only a scheduled job can be marked on hold."
       end
     end
 
     def complete
       if @inspection_request.complete!(actor: current_user)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Marked as completed."
       else
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "Only scheduled inspections can be completed."
       end
     end
 
     def site_access
       if @inspection_request.completed? && !@inspection_request.site_access?
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "Site access cannot be added after a job is completed."
       elsif @inspection_request.update(site_access_params)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Site access details saved."
       else
         flash.now[:alert] = @inspection_request.errors.full_messages.to_sentence
@@ -178,10 +178,10 @@ module Dashboard
 
     def point_of_contact
       if @inspection_request.completed? && !@inspection_request.point_of_contact?
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     alert: "A point of contact cannot be added after a job is completed."
       elsif @inspection_request.update(point_of_contact_params)
-        redirect_to dashboard_inspection_request_path(@inspection_request),
+        redirect_to job_show_path,
                     notice: "Point of contact saved."
       else
         flash.now[:alert] = @inspection_request.errors.full_messages.to_sentence
@@ -220,6 +220,28 @@ module Dashboard
       params.require(:inspection_request).permit(:map_url, :site_note)
     end
 
+    # The list the admin was looking at, carried onto a job so All jobs can return there.
+    def jobs_list_params
+      sort = @sort == "desc" ? nil : @sort
+      { status: @status_filter, q: @query, sort: sort }.compact
+    end
+
+    # Filter, search, and sort on the job page. After a form post, read them from
+    # the page the form was submitted from so the return link stays intact.
+    def job_return_params
+      source = list_query_source
+      status = list_param(source, :status).presence_in(InspectionRequest::STATUSES)
+      q = list_param(source, :q).to_s.strip.presence
+      sort = list_param(source, :sort).to_s
+      sort = SORT_VALUES.include?(sort) ? sort : nil
+      sort = nil if DATE_SORTS.include?(sort) && !DATE_SORT_STATUSES.include?(status)
+      { status: status, q: q, sort: sort }.compact
+    end
+
+    def job_show_path
+      dashboard_inspection_request_path(@inspection_request, job_return_params)
+    end
+
     # Keeps the current search and drops a sort the destination filter cannot use.
     def jobs_index_path(status: @status_filter, q: @query, sort: @sort)
       sort = nil if sort.blank? || sort == "desc"
@@ -245,6 +267,19 @@ module Dashboard
     end
 
     # Map AM/PM radio values to a time-of-day stored on scheduled_time.
+    def list_query_source
+      return params if request.get? || request.head?
+
+      query = URI.parse(request.referer.to_s).query
+      Rack::Utils.parse_query(query.to_s)
+    rescue URI::InvalidURIError
+      {}
+    end
+
+    def list_param(source, key)
+      source[key] || source[key.to_s]
+    end
+
     def period_to_time(period)
       case period
       when "AM" then Time.zone.parse("09:00")
@@ -261,7 +296,7 @@ module Dashboard
           fsp_id: params[:fsp_filter].presence || params.dig(:inspection_request, :fsp_filter)
         )
       else
-        dashboard_inspection_request_path(@inspection_request)
+        job_show_path
       end
     end
   end

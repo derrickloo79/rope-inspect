@@ -11,7 +11,7 @@
      data-cancel-job-modal-open-value="<%= @open_cancel_modal ? "true" : "false" %>"
      data-abort-job-modal-open-value="<%= @open_abort_modal ? "true" : "false" %>">
   <div class="job-detail-intro">
-    <%= link_to "← All jobs", dashboard_inspection_requests_path, class: "text-sm no-underline text-ink-muted hover:text-ink" %>
+    <%= link_to "← All jobs", dashboard_inspection_requests_path(job_return_params), class: "text-sm no-underline text-ink-muted hover:text-ink" %>
     <div class="mt-3 job-detail-heading">
       <% if @inspection_request.scheduled_on.present? %>
         <div class="job-cal" aria-label="<%= @inspection_request.scheduled_on.strftime("%-d %B") %><%= " #{@inspection_request.scheduled_period}" if @inspection_request.scheduled_period.present? %>">

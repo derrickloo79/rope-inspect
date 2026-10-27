@@ -137,7 +137,7 @@
           <% @inspection_requests.each do |request| %>
             <%= render "shared/job_list_item",
                        request: request,
-                       url: dashboard_inspection_request_path(request) %>
+                       url: dashboard_inspection_request_path(request, jobs_list_params) %>
           <% end %>
         </ul>
       </div>
