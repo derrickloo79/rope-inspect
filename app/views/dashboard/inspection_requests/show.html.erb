@@ -423,28 +423,6 @@
 
     <section class="card">
       <div class="card-section">
-        <h2 class="section-label mb-5">Timeline</h2>
-        <ol>
-          <% @inspection_request.status_timeline.each_with_index do |event, index| %>
-            <li class="flex gap-3 pb-5 last:pb-0">
-              <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold <%= timeline_marker_classes(event) %>">
-                <%= timeline_marker_content(event, index) %>
-              </span>
-              <div>
-                <p class="text-sm font-medium <%= 'text-red-700' if event[:failed] %>"><%= event[:label] %></p>
-                <p class="text-xs text-[--color-ink-muted]">
-                  <%= event[:at].present? ? format_datetime(event[:at]) : "—" %>
-                  <% if event[:detail].present? %> · <%= event[:detail] %><% end %>
-                </p>
-              </div>
-            </li>
-          <% end %>
-        </ol>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="card-section">
         <h2 class="section-label mb-5">Timeline (new)</h2>
         <% if @inspection_request.job_events.any? %>
           <ol class="flex flex-col gap-5">
