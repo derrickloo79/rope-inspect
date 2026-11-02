@@ -13,6 +13,8 @@ module Dashboard
     helper_method :jobs_index_path, :jobs_list_params, :job_return_params
 
     def index
+      @csv_start_on = Date.current.beginning_of_month
+      @csv_end_on = Date.current.end_of_month
       @query = params[:q].to_s.strip.presence
       @status_filter = params[:status].presence_in(InspectionRequest::STATUSES)
       @sort = SORT_VALUES.include?(params[:sort]) ? params[:sort] : "desc"
@@ -29,6 +31,30 @@ module Dashboard
         .includes(:fsp, cranes: { lm_certificate_attachment: :blob, mill_certificates_attachments: :blob })
       scope = scope.where(status: @status_filter) if @status_filter
       @inspection_requests = apply_job_sort(scope)
+    end
+
+    def export
+      start_on = parse_export_date(params[:start_on])
+      end_on = parse_export_date(params[:end_on])
+      statuses = Array(params[:statuses]).map(&:to_s) & InspectionRequest::EXPORT_STATUSES
+
+      if start_on.nil? || end_on.nil? || start_on > end_on || statuses.empty?
+        redirect_to dashboard_inspection_requests_path,
+                    alert: "Choose a start date, an end date, and at least one status."
+        return
+      end
+
+      jobs = InspectionRequest
+        .where(status: statuses)
+        .where(scheduled_on: start_on..end_on)
+        .includes(:fsp, :cranes)
+        .order(Arel.sql("scheduled_on ASC, scheduled_time ASC NULLS LAST, id ASC"))
+
+      response.headers["Cache-Control"] = "no-store"
+      send_data InspectionJobCsv.new(jobs).to_s,
+                filename: "inspection-jobs-#{start_on.iso8601}-to-#{end_on.iso8601}.csv",
+                type: "text/csv; charset=utf-8",
+                disposition: "attachment"
     end
 
     def show
@@ -342,6 +368,12 @@ module Dashboard
 
     def list_param(source, key)
       source[key] || source[key.to_s]
+    end
+
+    def parse_export_date(value)
+      Date.iso8601(value.to_s)
+    rescue ArgumentError, TypeError
+      nil
     end
 
     def period_to_time(period)

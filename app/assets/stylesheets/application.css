@@ -23,6 +23,11 @@
   border-radius: 0.5rem;
 }
 
+/* Jobs CSV modal sits at z-index 60, so its calendar has to paint above it. */
+.flatpickr-calendar.job-csv-calendar {
+  z-index: 80 !important;
+}
+
 .flatpickr-alt-input {
   width: 100%;
   cursor: pointer;
@@ -35,6 +40,13 @@
 .flatpickr-day.selected:hover {
   background: #1d4ed8;
   border-color: #1d4ed8;
+}
+
+.flatpickr-day.inRange,
+.flatpickr-day.inRange:hover {
+  background: #dbeafe;
+  border-color: #dbeafe;
+  box-shadow: none;
 }
 
 .flatpickr-months .flatpickr-month {

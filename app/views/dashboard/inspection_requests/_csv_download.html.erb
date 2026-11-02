@@ -1,0 +1,121 @@
+<%# Download control + dialog. Rendered as the first item in .job-list-actions. %>
+<div class="job-csv-download"
+     data-controller="job-csv-download"
+     data-action="keydown@window->job-csv-download#keydown click@window->job-csv-download#outside change->job-csv-download#clearError input->job-csv-download#clearError">
+  <button type="button"
+          class="job-list-filter__button job-csv-download__button"
+          data-action="job-csv-download#show"
+          aria-label="Download as CSV"
+          aria-haspopup="dialog">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" x2="12" y1="15" y2="3" />
+    </svg>
+  </button>
+  <span class="job-csv-download__tooltip" role="tooltip">Download as CSV</span>
+
+  <div class="planner-schedule-modal"
+       data-job-csv-download-target="dialog"
+       data-action="click->job-csv-download#backdropClose"
+       hidden>
+    <div class="planner-schedule-modal__dialog job-csv-download-modal__dialog"
+         data-job-csv-download-target="panel"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="job-csv-title"
+         tabindex="-1">
+      <div class="planner-schedule-modal__header">
+        <h2 id="job-csv-title" class="planner-schedule-modal__title">Download as CSV</h2>
+        <button type="button"
+                class="planner-schedule-modal__close"
+                data-action="job-csv-download#hide"
+                aria-label="Close">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6L6 18" />
+            <path d="M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <%= form_with url: export_dashboard_inspection_requests_path,
+                    method: :get,
+                    html: {
+                      class: "flex flex-col gap-4",
+                      data: { turbo: false, action: "submit->job-csv-download#submit" }
+                    } do %>
+        <p class="job-csv-download-modal__lead">Jobs that can be downloaded are only scheduled, completed, or aborted.</p>
+
+        <div class="error-list" role="alert" tabindex="-1" data-job-csv-download-target="error" hidden>
+          <p>Choose a start date, an end date, and at least one status.</p>
+        </div>
+
+        <div data-controller="date-range-picker"
+             data-date-range-picker-start-value="<%= @csv_start_on.iso8601 %>"
+             data-date-range-picker-end-value="<%= @csv_end_on.iso8601 %>">
+          <label class="field-label" for="job-csv-range">Date range</label>
+          <input type="text"
+                 id="job-csv-range"
+                 class="field-input"
+                 placeholder="Select a start and end date"
+                 autocomplete="off"
+                 data-date-range-picker-target="input">
+          <input type="hidden"
+                 name="start_on"
+                 value="<%= @csv_start_on.iso8601 %>"
+                 data-date-range-picker-target="start"
+                 data-job-csv-download-target="start">
+          <input type="hidden"
+                 name="end_on"
+                 value="<%= @csv_end_on.iso8601 %>"
+                 data-date-range-picker-target="end"
+                 data-job-csv-download-target="end">
+          <p class="field-hint">Jobs are included when their scheduled date falls in this range.</p>
+        </div>
+
+        <div class="job-csv-statuses" data-job-csv-download-target="statuses">
+          <span class="field-label" id="job-csv-status-label">Status</span>
+          <button type="button"
+                  class="field-select job-csv-statuses__button"
+                  data-job-csv-download-target="statusButton"
+                  data-action="job-csv-download#toggleStatuses"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  aria-controls="job-csv-status-menu"
+                  title="<%= InspectionRequest::EXPORT_STATUSES.map { |status| status_label(status) }.join(", ") %>">
+            <span class="job-csv-statuses__summary" data-job-csv-download-target="statusSummary">
+              <%= InspectionRequest::EXPORT_STATUSES.map { |status| status_label(status) }.join(", ") %>
+            </span>
+          </button>
+          <div class="job-csv-statuses__menu"
+               id="job-csv-status-menu"
+               data-job-csv-download-target="statusMenu"
+               role="group"
+               aria-labelledby="job-csv-status-label"
+               hidden>
+            <% InspectionRequest::EXPORT_STATUSES.each do |status| %>
+              <label class="job-csv-statuses__option">
+                <input type="checkbox"
+                       name="statuses[]"
+                       value="<%= status %>"
+                       checked
+                       data-label="<%= status_label(status) %>"
+                       data-action="change->job-csv-download#statusChanged">
+                <span><%= status_label(status) %></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <button type="button" class="btn-secondary w-full sm:w-auto cursor-pointer" data-action="job-csv-download#hide">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary w-full sm:w-auto cursor-pointer">
+            Download
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

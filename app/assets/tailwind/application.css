@@ -1475,6 +1475,117 @@
     flex-shrink: 0;
   }
 
+  .job-csv-download {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .job-csv-download__tooltip {
+    position: absolute;
+    z-index: 30;
+    left: 50%;
+    bottom: calc(100% + 0.5rem);
+    transform: translateX(-50%);
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-line-strong);
+    background: #fff;
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .job-csv-download__button:hover + .job-csv-download__tooltip,
+  .job-csv-download__button:focus-visible + .job-csv-download__tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .job-csv-download-modal__dialog {
+    max-width: 32rem;
+  }
+
+  .job-csv-download-modal__dialog:focus {
+    outline: none;
+  }
+
+  .job-csv-download-modal__lead {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+  }
+
+  .job-csv-statuses {
+    position: relative;
+  }
+
+  button.field-select.job-csv-statuses__button {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .job-csv-statuses__summary {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .job-csv-statuses__summary.is-empty {
+    color: var(--color-ink-faint);
+  }
+
+  .job-csv-statuses__menu {
+    position: absolute;
+    z-index: 5;
+    left: 0;
+    right: 0;
+    top: calc(100% + 0.25rem);
+    padding: 0.25rem;
+    background: #fff;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .job-csv-statuses__menu[hidden] {
+    display: none !important;
+  }
+
+  .job-csv-statuses__option {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    line-height: 1.25;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+
+  .job-csv-statuses__option:hover {
+    background-color: #f5f5f4;
+  }
+
+  .job-csv-statuses__option input {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    accent-color: var(--color-accent);
+    flex-shrink: 0;
+  }
+
   .job-list-filter {
     position: relative;
     flex-shrink: 0;

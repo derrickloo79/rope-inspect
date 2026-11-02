@@ -1,5 +1,8 @@
 class InspectionRequest < ApplicationRecord
   STATUSES = %w[pending accepted scheduled on_hold completed rejected cancelled aborted].freeze
+  # CSV download on the jobs index. Cancelled jobs stay out, along with
+  # pending, accepted, on hold, and rejected.
+  EXPORT_STATUSES = %w[scheduled completed aborted].freeze
   ON_HOLD_REASON_MAX = 1000
   CANCELLATION_REASON_MAX = 1000
   ABORT_REASON_MAX = 1000
