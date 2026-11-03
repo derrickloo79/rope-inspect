@@ -69,19 +69,28 @@ class InspectionRequest < ApplicationRecord
     like = "%#{sanitize_sql_like(term)}%"
     # "FSP 3" matches the stored number "FSP3".
     fsp_number_like = "%#{sanitize_sql_like(term.gsub(/\s+/, ""))}%"
-    sql = <<~SQL.squish
-      inspection_requests.site_name ILIKE :like
-      OR inspection_requests.company_name ILIKE :like
-      OR inspection_requests.requestor_name ILIKE :like
-      OR fsps.full_name ILIKE :like
-      OR fsps.fsp_number ILIKE :fsp_number_like
-    SQL
-    binds = { like: like, fsp_number_like: fsp_number_like }
-    if term.match?(/\A\s*(?:RI[-\s]?)?\d+\s*\z/i)
-      sql += " OR inspection_requests.id = :job_id"
-      binds[:job_id] = term.gsub(/\D/, "").to_i
-    end
-    where(id: left_joins(:fsp).where(sql, binds).select("inspection_requests.id"))
+    # One SQL literal, so Brakeman does not treat the bound query as injection.
+    # A nil job id makes the id clause false. The cast gives Postgres a type.
+    job_id = term.match?(/\A\s*(?:RI[-\s]?)?\d+\s*\z/i) ? term.gsub(/\D/, "").to_i : nil
+
+    matches = left_joins(:fsp).where(
+      <<~SQL.squish,
+        inspection_requests.site_name ILIKE :like
+        OR inspection_requests.company_name ILIKE :like
+        OR inspection_requests.requestor_name ILIKE :like
+        OR fsps.full_name ILIKE :like
+        OR fsps.fsp_number ILIKE :fsp_number_like
+        OR (
+          CAST(:job_id AS integer) IS NOT NULL
+          AND inspection_requests.id = CAST(:job_id AS integer)
+        )
+      SQL
+      like: like,
+      fsp_number_like: fsp_number_like,
+      job_id: job_id
+    ).select("inspection_requests.id")
+
+    where(id: matches)
   end
   scope :for_fsp, ->(fsp) { where(fsp_id: fsp.id) }
   scope :upcoming_within, ->(days = 7) {

@@ -6,8 +6,10 @@ on:
     branches: [ main ]
 
 jobs:
+  # ubuntu-latest is 26.04, which only ships the newest patch of each Ruby
+  # series. Ruby 3.1.4 is still published for 24.04, and that is the app target.
   scan_ruby:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -23,7 +25,7 @@ jobs:
         run: bundle exec bin/brakeman --no-pager -i config/brakeman.ignore
 
   scan_js:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -39,7 +41,7 @@ jobs:
         run: bundle exec bin/importmap audit
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
